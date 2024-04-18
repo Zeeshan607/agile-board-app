@@ -1,0 +1,21 @@
+.board-column-btn{
+    width: 100%;
+    display:inline-flex;
+    flex-direction: row;
+    align-items: center;
+    padding:10px 15px;
+    vertical-align: middle;
+    cursor: pointer;
+    color:rgba(0, 0, 0, 0.493);
+    border-radius: 10px;
+
+}
+.board-column-btn:hover{
+    text-decoration: none;
+    color:black;
+    background-color: rgba(128, 128, 128, 0.39);
+}
+.board-column-btn i{
+    margin-right:5px;
+
+}

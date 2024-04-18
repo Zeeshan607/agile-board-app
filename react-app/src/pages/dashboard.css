@@ -1,0 +1,20 @@
+.board-view-card{
+    height:100px;
+    width:150px;
+    margin:10px;
+    vertical-align: middle;
+    text-align: center;
+    transition:border .1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-weight: 500;
+    text-transform: uppercase;
+    border:1px solid pink;
+}
+.board-view-card:hover{
+    border: 2px solid pink!important;
+    box-shadow: 0px 0px 15px #ffc0cb9c;
+    text-decoration: none;
+    cursor: pointer;
+}

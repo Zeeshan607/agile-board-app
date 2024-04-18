@@ -1,0 +1,22 @@
+.kanban-container{
+    .board{
+        width:450px;
+        margin:10px;
+            .tasks-list{
+                .task{
+                    background-color:rgb(245 247 251)!important;
+                    padding:10px;
+                    margin:5px 0px;
+                    border-radius: 5px;
+                    border:1px solid rgba(179, 179, 179, 0.664);
+                    .task-link {
+                        text-decoration: none;
+                        cursor: pointer;
+                    }
+                    .task-header{
+                        margin-bottom:10px;
+                    }
+                }
+            }
+    }
+}
