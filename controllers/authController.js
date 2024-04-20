@@ -13,11 +13,18 @@ class AuthController{
 
   constructor(){}
 
+
+  async isExistingUser(email){
+    const user = await User.findOne({where:{email:email}});
+    return user?true:false;
+   }
+
+
   // register function
   async register(req, res){
 
     const isFirstAccount = (await User.count()) === 0;
-    req.body.role = isFirstAccount ? 'admin' : 'user';
+    req.body.role = isFirstAccount && !isExistingUser(req.body.email) ? 'admin' : 'user';
     const hashedPass= await hashMake(req.body.password);
     req.body.password=hashedPass;
 
@@ -26,6 +33,10 @@ class AuthController{
     if(!user) throw new BadRequestError("OOPs! something went wrong. please try again");
     return res.status(StatusCodes.OK).json({ msg:"Account Created successfully", });
   }
+
+
+ 
+
 
 // login function
   async login(req, res){

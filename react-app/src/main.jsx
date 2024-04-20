@@ -4,7 +4,7 @@ import Store from "./app/store.js";
 import { createRoot } from "react-dom/client";
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-responsive-modal/styles.css';
-import {ToastContainer } from 'react-toastify';
+import {toast, ToastContainer } from 'react-toastify';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -15,6 +15,10 @@ import {
 import { PersistGate } from 'redux-persist/integration/react';
 import {persistStore} from 'redux-persist';
 import router from './routes.jsx';
+
+
+// global variables
+window.toast= toast;
 
 
 
