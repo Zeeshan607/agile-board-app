@@ -1,5 +1,9 @@
 # Agile Board
 
+- Current Status
+    Under Development 
+
+
 - Description
 
     My first SERN(using MySQL as Database) stack app. its just basic clone of Trello [https://trello.com/]
