@@ -20,7 +20,7 @@ const BoardColumn = sequelize.define('BoardColumn', {
         allowNull:false
     },
     boardId:{
-        type:DataTypes.BIGINT.UNSIGNED,
+        type:DataTypes.INTEGER,
         allowNull:false
     },
     order:{

@@ -10,12 +10,6 @@ import AddBoard from "./pages/addBoard.jsx";
 import BoardView from "./pages/boardView.jsx";
 
 
-
-
-
-
-
-
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -37,19 +31,6 @@ const router = createBrowserRouter([
         path:'/users',
         element:<Users/>
       },
-      // {
-      //   path:'/projects',
-      //   element:<Projects/>,
-      
-      // },
-      // {
-      //   path:"/add-project",
-      //   element:<AddProject/>
-      // },
-      // {
-      //   path:"/edit-project/:id",
-      //   element:<EditProject/>
-      // },
       {
         path: "/boards",
         element: <Board />,

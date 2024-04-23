@@ -18,18 +18,18 @@ const Dashboard = () => {
       if(!selectedBoard){
           // boards.filter()
       }
-      loadBoardColumns(selectedBoard)
+      // loadBoardColumns(selectedBoard)
   }, [selectedBoard]);
 
 
-    const loadBoardColumns=async(board)=>{
-        try{
-              const resp= await CustomRequest.get(`/dashboard/boards/columns/${board}`);
+    // const loadBoardColumns=async(board)=>{
+    //     try{
+    //           const resp= await CustomRequest.get(`/dashboard/boards/columns/${board}`);
 
-        }catch(err){
-          toast.error(err.response?.data?.msg);
-        }
-    }
+    //     }catch(err){
+    //       toast.error(err.response?.data?.msg);
+    //     }
+    // }
 
 
   

@@ -29,8 +29,8 @@ class AuthController{
     req.body.password=hashedPass;
 
   const user=await User.create(req.body);
- 
     if(!user) throw new BadRequestError("OOPs! something went wrong. please try again");
+    
     return res.status(StatusCodes.OK).json({ msg:"Account Created successfully", });
   }
 
@@ -51,7 +51,7 @@ class AuthController{
     if (!isValidUser) throw new UnauthenticatedError('invalid credentials');
 
 
-    let token = createJwt({'userId':user.id,"role":user.role,"email":user.email});
+    let token = createJwt({'userId':user.id,"role":user.role,"email":user.email,"name":user.username});
 
     const oneDay= 1000*60*60*24;//converting one Day into milliseconds
 
@@ -62,7 +62,7 @@ class AuthController{
       secure: config.node_env === "production",
     })
 
-    res.status(StatusCodes.OK).json({token, "user":user, msg:"User login successfully"})
+    res.status(StatusCodes.OK).json({token, msg:"User login successfully"})
     
 
   }

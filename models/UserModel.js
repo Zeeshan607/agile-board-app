@@ -1,5 +1,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
+import Role from "./RoleModel.js";
+import User_Has_Roles from './User_Has_Roles.js';
 
 const User = sequelize.define('User', {
     // Define model attributes
@@ -17,22 +19,39 @@ const User = sequelize.define('User', {
             allowNull: false,
             unique: true
         },
-        role:{
-            type: DataTypes.STRING,
-            allowNull:false,
+    
+        role_id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            reference:{
+                model:Role,
+                key:'id'
+            }
         },
         password: {
             type: DataTypes.STRING,
             allowNull: false
         }
 
-})
+});
+// Relations
+User.hasMany(Role,{foreignKey:"role_id",onDelete: 'CASCADE',as:"Roles"});
+Role.belongsTo(User,{as:"Role"})
 
-User.prototype.passwordLessUser=function(){
-   
-}
 
-export default  User;
+        
+//Methods
+User.prototype.hideSensitiveInfo=function(){
+   // Create a copy of the instance object
+  const instance = this.toJSON();
+  // Remove sensitive properties from the copy
+  delete instance.password;
+
+  return instance;
+
+};
+
+export default User;
 
 
 

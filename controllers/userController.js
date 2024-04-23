@@ -1,5 +1,7 @@
 import User from "../models/UserModel.js";
 import { hashMake } from "../utils/helpers.js";
+import { StatusCodes } from "http-status-codes";
+
 
 class UserController {
 

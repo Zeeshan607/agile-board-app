@@ -1,12 +1,11 @@
 
 import {DataTypes} from 'sequelize';
-
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import BoardColumn from './BoardColumnModel.js';
-import User from './UserModel.js';
+// import User from './UserModel.js';
 
 
-const Task = sequelize.define('task', {
+const Task = sequelize.define('Task', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -32,10 +31,10 @@ const Task = sequelize.define('task', {
     assigned_to:{
             type:DataTypes.INTEGER,
             allowNull:true,
-            references:{
-                model:User,
-                key:'id',
-            }
+            // references:{
+            //     model:User,
+            //     key:'id',
+            // }
     },
     column_id:{
         type:DataTypes.INTEGER,
@@ -47,8 +46,6 @@ const Task = sequelize.define('task', {
        
 
     }
-
-
 });
 //example of model relation defination in squalize model
 // User.hasMany(Post, { onDelete: 'CASCADE' });

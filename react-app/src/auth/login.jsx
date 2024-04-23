@@ -8,6 +8,10 @@ import {
   setUserLoginStatus,
 } from "../features/UserAuthSlice.js";
 
+import {jwtDecode} from 'jwt-decode'
+
+
+
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
@@ -15,25 +19,27 @@ function Login() {
   const dispatch = useDispatch();
   const token = useSelector(selectAuthToken);
 
-  
+  // component on load logic
   useEffect(() => {
     if (token) {
       navigate("/");
     }
   }, [navigate]);
 
+
+
+// handle user login
   const onLogin = async (e) => {
     e.preventDefault();
-
     const data = {
-      email: form.email,
-      password: form.password,
-    };
+          email: form.email,
+          password: form.password,
+        };
 
     try {
       const resp = await CustomRequest.post("/auth/login", data);
       const token = await resp.data?.token;
-      const user = await resp.data?.user;
+      const user = jwtDecode(token);
       dispatch(setUserLoginStatus({ token, user }));
       toast.success(resp.data?.msg);
       navigate("/");
@@ -42,6 +48,11 @@ function Login() {
       toast.error(err.response?.data?.msg);
     }
   };
+
+
+
+
+
 
   return (
     <main className="d-flex w-100">

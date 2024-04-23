@@ -1,6 +1,7 @@
 
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
+import User from './UserModel.js';
 
 const Board = sequelize.define('Board', {
     // Define model attributes
@@ -23,7 +24,11 @@ const Board = sequelize.define('Board', {
     },
     createdBy:{
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        reference:{
+            model:User,
+            key:'id'
+        }
     },
   
     is_deleted:{
