@@ -21,13 +21,16 @@ import AppResponse from "./components/AppResponse.jsx";
 import {
   selectBoardsList,
   setBoardsList,
-  selectLoadedBoard,
-  setLoadedBoard,
 } from "./features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
+import { jwtDecode } from "jwt-decode";
+
+
 
 const App = () => {
+
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
@@ -38,14 +41,16 @@ const App = () => {
   const onCloseCreateBoardModal = () => setOpen(false);
   const location = useLocation();
   const { hash, pathname, search } = location;
-
+  const currentUser= authToken?jwtDecode(authToken):null;
 
   useEffect(() => {
-    if (!authToken) {
+    if (!authToken ) {
       navigate("/login");
     }
+
     loadBoards();
   },[]);
+  
 
   const Logout = async () => {
     try {
@@ -263,7 +268,7 @@ const App = () => {
                         <div className="row g-0 align-items-center">
                           <div className="col-2">
                             <img
-                              src="public/img/avatars/avatar-2.jpg"
+                              src="/img/avatars/avatar-2.jpg"
                               className="avatar img-fluid rounded-circle"
                               alt="William Harris"
                             />
@@ -281,7 +286,7 @@ const App = () => {
                         <div className="row g-0 align-items-center">
                           <div className="col-2">
                             <img
-                              src="public/img/avatars/avatar-4.jpg"
+                              src="img/avatars/avatar-4.jpg"
                               className="avatar img-fluid rounded-circle"
                               alt="Christina Mason"
                             />
@@ -299,7 +304,7 @@ const App = () => {
                         <div className="row g-0 align-items-center">
                           <div className="col-2">
                             <img
-                              src="public/img/avatars/avatar-3.jpg"
+                              src="/img/avatars/avatar-3.jpg"
                               className="avatar img-fluid rounded-circle"
                               alt="Sharon Lessman"
                             />
@@ -337,11 +342,17 @@ const App = () => {
                     data-bs-toggle="dropdown"
                   >
                     <img
-                      src="public/img/avatars/avatar.jpg"
+                      src="/img/avatars/avatar.jpg"
                       className="avatar img-fluid rounded me-1"
                       alt="Charles Hall"
                     />{" "}
-                    <span className="text-dark">Charles Hall</span>
+{
+        currentUser?(
+          <span className="text-dark">{currentUser.name}</span>
+        ):''
+}
+                  
+
                   </a>
                   <div className="dropdown-menu dropdown-menu-end">
                     <a className="dropdown-item" href="pages-profile.html">

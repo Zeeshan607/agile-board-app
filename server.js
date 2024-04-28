@@ -53,24 +53,24 @@ app.use('/api/v1/', Route);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 
-sequelize.sync({ force: false }) // Set force to true to drop existing tables and recreate them
+sequelize.sync({ force: false })// Set force to true to drop existing tables and recreate them
     .then(() => {
         console.log('Database synchronized successfully');
-    })
-    .catch((error) => {
-        console.error('Error synchronizing database:', error);
+        app.listen(config.port, async () => {
+          // await mongoos.connect(config.mongodb_uri);
+          console.log(`Server is running on port ${config.port} `);
+        });
+    }).catch((error) => {
+        // console.error('Error synchronizing database:', error);
+        console.error('Error: '+ err);
+        process.exit(1);
     });
 
 
-try{
-// Start the server
-app.listen(config.port, async () => {
-  // await mongoos.connect(config.mongodb_uri);
+// try{
+// // Start the server
 
-  console.log(`Server is running on port ${config.port} `);
-
-});
-}catch(err){
-  console.log('Error: '+ err);
-  process.exit(1);
-}
+// }catch(err){
+//   console.log('Error: '+ err);
+//   process.exit(1);
+// }

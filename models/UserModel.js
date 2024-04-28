@@ -1,7 +1,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import Role from "./RoleModel.js";
-import User_Has_Roles from './User_Has_Roles.js';
+
 
 const User = sequelize.define('User', {
     // Define model attributes
@@ -35,9 +35,8 @@ const User = sequelize.define('User', {
 
 });
 // Relations
-User.hasMany(Role,{foreignKey:"role_id",onDelete: 'CASCADE',as:"Roles"});
-Role.belongsTo(User,{as:"Role"})
-
+Role.hasMany(User,{onDelete: 'CASCADE',foreignKey:{ allowNull: false,name:"role_id"}});
+User.belongsTo(Role,{as:"Role", foreignKey:{ allowNull: false,name:"role_id"}});
 
         
 //Methods

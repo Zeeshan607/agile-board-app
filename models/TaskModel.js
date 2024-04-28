@@ -2,7 +2,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import BoardColumn from './BoardColumnModel.js';
-// import User from './UserModel.js';
+import User from './UserModel.js';
 
 
 const Task = sequelize.define('Task', {
@@ -31,10 +31,10 @@ const Task = sequelize.define('Task', {
     assigned_to:{
             type:DataTypes.INTEGER,
             allowNull:true,
-            // references:{
-            //     model:User,
-            //     key:'id',
-            // }
+            references:{
+                model:User,
+                key:'id',
+            }
     },
     column_id:{
         type:DataTypes.INTEGER,
@@ -48,11 +48,11 @@ const Task = sequelize.define('Task', {
     }
 });
 //example of model relation defination in squalize model
-// User.hasMany(Post, { onDelete: 'CASCADE' });
-// Post.belongsTo(User);
 
-BoardColumn.hasMany(Task,{foreignKey:"column_id",onDelete: 'CASCADE',as:"Tasks"});
-Task.belongsTo(BoardColumn,{as:'Columns'});
+// Task.belongsTo(User,{as:"assigned_task", foreignKey:{ allowNull: false,name:"assigned_to"}});
+
+BoardColumn.hasMany(Task,{foreignKey:{ allowNull: false,name:"column_id"},onDelete: 'CASCADE',as:"Tasks"});
+Task.belongsTo(BoardColumn,{as:'Columns',onDelete: 'RESTRICT',foreignKey:{ allowNull: false,name:"column_id"}});
 
 
 export default Task;

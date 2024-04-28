@@ -6,25 +6,32 @@ import {StatusCodes}  from 'http-status-codes';
 import config from "../config/default.js";
 import  Board from "../models/BoardModel.js";
 import { hashMake } from "../utils/helpers.js";
+import Role from "../models/RoleModel.js";
 
 
 
-class AuthController{
+
+async function isExistingUser(email){
+    
+  const user = await User.findOne({where:{email:email}});
+  return user?true:false;
+ }
+
+
+
+class AuthController {
 
   constructor(){}
 
 
-  async isExistingUser(email){
-    const user = await User.findOne({where:{email:email}});
-    return user?true:false;
-   }
-
-
   // register function
   async register(req, res){
-
+  //  console.log(this.hello)
     const isFirstAccount = (await User.count()) === 0;
-    req.body.role = isFirstAccount && !isExistingUser(req.body.email) ? 'admin' : 'user';
+    const isExisting=await isExistingUser(req.body.email);
+
+    req.body.role_id = isFirstAccount && !isExisting ? '1' : '3';
+
     const hashedPass= await hashMake(req.body.password);
     req.body.password=hashedPass;
 
@@ -42,7 +49,7 @@ class AuthController{
   async login(req, res){
 
     // console.log(req.body)
-    const user = await User.findOne({where:{ email: req.body.email }});
+    const user = await User.findOne({where:{ email: req.body.email }, include:[{model:Role,as:"Role",required:true,}]});
     const isValidUser =user && (await comparePassword(
       req.body.password,
       user.password
@@ -50,8 +57,8 @@ class AuthController{
 
     if (!isValidUser) throw new UnauthenticatedError('invalid credentials');
 
-
-    let token = createJwt({'userId':user.id,"role":user.role,"email":user.email,"name":user.username});
+console.log(user);
+    let token = createJwt({'userId':user.id,"role":user.Role?.title,"email":user.email,"name":user.username});
 
     const oneDay= 1000*60*60*24;//converting one Day into milliseconds
 
@@ -83,8 +90,4 @@ res.status(StatusCodes.OK).json({msg:"user logged out"});
 
 
 
-
-
-
-
-export default new AuthController()
+export default new AuthController();
