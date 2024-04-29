@@ -10,9 +10,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-     this.hasMany(models.permission, {
+     this.belongsToMany(models.permission, {
         onDelete: "CASCADE",
         through: [models.role_has_permission],
+        foreignKey:'role_id',
+        as:'roles'
       });
     }
   }

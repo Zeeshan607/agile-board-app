@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
      this.belongsToMany(models.roles, {
         onDelete: "CASCADE",
         through: [models.role_has_permission],
+        foreignKey:'permission_id',
+        as:'permissions'
       });
     }
   }

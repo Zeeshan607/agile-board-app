@@ -1,6 +1,7 @@
-import {Model, DataTypes} from 'sequelize';
-import sequelize from '../db';
+import {Model} from 'sequelize';
 
+
+module.exports = (sequelize, DataTypes) => {
   class Role_Has_Permission extends Model {
     /**
      * Helper method for defining associations.
@@ -9,6 +10,12 @@ import sequelize from '../db';
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.Role, {
+        foreignKey:'role_id',
+      });
+      this.belongsTo(models.Permission, {
+        foreignKey:'permission_id',
+      });
     }
   }
 Role_Has_Permission.init({
@@ -19,4 +26,5 @@ Role_Has_Permission.init({
     modelName: 'Role_Has_Permission',
   });
 
-export default Role_Has_Permission;
+return Role_Has_Permission;
+}

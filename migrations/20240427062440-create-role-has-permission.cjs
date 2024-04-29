@@ -11,10 +11,20 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       role_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references:{
+          model:'roles',
+          key:'id'
+        }
       },
       permission_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references:{
+          model:'permissions',
+          key:'id'
+        }
       },
       createdAt: {
         allowNull: false,

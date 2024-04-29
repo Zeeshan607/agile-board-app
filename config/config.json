@@ -5,7 +5,8 @@
     "password": "",
     "database": "kanban-board",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": "console.log"
   },
   "test": {
     "username": "root",
