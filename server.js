@@ -60,7 +60,7 @@ sequelize.sync({ force: false })// Set force to true to drop existing tables and
           // await mongoos.connect(config.mongodb_uri);
           console.log(`Server is running on port ${config.port} `);
         });
-    }).catch((error) => {
+    }).catch((err) => {
         // console.error('Error synchronizing database:', error);
         console.error('Error: '+ err);
         process.exit(1);

@@ -6,7 +6,7 @@ import {StatusCodes}  from 'http-status-codes';
 import config from "../config/default.js";
 import  Board from "../models/BoardModel.js";
 import { hashMake } from "../utils/helpers.js";
-import Role from "../models/RoleModel.js";
+import Role from "../models/Role.js";
 
 
 
