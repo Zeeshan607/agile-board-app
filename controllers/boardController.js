@@ -1,4 +1,3 @@
-import {nanoid} from 'nanoid';
 import Board from '../models/BoardModel.js';
 import BoardColumn from '../models/BoardColumnModel.js';
 import StatusCodes from 'http-status-codes';

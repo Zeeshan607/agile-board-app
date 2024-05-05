@@ -47,8 +47,8 @@ const App = () => {
     if (!authToken ) {
       navigate("/login");
     }
-
-    loadBoards();
+LoadWorkspace();
+   
   },[]);
   
 
@@ -63,25 +63,47 @@ const App = () => {
   };
 
 
-  const loadBoards = async () => {
+
+      const  LoadWorkspace = async ()=>{
     setIsLoading(true);
     try {
-      const resp = await CustomRequest.get(`dashboard/boards`);
-      const boards = await resp.data;
-
-      boards.sort((a, b) => a.id - b.id);
-      dispatch(setBoardsList({ boards: boards }));
+      const resp = await CustomRequest.get(`/dashboard/workspaces`);
+      const wss = await resp.data;
+      const ws_sorted=[]
+           wss.map(ws=>{
+        if(ws.admin){
+          ws_sorted.push(ws);
+        }else{
+          ws_sorted.shared.push(ws)
+        }
+       
+           })
+console.log(ws_sorted)
+      // dispatch(setworkspaceList({ workspace: ws }));
       setIsLoading(false);
     } catch (err) {
       toast.error(err.response?.data?.msg);
       setIsLoading(false);
     }
-  };
+
+      }
 
 
 
+  // const loadBoards = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const resp = await CustomRequest.get(`dashboard/boards`);
+  //     const boards = await resp.data;
 
-
+  //     boards.sort((a, b) => a.id - b.id);
+  //     dispatch(setBoardsList({ boards: boards }));
+  //     setIsLoading(false);
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.msg);
+  //     setIsLoading(false);
+  //   }
+  // };
 
 
   const boards = useSelector(selectBoardsList);

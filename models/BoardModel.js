@@ -2,7 +2,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import User from './UserModel.js';
-
+import Workspace from './workspace.js';
 const Board = sequelize.define('Board', {
     // Define model attributes
     id: {
@@ -18,18 +18,26 @@ const Board = sequelize.define('Board', {
         type: DataTypes.STRING,
         allowNull:false
     },
+    workspace_id:{
+        type:DataTypes.UUIDV1,
+        allowNull:false,
+        references:{
+            model:Workspace,
+            key:'id'
+        }
+    },
     description:{
         type:DataTypes.STRING,
         allowNull:false
     },
-    createdBy:{
-        type:DataTypes.INTEGER,
-        allowNull:false,
-        reference:{
-            model:User,
-            key:'id'
-        }
-    },
+    // createdBy:{
+    //     type:DataTypes.INTEGER,
+    //     allowNull:false,
+    //     references:{
+    //         model:User,
+    //         key:'id'
+    //     }
+    // },
   
     is_deleted:{
         type:DataTypes.DATE,

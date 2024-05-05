@@ -1,7 +1,8 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import Role from './Role.js';
-
+import Workspace from './workspace.js';
+import UserWorkspace from './UserWorkspace.js'
 
 const User = sequelize.define('User', {
     // Define model attributes
@@ -19,26 +20,41 @@ const User = sequelize.define('User', {
             allowNull: false,
             unique: true
         },
-    
-        role_id:{
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            reference:{
-                model:Role,
-                key:'id'
-            }
-        },
+        // role_id:{
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false,
+        //     reference:{
+        //         model:Role,
+        //         key:'id'
+        //     }
+        // },
         password: {
             type: DataTypes.STRING,
             allowNull: false
         }
 
 });
-// Relations
-Role.hasMany(User,{onDelete: 'CASCADE',foreignKey:{ allowNull: false,name:"role_id"}});
-User.belongsTo(Role,{as:"Role", foreignKey:{ allowNull: false,name:"role_id"}});
 
-        
+// Relations
+// Role.hasMany(User,{onDelete: 'CASCADE',foreignKey:{ allowNull: false,name:"role_id"}});
+// User.belongsTo(Role,{as:"Role", foreignKey:{ allowNull: false,name:"role_id"}});
+       
+
+User.belongsToMany(Workspace,{
+onDelete: "CASCADE",
+through: UserWorkspace,
+foreignKey:'user_id',
+constraints:false,
+as:'workspace'})
+
+Workspace.belongsToMany(User, {
+    onDelete: "RESTRICT",
+    through:UserWorkspace,
+    foreignKey:'workspace_id',
+    constraints:false,
+    as:'users',
+})
+
 //Methods
 User.prototype.hideSensitiveInfo=function(){
    // Create a copy of the instance object
@@ -49,6 +65,11 @@ User.prototype.hideSensitiveInfo=function(){
   return instance;
 
 };
+
+
+
+
+
 
 export default User;
 

@@ -7,6 +7,7 @@ import config from "../config/default.js";
 import  Board from "../models/BoardModel.js";
 import { hashMake } from "../utils/helpers.js";
 import Role from "../models/Role.js";
+import Workspace from "../models/workspace.js";
 
 
 
@@ -27,15 +28,19 @@ class AuthController {
   // register function
   async register(req, res){
   //  console.log(this.hello)
-    const isFirstAccount = (await User.count()) === 0;
-    const isExisting=await isExistingUser(req.body.email);
+    // const isFirstAccount = (await User.count()) === 0;
+    // const isExisting=await isExistingUser(req.body.email);
 
-    req.body.role_id = isFirstAccount && !isExisting ? '1' : '3';
+    // req.body.role_id = isFirstAccount && !isExisting ? '1' : '3';
 
     const hashedPass= await hashMake(req.body.password);
     req.body.password=hashedPass;
 
-  const user=await User.create(req.body);
+    req.body.workspace={title:"Agile-Workspace",admin:1};
+
+  const user=await User.create(req.body,{include:[{model:Workspace,as:"workspace"}]});
+ 
+
     if(!user) throw new BadRequestError("OOPs! something went wrong. please try again");
     
     return res.status(StatusCodes.OK).json({ msg:"Account Created successfully", });
@@ -57,8 +62,8 @@ class AuthController {
 
     if (!isValidUser) throw new UnauthenticatedError('invalid credentials');
 
-console.log(user);
-    let token = createJwt({'userId':user.id,"role":user.Role?.title,"email":user.email,"name":user.username});
+// console.log(user);
+    let token = createJwt({'userId':user.id,"email":user.email,"name":user.username});
 
     const oneDay= 1000*60*60*24;//converting one Day into milliseconds
 

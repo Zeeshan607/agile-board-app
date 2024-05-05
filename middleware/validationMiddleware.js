@@ -36,7 +36,7 @@ export const ValidateUser = withValidationErrors([
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email) => {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ where:{'email':email} });
       if (user) {
         throw new BadRequestError("User already exist with this email address");
       }
@@ -51,7 +51,7 @@ export const ValidateUser = withValidationErrors([
 export const validateUserParam = withValidationErrors([
   param("id")
     .custom(async (val) => {
-      const user = await User.findByPk({ val });
+      const user = await User.findById({ val });
       if (!user) throw new NotFoundError(`No User found with id ${val}`);
     })
     .withMessage("invalid User id"),
@@ -64,7 +64,7 @@ export const ValidateUserCredentials = withValidationErrors([
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email) => {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ where:{'email':email} });
       if (!user) {
         throw new BadRequestError("Incorrect credentials");
       }
@@ -97,7 +97,7 @@ export const validateBoardIdParam = withValidationErrors([
   param("id")
     .custom(async (val) => {
       // console.log(val)
-      const board= await Board.findByPk(val);
+      const board= await Board.findById(val);
       if(!board) throw new NotFoundError(`No Board found with id ${val}`);
     }).withMessage("invalid record id"),
 ]);

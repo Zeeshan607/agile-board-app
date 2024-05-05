@@ -5,7 +5,8 @@ import { validateBoard, validateBoardIdParam } from "../middleware/validationMid
 import userController from "../controllers/userController.js";
 import boardController from '../controllers/boardController.js';
 import boardColumnController from "../controllers/boardColumnController.js";
-
+import roleController from "../controllers/roleController.js";
+import workspaceController from "../controllers/workspaceController.js";
 
 
 
@@ -27,7 +28,7 @@ AuthRoutes.delete('/board/:id',validateBoardIdParam, boardController.delete);// 
 AuthRoutes.get('/board/columns/:slug', boardColumnController.index);
 
 AuthRoutes.get('/users',userController.index)
-
+AuthRoutes.get('/workspaces', workspaceController.index);
 
 
 

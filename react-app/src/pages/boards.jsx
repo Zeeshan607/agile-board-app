@@ -15,23 +15,25 @@ const Boards = () => {
   const onCloseModal = () => setOpen(false);
 
   /////
-  // useEffect(() => {
-    // getBoards();
-  // }, [dispatch]);
+  useEffect(() => {
+    loadBoards();
+  }, [dispatch]);
 
-//   const getBoards = async () => {
-//     setIsLoading(true);
-//     try {
-//       const resp = await CustomRequest.get("dashboard/boards/");
-//       const boards = await resp.data.boards;
-//       dispatch(setBoardsList({ boards }));
-//       setIsLoading(false);
-//     } catch (err) {
-//       setIsLoading(false);
-//       toast.error(err.response?.data?.msg);
-//     }
-//   };
 
+  const loadBoards = async () => {
+    setIsLoading(true);
+    try {
+      const resp = await CustomRequest.get(`dashboard/boards`);
+      const boards = await resp.data;
+
+      boards.sort((a, b) => a.id - b.id);
+      dispatch(setBoardsList({ boards: boards }));
+      setIsLoading(false);
+    } catch (err) {
+      toast.error(err.response?.data?.msg);
+      setIsLoading(false);
+    }
+  };
   const del = (e, id) => {
     e.target.classList.add("disabled");
     // window.confirm("Delete the item?");
