@@ -39,8 +39,6 @@ class AuthController {
     req.body.workspace={title:"Agile-Workspace",admin:1};
 
   const user=await User.create(req.body,{include:[{model:Workspace,as:"workspace"}]});
- 
-
     if(!user) throw new BadRequestError("OOPs! something went wrong. please try again");
     
     return res.status(StatusCodes.OK).json({ msg:"Account Created successfully", });
@@ -54,7 +52,7 @@ class AuthController {
   async login(req, res){
 
     // console.log(req.body)
-    const user = await User.findOne({where:{ email: req.body.email }, include:[{model:Role,as:"Role",required:true,}]});
+    const user = await User.findOne({where:{ email: req.body.email }});
     const isValidUser =user && (await comparePassword(
       req.body.password,
       user.password

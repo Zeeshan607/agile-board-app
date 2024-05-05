@@ -6,7 +6,7 @@ import storage from "redux-persist/lib/storage";
 import boardsReducer from '../features/BoardSlice.js';
 import columnReducer from '../features/ColumnSlice.js';
 import userReducer from '../features/UserSlice.js';
-
+import workspaceReducer from '../features/workspace.js';
 
 const rootReducer= combineReducers({
   userAuth: userAuthReducer,
@@ -15,6 +15,7 @@ const rootReducer= combineReducers({
   boards:boardsReducer,
   columns:columnReducer,
   users:userReducer,
+  workspace:workspaceReducer,
 });
 
 const persistConfig={

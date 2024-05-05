@@ -25,6 +25,7 @@ import {
 import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
 import { jwtDecode } from "jwt-decode";
+import { setActiveWorkspace, setWorkspaceList } from "./features/workspace.js";
 
 
 
@@ -64,22 +65,14 @@ LoadWorkspace();
 
 
 
-      const  LoadWorkspace = async ()=>{
+    const  LoadWorkspace = async ()=>{
     setIsLoading(true);
     try {
       const resp = await CustomRequest.get(`/dashboard/workspaces`);
       const wss = await resp.data;
-      const ws_sorted=[]
-           wss.map(ws=>{
-        if(ws.admin){
-          ws_sorted.push(ws);
-        }else{
-          ws_sorted.shared.push(ws)
-        }
-       
-           })
-console.log(ws_sorted)
-      // dispatch(setworkspaceList({ workspace: ws }));
+        dispatch(setWorkspaceList({workspaces:wss}));
+        dispatch(setActiveWorkspace({workspace:findActiveWorkspaceOfThisUser(wss)}))
+
       setIsLoading(false);
     } catch (err) {
       toast.error(err.response?.data?.msg);
@@ -88,6 +81,11 @@ console.log(ws_sorted)
 
       }
 
+
+      const findActiveWorkspaceOfThisUser=(list)=>{
+        const active=list.workspace.owned.filter(ws=> ws.is_active==true)??list.workspace.shared.filter(ws=> ws.is_active==true);
+        return active[0];
+      }
 
 
   // const loadBoards = async () => {

@@ -3,6 +3,7 @@ import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import User from './UserModel.js';
 import Workspace from './workspace.js';
+
 const Board = sequelize.define('Board', {
     // Define model attributes
     id: {
@@ -47,6 +48,20 @@ const Board = sequelize.define('Board', {
 
 });
 
+Workspace.hasMany(Board,{
+    onDelete:"CASCADE",
+    foreignKey:'workspace_id',
+    as:'boards'
+  })
+  
+
+Board.belongsTo(Workspace,{
+    onDelete:"RESTRICT",
+    foreignKey:'workspace_id',
+    as:'workspace',
+    constraints:false
+  })
+  
 export default Board;
 
 
