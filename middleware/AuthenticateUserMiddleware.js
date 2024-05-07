@@ -8,8 +8,8 @@ export const AuthenticateUser=(req, res, next)=>{
     if(!token) throw new UnauthenticatedError('Authentication invalid')
 
     try{
-        const {userId, role, email}= verifyJwt(token);
-        req.user={userId, role, email}; // now these user details will be available in every authenticated request after login.
+        const {userId, email}= verifyJwt(token);
+        req.user={userId, email}; // now these user details will be available in every authenticated request after login.
 
     }catch(err){
         throw new UnauthenticatedError('Authentication invalid')

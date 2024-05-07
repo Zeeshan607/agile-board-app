@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./App.css";
 import {
   Outlet,
   useNavigate,
@@ -26,6 +27,7 @@ import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
 import { jwtDecode } from "jwt-decode";
 import { setActiveWorkspace, setWorkspaceList } from "./features/workspace.js";
+import { selectActiveWorkspace } from "./features/workspace.js";
 
 
 
@@ -35,23 +37,25 @@ const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
-  let [searchParams, setSearchParams] = useSearchParams();
+  // let [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const onOpenCreateBoardModal = () => setOpen(true);
   const onCloseCreateBoardModal = () => setOpen(false);
-  const location = useLocation();
-  const { hash, pathname, search } = location;
+  // const location = useLocation();
+  // const { hash, pathname, search } = location;
   const currentUser= authToken?jwtDecode(authToken):null;
+
+
 
   useEffect(() => {
     if (!authToken ) {
       navigate("/login");
     }
-LoadWorkspace();
-   
-  },[]);
-  
+    LoadWorkspace();
+  },[authToken]);
+  // selectors
+
 
   const Logout = async () => {
     try {
@@ -64,15 +68,15 @@ LoadWorkspace();
   };
 
 
-
-    const  LoadWorkspace = async ()=>{
+// fetching functions
+    const LoadWorkspace = async ()=>{
     setIsLoading(true);
     try {
       const resp = await CustomRequest.get(`/dashboard/workspaces`);
       const wss = await resp.data;
         dispatch(setWorkspaceList({workspaces:wss}));
         dispatch(setActiveWorkspace({workspace:findActiveWorkspaceOfThisUser(wss)}))
-
+          // console.log(wss)
       setIsLoading(false);
     } catch (err) {
       toast.error(err.response?.data?.msg);
@@ -81,44 +85,52 @@ LoadWorkspace();
 
       }
 
+// helping functions
 
+      // searching for any active workspace that this user viewed in previous login time // there is mechanisam which is making sure there is always a one active workspace in DB 
       const findActiveWorkspaceOfThisUser=(list)=>{
         const active=list.workspace.owned.filter(ws=> ws.is_active==true)??list.workspace.shared.filter(ws=> ws.is_active==true);
         return active[0];
       }
 
 
-  // const loadBoards = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const resp = await CustomRequest.get(`dashboard/boards`);
-  //     const boards = await resp.data;
-
-  //     boards.sort((a, b) => a.id - b.id);
-  //     dispatch(setBoardsList({ boards: boards }));
-  //     setIsLoading(false);
-  //   } catch (err) {
-  //     toast.error(err.response?.data?.msg);
-  //     setIsLoading(false);
-  //   }
-  // };
 
 
-  const boards = useSelector(selectBoardsList);
-  let options = boards?.map((b) => {
-    return { value: b.id, label: b.slug };
-  });
+      const activeWorkspace = useSelector(selectActiveWorkspace);
+
+     useEffect(()=>{
+
+      // console.log(!activeWorkspace.boards?.length)
+     if(activeWorkspace =={} && (!activeWorkspace.boards?.length)){
+         onOpenCreateBoardModal();
+     }
+     loadBoards();
+     
+     },[activeWorkspace])
+     
+     
+     
+         const loadBoards = async () => {
+           setIsLoading(true);
+           try {
+               const active_ws_id= activeWorkspace?activeWorkspace.id:null;
+               // console.log(active_ws_id)
+             const resp = await CustomRequest.get(`dashboard/boards/${active_ws_id}`);
+             const boards = await resp.data;
+       
+             boards.sort((a, b) => a.id - b.id);
+             dispatch(setBoardsList({ boards: boards }));
+             setIsLoading(false);
+           } catch (err) {
+             toast.error(err.response?.data?.msg);
+             setIsLoading(false);
+           }
+         };
+     
+     
 
 
 
-  const handleSelect = (e) => {
-    setSearchParams({ board: e.label });
-  };
-  const boardQuery = searchParams.get("board");
-  const selectedBoard=boardQuery?{value:boardQuery,label:boardQuery}:{value:"null",label:"--select Board--"}
-
-
-  // console.log(loadedBoard);
 
   return (
     <React.Fragment>
@@ -132,26 +144,9 @@ LoadWorkspace();
             </a>
 
             <div className="header-options d-flex flex-row">
-      
-                {
-                    pathname=="/"?(
-                      <div className="input-group">
-                      <Select
-                      defaultValue={selectedBoard?selectedBoard:{value:"null",label:"--select Board--"}}
-                      onChange={handleSelect}
-                      options={options}
-                      placeholder="0 board found"
-                    /> 
-                      <button className="btn btn-transparent" onClick={(e)=>setOpen(true)}><i className="fa fa-plus"></i></button>
-                      <CreateBoardModel open={open} onClose={onCloseCreateBoardModal}/>
-        
-                      </div>
-                
-                    ):('')
-                }
-        
-
+              
             </div>
+            <CreateBoardModel open={open} ws_id={activeWorkspace?.id} onClose={onCloseCreateBoardModal}/>
 
             <div className="navbar-collapse collapse">
               <ul className="navbar-nav navbar-align">

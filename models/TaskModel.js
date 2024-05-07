@@ -2,6 +2,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import BoardColumn from './BoardColumnModel.js';
+import Board from './BoardModel.js'
 import User from './UserModel.js';
 
 
@@ -43,7 +44,14 @@ const Task = sequelize.define('Task', {
             model:BoardColumn,
             key:'id',
         },
-       
+       board_id:{
+        type:DataTypes.INTEGER,
+        allowNull:true,
+        references:{
+            model:Board,
+            key:'id',
+        },
+       }
 
     }
 });

@@ -6,7 +6,7 @@ import CustomRequest from "../utils/customRequest";
 import { selectColumnsList, setColumnsList } from "../features/ColumnSlice";
 import "./boardView.css";
 import AddNewTask from "../components/addNewTaskModal.jsx";
-
+import { selectActiveWorkspace } from "../features/workspace.js";
 // REMEMBER we are using BoardStatus as Columns in client side app, in server side its logics are as BoardStatus
 
 const BoardView=()=>{
@@ -45,20 +45,33 @@ useEffect(()=>{
 
 
 
+const handleTaskClick=()=>{
+
+
+}
+
+
+
 
 const columns = useSelector(selectColumnsList);
+const activeWorkspace = useSelector(selectActiveWorkspace);
 return (
-    <div className="container-fluid ">
-    <div className="row mx-0 bg-white p-3 my-3 ">
+    <div className="container-fluid bg-white pt-3">
+    <div className="row mx-0 bg-white p-3 shadow-md bg-body ">
       <div className="col-12 col-sm-12 col-md-6 col-lg-6">
-
+      {
+          activeWorkspace?(
+            <h6 className="m-0 d-inline"> <b className="text-success">Workspace:</b> <span title="Default Workspace">{activeWorkspace.title} </span></h6>
+          ):('No active workspace')
+        }
+        <button className="btn btn-primary mx-2"><i className="fa fa-plus "></i> Create</button>
       </div>
       <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end">
          
       </div>
     </div>
 
-    <div className="d-flex flex-row flex-wrap justify-content-center kanban-container">
+    <div className="d-flex flex-row flex-wrap justify-content-start kanban-container">
       {isLoading ? (
         <p>
           <i
@@ -69,40 +82,19 @@ return (
       ) : columns.length ? (
         columns.map((column) => ( 
           <div className="card board" key={column.id} >
-            <div className="card-header">
+            <div className="card-header bg-transparent">
               <h1 className="card-title">{column.name}</h1>
               <p className="card-subtitle">{column.description}</p>
             </div>
             <div className="card-body">
               <ul className="list-unstyled tasks-list">
                 <li className="task" draggable="true">
+                <div className="task-link" onClick={handleTaskClick}>
                   <div className="d-flex flex-row task-header">
                     <div className="priority flex-fill">
                       <span className="badge bg-danger" title="priority">
                         High
                       </span>
-                    </div>
-                    <div className="created_at flex-fill text-end">
-                      18 Jul 2018
-                    </div>
-                  </div>
-                  <a href="#" className="task-link">
-                    <h4>Create landing page</h4>
-                  </a>
-                  <p>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Corporis, repellat est quam sit asperiores esse sint unde
-                    accusantium doloribus ipsa.
-                  </p>
-                  <div className="d-flex flex-row task-footer">
-                    <div className="added-by flex-fill">
-                      <span>
-                        Added by: <b>Admin</b>
-                      </span>
-                      <a className="comments ms-2 text-decoration-none">
-                        <i className="fa fa-comments"></i>
-                        200+
-                      </a>
                     </div>
                     <div className="menu flex-fill text-end ">
                       <div className="dropdown position-relative">
@@ -131,34 +123,65 @@ return (
                         </div>
                       </div>
                     </div>
+
+
+
+
                   </div>
-                </li>
-                <li className="task">
-                  <div className="d-flex flex-row">
-                    <div className="priority flex-fill">
-                      <span className="badge bg-info">low</span>
+          
+                    <h4>Create landing page</h4>
+
+                  <div className="d-flex flex-row task-footer">
+                    <div className="added-by flex-fill">
+                      <a className="comments ms-2 text-decoration-none text-dark-light">
+                        <i className="fa fa-comments"></i>
+                           200+
+                      </a>
                     </div>
                     <div className="created_at flex-fill text-end">
-                      18 Jul 2018
+                     <span><b>Due:</b> 18 Jul 2018</span> 
                     </div>
+                    
                   </div>
-                  <a href="#">
-                    <h4>Fix post comments cystem</h4>
-                  </a>
-                  <p>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Corporis, repellat est quam sit asperiores esse sint unde
-                    accusantium doloribus ipsa, harum voluptates quidem porro,
-                    possimus maiores ad maxime suscipit. Sequi.
-                  </p>
+                  </div>
+                </li>
 
-                  <div className="d-flex flex-row">
-                    <div className="added-by flex-fill">
-                      <span>
-                        Added by: <b>Admin</b>
+              </ul>
+            </div>
+            <div className="card-footer bg-transparent">
+            <button onClick={()=>openTaskModal(column.id)} className=' board-column-btn'><i className="fa fa-plus"></i> Add New Task </button>
+            <AddNewTask open={openNewTaskModal}   onClose={closeTaskModal} column_id={column.id} />
+            </div>
+          </div>
+
+
+
+
+
+
+      ))
+       ) : (
+         <p>0 Columns found..</p>
+       )} 
+
+
+
+{/* <div className="card board">
+          <div className="card-header">
+            <h1 className="card-title">Queue</h1>
+            <p className="card-subtitle">All tasks assigned by project owner</p>
+          </div>
+          <div className="card-body">
+            <ul className="list-unstyled tasks-list">
+            <li className="task" draggable="true">
+                <a href="#" className="task-link">
+                  <div className="d-flex flex-row task-header">
+                    <div className="priority flex-fill">
+                      <span className="badge bg-danger" title="priority">
+                        High
                       </span>
                     </div>
-                    <div className="menu flex-fill text-end">
+                    <div className="menu flex-fill text-end ">
                       <div className="dropdown position-relative">
                         <a
                           href="#"
@@ -185,19 +208,32 @@ return (
                         </div>
                       </div>
                     </div>
+
+
+
+
                   </div>
+          
+                    <h4>Create landing page</h4>
+
+                  <div className="d-flex flex-row task-footer">
+                    <div className="added-by flex-fill">
+                      <a className="comments ms-2 text-decoration-none text-dark-light">
+                        <i className="fa fa-comments"></i>
+                           200+
+                      </a>
+                    </div>
+                    <div className="created_at flex-fill text-end">
+                     <span><b>Due:</b> 18 Jul 2018</span> 
+                    </div>
+                    
+                  </div>
+                  </a>
                 </li>
-              </ul>
-            </div>
-            <div className="card-footer">
-            <button onClick={()=>openTaskModal(column.id)} className=' board-column-btn'><i className="fa fa-plus"></i> Add New Task </button>
-            <AddNewTask open={openNewTaskModal}   onClose={closeTaskModal} column_id={column.id} />
-            </div>
+            
+            </ul>
           </div>
-      ))
-       ) : (
-         <p>0 Columns found..</p>
-       )} 
+        </div> */}
 
 
     </div>

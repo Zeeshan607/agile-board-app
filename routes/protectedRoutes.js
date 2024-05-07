@@ -18,7 +18,7 @@ AuthRoutes.get("/get_current_user",userController.getCurrectUser);
 
 
 // board module Routs
-AuthRoutes.get('/boards/', boardController.getBoards);//list
+AuthRoutes.get('/boards/:ws_id', boardController.getBoards);//list
 AuthRoutes.post('/board/create', validateBoard, boardController.store);// store new one
 AuthRoutes.get('/board/:id',validateBoardIdParam, boardController.single);//get by id
 AuthRoutes.patch('/board/:id',validateBoardIdParam,validateBoard,  boardController.update);// update by id

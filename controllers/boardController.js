@@ -1,13 +1,15 @@
 import Board from '../models/BoardModel.js';
 import BoardColumn from '../models/BoardColumnModel.js';
 import StatusCodes from 'http-status-codes';
+import Workspace from '../models/workspace.js';
 
 class BoardController{
 
 constructor(){}
 
   async getBoards(req, res){
-    const data= await Board.findAll({where:{createdBy:req.user.userId}});
+    const {ws_id}=req.params;
+    const data= await Board.findAll({where:{workspace_id:ws_id}});
     return res.status(200).json(data);
  }
 
@@ -22,9 +24,9 @@ constructor(){}
 
 // create
  async store (req, res) {
-    const { name, description } = req.body;
+    const { name, description, ws_id } = req.body;
     const slug= name.replaceAll(' ','-');
-    const board=await Board.create({name, description,slug:slug, createdBy:req.user.userId});
+    const board=await Board.create({name, description,slug:slug, workspace_id:ws_id});
     const def_boardstatus=await BoardColumn.bulkCreate([
       {name:'To Do', description:"List of all tasks that we have to do.",boardId:board.id,createdBy:req.user.userId,order:1},
       {name:'In Progress', description:"All tasks that are under development",boardId:board.id,createdBy:req.user.userId,order:2},

@@ -1,0 +1,8 @@
+@media (min-width: 992px) {
+    .content {
+        padding: 1rem 1rem 1rem;
+    }
+}
+.content > [class^="container-"]{
+    height: 100%;
+}

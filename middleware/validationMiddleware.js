@@ -2,6 +2,7 @@ import { body, param, validationResult } from "express-validator";
 import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import User from "../models/UserModel.js";
 import Board from "../models/BoardModel.js";
+import Workspace from "../models/workspace.js";
 
 
 
@@ -91,7 +92,13 @@ export const ValidateUserCredentials = withValidationErrors([
 export const validateBoard = withValidationErrors([
   body("name").notEmpty().withMessage("Board name required"),
   body("description").notEmpty().withMessage("Board description required"),
+  body('ws_id').custom(async (val)=>{
+    console.log(body())
+        const ws=await Workspace.findByPk(val);
 
+        if(!ws) throw new NotFoundError(`No workspace found with id ${val}`);
+
+  }).withMessage("invalid ws_id"),
 ]);
 export const validateBoardIdParam = withValidationErrors([
   param("id")

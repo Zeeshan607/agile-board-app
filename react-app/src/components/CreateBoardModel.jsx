@@ -3,17 +3,23 @@ import {Form } from 'react-router-dom';
 import FormRow from "./FormRow.jsx";
 import FormTextarea from "./FormTextarea.jsx";
 import SubmitBtn  from './SubmitBtn.jsx';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomRequest from "../utils/customRequest.jsx";
 import {toast} from 'react-toastify';
 
 
-const CreateBoardModel =({open, onClose, })=>{
-        const [form, setForm]= useState({name:'', description:''});
+const CreateBoardModel =({open, onClose, ws_id })=>{
+        const [form, setForm]= useState({name:'', description:'', ws_id:''});
+
+
+            
+
 
       const  saveBoard= async (e)=>{
                 e.target.classList.add('disabled');
+             
                 try{
+                    form.ws_id=ws_id;
                     const resp=await CustomRequest.post('/dashboard/board/create',form);
                         toast.success('Board Created successfully');
                         setForm({...form});
@@ -37,7 +43,8 @@ const CreateBoardModel =({open, onClose, })=>{
     return (
 
         <Modal open={open} onClose={onClose} center classNames={{modal:["container-lg"]}}>
-                <h2>Create new Board</h2>
+                <h3><b>Wellcome. </b> <br/>
+                <small>It seems that you don't have any boards in this workspace. Please create your first board. </small></h3>
                 <hr/>
                 <div className="container-fluid">
                     <div className="row mx-0">
@@ -55,7 +62,7 @@ const CreateBoardModel =({open, onClose, })=>{
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             />
 
-                            <SubmitBtn text="Save" onClick={saveBoard}  />
+                            <SubmitBtn text="Create" onClick={saveBoard}  />
                         </Form>
                         </div>
                     </div>
