@@ -1,8 +1,9 @@
 .kanban-container{
-    .board{
+    .column{
         width:360px;
         margin:10px;
         background-color: rgb(236, 242, 247);
+        border: 1px solid lightgray;
             .tasks-list{
                 .task{
                     padding:10px;

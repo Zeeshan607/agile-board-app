@@ -2,7 +2,7 @@ import User from "../models/UserModel.js";
 import { StatusCodes } from "http-status-codes";
 import Workspace from "../models/workspace.js";
 import Board from "../models/BoardModel.js";
-
+import Task from '../models/TaskModel.js';
 
 class workspaceController {
 
@@ -12,7 +12,7 @@ async index(req,res){
 
     // get all workspaces to which current user is admin or member 
     const user_workspace= await User.findOne({where:{id:req.user.userId},
-        include:[{model:Workspace, as:"workspace", include:[{model:Board, as:'boards'}]}]
+        include:[{model:Workspace, as:"workspace", include:[{model:Board, as:'boards',include:[{model:Task, as:'tasks'}]}]}]
     });
     const workspaces=user_workspace.workspace;
     const formated_workspaces={};

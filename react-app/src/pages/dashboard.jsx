@@ -15,9 +15,9 @@ const Dashboard = () => {
 
   useEffect(() => {
 
-      if(!selectedBoard){
+      // if(!selectedBoard){
           // boards.filter()
-      }
+      // }
       // loadBoardColumns(selectedBoard)
   }, [selectedBoard]);
 

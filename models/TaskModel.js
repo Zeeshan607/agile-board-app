@@ -1,4 +1,3 @@
-
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
 import BoardColumn from './BoardColumnModel.js';
@@ -44,7 +43,8 @@ const Task = sequelize.define('Task', {
             model:BoardColumn,
             key:'id',
         },
-       board_id:{
+    },
+    board_id:{
         type:DataTypes.INTEGER,
         allowNull:true,
         references:{
@@ -52,8 +52,6 @@ const Task = sequelize.define('Task', {
             key:'id',
         },
        }
-
-    }
 });
 //example of model relation defination in squalize model
 
@@ -61,6 +59,15 @@ const Task = sequelize.define('Task', {
 
 BoardColumn.hasMany(Task,{foreignKey:{ allowNull: false,name:"column_id"},onDelete: 'CASCADE',as:"Tasks"});
 Task.belongsTo(BoardColumn,{as:'Columns',onDelete: 'RESTRICT',foreignKey:{ allowNull: false,name:"column_id"}});
+
+Board.hasMany(Task,{
+    onDelete:"CASCADE",
+    foreignKey:'board_id',
+    as:'tasks'
+})
+
+Task.belongsTo(Board,{as:'boards',onDelete: 'RESTRICT',constraints:false,foreignKey:{ allowNull: false,name:"board_id"}});
+
 
 
 export default Task;

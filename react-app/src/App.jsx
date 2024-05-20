@@ -19,43 +19,58 @@ import {
 import { toast } from "react-toastify";
 import CustomRequest from "./utils/customRequest.jsx";
 import AppResponse from "./components/AppResponse.jsx";
-import {
-  selectBoardsList,
-  setBoardsList,
-} from "./features/BoardSlice.js";
+import { selectBoardsList, setBoardsList } from "./features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
 import { jwtDecode } from "jwt-decode";
-import { setActiveWorkspace, setWorkspaceList } from "./features/workspace.js";
-import { selectActiveWorkspace } from "./features/workspace.js";
-
+import {
+  fetchWorkspaces,
+  selectActiveWorkspace,
+  selectWorkspaceErrors
+} from "./features/workspaceSlice.js";
 
 
 const App = () => {
-
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
   // let [searchParams, setSearchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const onOpenCreateBoardModal = () => setOpen(true);
   const onCloseCreateBoardModal = () => setOpen(false);
-  // const location = useLocation();
-  // const { hash, pathname, search } = location;
-  const currentUser= authToken?jwtDecode(authToken):null;
-
-
+  const ws_status=useSelector((state)=>state.workspace.status);
+ const activeHasBoards= useSelector((state)=>state.workspace.activeHasBoards);
+  const currentUser = authToken ? jwtDecode(authToken) : null;
+  const activeWorkspace = useSelector(selectActiveWorkspace);
+const wsSliceErr= useSelector(selectWorkspaceErrors);
 
   useEffect(() => {
-    if (!authToken ) {
+    if (!authToken) {
       navigate("/login");
     }
-    LoadWorkspace();
-  },[authToken]);
-  // selectors
 
+    const loadData=()=>{
+      if(ws_status=="idle"){
+        dispatch(fetchWorkspaces());
+        setIsLoading(false)
+      }
+      
+    }
+    loadData();
+    if(wsSliceErr.length){
+      toast.error("Workspace loading Error:"+ wsSliceErr);
+    }
+
+    if(activeHasBoards){
+      if (activeWorkspace == {} && !activeWorkspace.boards?.length) {
+        onOpenCreateBoardModal();
+      } 
+    }
+  
+  
+  }, [authToken, dispatch, activeHasBoards, wsSliceErr]);
+  // selectors
 
   const Logout = async () => {
     try {
@@ -67,70 +82,37 @@ const App = () => {
     }
   };
 
+  // fetching functions
+  // const LoadWorkspace = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const resp = await CustomRequest.get(`/dashboard/workspaces`);
+  //     const wss = await resp.data;
+  //     dispatch(setWorkspaceList({ workspaces: wss }));
+  //     dispatch(setActiveWorkspace());
+  //     setIsLoading(false);
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.msg);
+  //     setIsLoading(false);
+  //   }
+  // };
 
-// fetching functions
-    const LoadWorkspace = async ()=>{
-    setIsLoading(true);
-    try {
-      const resp = await CustomRequest.get(`/dashboard/workspaces`);
-      const wss = await resp.data;
-        dispatch(setWorkspaceList({workspaces:wss}));
-        dispatch(setActiveWorkspace({workspace:findActiveWorkspaceOfThisUser(wss)}))
-          // console.log(wss)
-      setIsLoading(false);
-    } catch (err) {
-      toast.error(err.response?.data?.msg);
-      setIsLoading(false);
-    }
+  //  const loadBoards = async () => {
+  //    setIsLoading(true);
+  //    try {
+  //        const active_ws_id= activeWorkspace?activeWorkspace.id:null;
 
-      }
+  //      const resp = await CustomRequest.get(`dashboard/boards/${active_ws_id}`);
+  //      const boards = await resp.data;
 
-// helping functions
-
-      // searching for any active workspace that this user viewed in previous login time // there is mechanisam which is making sure there is always a one active workspace in DB 
-      const findActiveWorkspaceOfThisUser=(list)=>{
-        const active=list.workspace.owned.filter(ws=> ws.is_active==true)??list.workspace.shared.filter(ws=> ws.is_active==true);
-        return active[0];
-      }
-
-
-
-
-      const activeWorkspace = useSelector(selectActiveWorkspace);
-
-     useEffect(()=>{
-
-      // console.log(!activeWorkspace.boards?.length)
-     if(activeWorkspace =={} && (!activeWorkspace.boards?.length)){
-         onOpenCreateBoardModal();
-     }
-     loadBoards();
-     
-     },[activeWorkspace])
-     
-     
-     
-         const loadBoards = async () => {
-           setIsLoading(true);
-           try {
-               const active_ws_id= activeWorkspace?activeWorkspace.id:null;
-               // console.log(active_ws_id)
-             const resp = await CustomRequest.get(`dashboard/boards/${active_ws_id}`);
-             const boards = await resp.data;
-       
-             boards.sort((a, b) => a.id - b.id);
-             dispatch(setBoardsList({ boards: boards }));
-             setIsLoading(false);
-           } catch (err) {
-             toast.error(err.response?.data?.msg);
-             setIsLoading(false);
-           }
-         };
-     
-     
-
-
-
+  //      boards.sort((a, b) => a.id - b.id);
+  //      dispatch(setBoardsList({ boards: boards }));
+  //      setIsLoading(false);
+  //    } catch (err) {
+  //      toast.error(err.response?.data?.msg);
+  //      setIsLoading(false);
+  //    }
+  //  };
 
   return (
     <React.Fragment>
@@ -144,9 +126,21 @@ const App = () => {
             </a>
 
             <div className="header-options d-flex flex-row">
-              
+              {activeWorkspace ? (
+                <h6 className="m-0 d-inline">
+                  {" "}
+                  <b className="text-success">Workspace:</b>{" "}
+                  <span title="Default Workspace">
+                    {activeWorkspace.title}{" "}
+                  </span>
+                </h6>
+              ) : (
+                "No active workspace"
+              )}
+              <button className="btn btn-primary mx-2">
+                <i className="fa fa-plus "></i> Create
+              </button>
             </div>
-            <CreateBoardModel open={open} ws_id={activeWorkspace?.id} onClose={onCloseCreateBoardModal}/>
 
             <div className="navbar-collapse collapse">
               <ul className="navbar-nav navbar-align">
@@ -361,13 +355,11 @@ const App = () => {
                       className="avatar img-fluid rounded me-1"
                       alt="Charles Hall"
                     />{" "}
-{
-        currentUser?(
-          <span className="text-dark">{currentUser.name}</span>
-        ):''
-}
-                  
-
+                    {currentUser ? (
+                      <span className="text-dark">{currentUser.name}</span>
+                    ) : (
+                      ""
+                    )}
                   </a>
                   <div className="dropdown-menu dropdown-menu-end">
                     <a className="dropdown-item" href="pages-profile.html">
@@ -409,7 +401,17 @@ const App = () => {
           <main className="content" id="page-content">
             {/* page content will be here */}
             <AppResponse />
-            <Outlet ></Outlet>
+            {isLoading ? (
+              <div className="container-fluid">
+                <div className="row mx-0">
+                  <div className="col-12 text-center">
+                    <i className="fa fa-spinner fa-spin"></i>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Outlet></Outlet>
+            )}
           </main>
 
           <Footer></Footer>

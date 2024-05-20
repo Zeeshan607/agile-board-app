@@ -19,3 +19,9 @@
     margin-right:5px;
 
 }
+.input-group-inline{
+    display: inline-flex!important;
+    align-items: stretch;
+    flex-wrap: wrap;
+    position: relative
+}

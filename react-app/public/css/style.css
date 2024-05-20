@@ -1,22 +1,23 @@
-.kanban-container .board {
+.kanban-container .column {
   width: 360px;
   margin: 10px;
   background-color: rgb(236, 242, 247);
+  border: 1px solid lightgray;
 }
-.kanban-container .board .tasks-list .task {
+.kanban-container .column .tasks-list .task {
   padding: 10px;
   margin: 5px 0px;
   background-color: white;
   border-radius: 8px;
   box-shadow: var(white, 0px 1px 1px rgba(9, 30, 66, 0.2509803922), 0px 0px 1px rgba(9, 30, 66, 0.3098039216));
 }
-.kanban-container .board .tasks-list .task .task-link {
+.kanban-container .column .tasks-list .task .task-link {
   text-decoration: none;
   cursor: pointer;
 }
-.kanban-container .board .tasks-list .task .task-link h4 {
+.kanban-container .column .tasks-list .task .task-link h4 {
   font-size: 16px;
 }
-.kanban-container .board .tasks-list .task .task-header {
+.kanban-container .column .tasks-list .task .task-header {
   margin-bottom: 10px;
 }/*# sourceMappingURL=style.css.map */

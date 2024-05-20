@@ -6,13 +6,13 @@ import SubmitBtn  from './SubmitBtn.jsx';
 import { useEffect, useState } from "react";
 import CustomRequest from "../utils/customRequest.jsx";
 import {toast} from 'react-toastify';
+import { useSelector } from "react-redux";
+import { selectBoardsList } from "../features/BoardSlice.js";
 
 
 const CreateBoardModel =({open, onClose, ws_id })=>{
         const [form, setForm]= useState({name:'', description:'', ws_id:''});
 
-
-            
 
 
       const  saveBoard= async (e)=>{
@@ -37,15 +37,24 @@ const CreateBoardModel =({open, onClose, ws_id })=>{
 
 
 
+        const boards=useSelector(selectBoardsList);
+            
 
 
 
     return (
 
         <Modal open={open} onClose={onClose} center classNames={{modal:["container-lg"]}}>
-                <h3><b>Wellcome. </b> <br/>
-                <small>It seems that you don't have any boards in this workspace. Please create your first board. </small></h3>
+                <h3><b>Wellcome. </b></h3>
+                    {
+                    boards.length?(
+                        <small>It seems that you don't have any boards in this workspace. Please create your first board. </small>
+                    ):('')
+                    }
+             
+
                 <hr/>
+
                 <div className="container-fluid">
                     <div className="row mx-0">
                         <div className="col-12">
