@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import CustomRequest from "../utils/customRequest";
-import { selectColumnsList, setColumnsList } from "../features/ColumnSlice";
-
-import AddNewTask from "../components/addNewTaskModal.jsx";
+import { fetchColumns, selectColumnsList, setColumnsList } from "../features/ColumnSlice.js";
+import Loading from "../components/Loading.jsx";
+import CreateNewTask from "../components/createNewTaskModal.jsx";
 import { selectActiveWorkspace } from "../features/workspaceSlice.js";
 import TaskList from "../components/TaskList.jsx";
-import { selectTasks, setTasksList } from "../features/TaskSlice.js";
+import { selectTasks, setTasksList,fetchTasks } from "../features/TaskSlice.js";
 import { selectBoardsList } from "../features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "../components/CreateBoardModel.jsx";
@@ -31,50 +31,69 @@ const BoardView = () => {
   const onOpenCreateBoardModal = () => setOpenCreateBoardModel(true);
   const onCloseCreateBoardModal = () => setOpenCreateBoardModel(false);
   const activeWorkspace = useSelector(selectActiveWorkspace);
+  const columnsErr= useSelector(state=>state.columns.errors);
+  const columnsStatus= useSelector(state=>state.columns.status);
+  const wsStatus=useSelector(state=>state.workspace.status);
+  const taskStatus=useSelector(state=>state.tasks.status);
 
+  
   useEffect(() => {
- 
-      loadBoardColumns(boardSlug);
-      laodTasks(boardSlug);
+      if(wsStatus=="success"){
+
+
+      if(columnsStatus=='idle'){
+        dispatch(fetchColumns(boardSlug))
+      }
+      if(columnsErr.length!=0){
+          columnsErr.map(err=>{
+            toast.error("Columns Error: "+err);
+          });
+      }
+      if(taskStatus=="idle"){
+        dispatch(fetchTasks(boardSlug))
+      }
+
       dispatch(setActiveBoard({ slug: boardSlug }));
 
-  }, [boardSlug, dispatch]);
 
-  const loadBoardColumns = async (slug) => {
-    setIsLoading(true);
-    try {
-      const resp = await CustomRequest.get(`/dashboard/board/columns/${slug}`);
-      const columns = await resp.data.columns;
-      dispatch(setColumnsList({ columns: columns }));
-      setIsLoading(false);
-    } catch (err) {
-      toast.error(err.response?.data?.msg);
-      setIsLoading(false);
+
     }
-  };
+  }, [boardSlug, dispatch, wsStatus]);
 
-  const laodTasks = async (boardSlug) => {
-    setIsLoading(true);
-    try {
-      const resp = await CustomRequest.get(
-        `/dashboard/board/tasks/${boardSlug}`
-      );
-      const tasks = await resp.data.tasks;
+  // const loadBoardColumns = async (slug) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const resp = await CustomRequest.get(`/dashboard/board/${slug}/columns`);
+  //     const columns = await resp.data.columns;
+  //     dispatch(setColumnsList({ columns: columns }));
+  //     setIsLoading(false);
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.msg);
+  //     setIsLoading(false);
+  //   }
+  // };
 
-      dispatch(setTasksList({ tasks: tasks }));
-      setIsLoading(false);
-    } catch (err) {
-      toast.error(err.response?.data?.msg);
-      setIsLoading(false);
-    }
-  };
+  // const laodTasks = async (boardSlug) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const resp = await CustomRequest.get(
+  //       `/dashboard/board/${boardSlug}/tasks`
+  //     );
+  //     const tasks = await resp.data.tasks;
+  //     dispatch(setTasksList({ tasks: tasks }));
+  //     setIsLoading(false);
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.msg);
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const boards = useSelector(selectBoardsList);
   let options = boards?.map((b) => {
     return { value: b.id, label: b.slug };
   });
   const handleSelect = (e) => {
-    setSearchParams({ board: e.label });
+    // setSearchParams({ board: e.label });
   };
   const boardQuery = searchParams.get("slug");
   const selectedBoard = boardQuery
@@ -85,6 +104,11 @@ const BoardView = () => {
 
   const columns = useSelector(selectColumnsList);
   const tasks = useSelector(selectTasks);
+
+if( wsStatus !== "success"){
+  return <Loading/>
+}
+
   return (
     <div className="container-fluid bg-white pt-3">
       <div className="row mx-0 bg-white p-3 shadow-md bg-body ">
@@ -154,7 +178,7 @@ const BoardView = () => {
                 >
                   <i className="fa fa-plus"></i> Add New Task{" "}
                 </button>
-                <AddNewTask
+                <CreateNewTask
                   open={openNewTaskModal}
                   onClose={closeTaskModal}
                   column_id={column.id}

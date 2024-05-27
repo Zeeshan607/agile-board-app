@@ -20,5 +20,11 @@ async index(req, res){
 
 
 
+async store(req, res){
+    const {name, description, column_id, board_id, assigned_to}=req.body;
+    const task = await  Task.create({name, description, column_id, board_id, assigned_to});
+}
+
+
 }
 export default new TaskController(); 

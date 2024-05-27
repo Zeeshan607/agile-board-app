@@ -28,6 +28,7 @@ import {
   selectActiveWorkspace,
   selectWorkspaceErrors
 } from "./features/workspaceSlice.js";
+import Loading from "./components/Loading.jsx";
 
 
 const App = () => {
@@ -46,9 +47,12 @@ const App = () => {
 const wsSliceErr= useSelector(selectWorkspaceErrors);
 
   useEffect(() => {
+
     if (!authToken) {
       navigate("/login");
     }
+
+
 
     const loadData=()=>{
       if(ws_status=="idle"){
@@ -57,9 +61,10 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
       }
       
     }
-    loadData();
+    authToken?loadData():"";
+
     if(wsSliceErr.length){
-      toast.error("Workspace loading Error:"+ wsSliceErr);
+      toast.error("Workspace Error:"+ wsSliceErr);
     }
 
     if(activeHasBoards){
@@ -70,7 +75,7 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
   
   
   }, [authToken, dispatch, activeHasBoards, wsSliceErr]);
-  // selectors
+
 
   const Logout = async () => {
     try {
@@ -402,13 +407,7 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
             {/* page content will be here */}
             <AppResponse />
             {isLoading ? (
-              <div className="container-fluid">
-                <div className="row mx-0">
-                  <div className="col-12 text-center">
-                    <i className="fa fa-spinner fa-spin"></i>
-                  </div>
-                </div>
-              </div>
+                  <Loading/>
             ) : (
               <Outlet></Outlet>
             )}

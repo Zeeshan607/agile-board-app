@@ -9,7 +9,7 @@ import userReducer from "../features/UserSlice.js";
 import workspaceReducer from "../features/workspaceSlice.js";
 import taskReducer from "../features/TaskSlice.js";
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   userAuth: userAuthReducer,
   response: responseReducer,
 
@@ -19,6 +19,16 @@ const rootReducer = combineReducers({
   workspace: workspaceReducer,
   tasks: taskReducer,
 });
+
+
+const rootReducer= (state, action )=>{
+  console.log(action.type)
+  if (action.type === 'userAuth/setUserLogoutStatus') {
+    return appReducer(undefined, action)
+  }
+
+  return appReducer(state, action)
+}
 
 const persistConfig = {
   key: "root",

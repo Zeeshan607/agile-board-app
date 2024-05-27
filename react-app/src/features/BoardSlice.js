@@ -45,6 +45,6 @@ const BoardSlice = createSlice({
 
 export const { setBoardsList, setActiveBoard, insertBoard, removeBoard } = BoardSlice.actions;
 export const selectBoardsList = (state) => state.boards.list;
-export const selectActiveBoard = (state) => state.boards.loadedBoard?state.boards.loadedBoard:"--Select--";
+export const selectActiveBoard = (state) => state.boards.activeBoard?state.boards.activeBoard:null;
 
 export default BoardSlice.reducer;

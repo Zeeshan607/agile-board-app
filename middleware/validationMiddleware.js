@@ -3,7 +3,7 @@ import { BadRequestError, NotFoundError } from "../errors/customErrors.js";
 import User from "../models/UserModel.js";
 import Board from "../models/BoardModel.js";
 import Workspace from "../models/workspace.js";
-
+import Task from '../models/TaskModel.js';
 
 
 const withValidationErrors = (validateValues) => {
@@ -93,8 +93,8 @@ export const validateBoard = withValidationErrors([
   body("name").notEmpty().withMessage("Board name required"),
   body("description").notEmpty().withMessage("Board description required"),
   body('ws_id').custom(async (val)=>{
-    console.log(body())
-        const ws=await Workspace.findByPk(val);
+
+        const ws=await Workspace.findById(val);
 
         if(!ws) throw new NotFoundError(`No workspace found with id ${val}`);
 
@@ -108,3 +108,15 @@ export const validateBoardIdParam = withValidationErrors([
       if(!board) throw new NotFoundError(`No Board found with id ${val}`);
     }).withMessage("invalid record id"),
 ]);
+
+
+export const validateTask= withValidationErrors([
+  body('title').notEmpty().withMessage('Task title Required'),
+  body('description').notEmpty().withMessage('Task Description required'),
+  body('column_id').custom(async (val)=>{
+        const task=await Task.findById(val);
+        if(!task){
+          throw new NotFoundError(`No Task found with id ${val}`);
+        }
+  }).withMessage('invalid column id')
+])
