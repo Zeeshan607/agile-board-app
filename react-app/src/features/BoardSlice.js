@@ -5,6 +5,7 @@ import { fetchWorkspaces} from "./workspaceSlice.js";
 const initialState = {
   list: [],
   activeBoard: "",
+  status:"idle",
 };
 
 
@@ -39,6 +40,7 @@ const BoardSlice = createSlice({
       const wss=action.payload;
       const activeWs= wss.workspace.owned.filter(ws=> ws.is_active==true)??wss.workspace.shared.filter(ws=> ws.is_active==true);
        state.list=activeWs[0].boards.length?activeWs[0].boards:[];
+       state.status="success";
     })
   }
 });

@@ -34,7 +34,7 @@ AuthRoutes.post("task/store",validateTask, tasksController.store)
 
 AuthRoutes.get('/users',userController.index)
 AuthRoutes.get('/workspaces', workspaceController.index);
-
+AuthRoutes.get('/workspace/:id/members', workspaceController.getMemebers)
 
 
 export default AuthRoutes;

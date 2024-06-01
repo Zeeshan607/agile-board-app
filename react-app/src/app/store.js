@@ -8,6 +8,8 @@ import columnReducer from "../features/ColumnSlice.js";
 import userReducer from "../features/UserSlice.js";
 import workspaceReducer from "../features/workspaceSlice.js";
 import taskReducer from "../features/TaskSlice.js";
+import WorkspaceMembersReducer from "../features/WorkspaceMembersSlice.js";
+
 
 const appReducer = combineReducers({
   userAuth: userAuthReducer,
@@ -18,6 +20,7 @@ const appReducer = combineReducers({
   users: userReducer,
   workspace: workspaceReducer,
   tasks: taskReducer,
+  workspaceMembers:WorkspaceMembersReducer ,
 });
 
 

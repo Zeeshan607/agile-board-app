@@ -35,6 +35,14 @@ async index(req,res){
 }
 
 
+async getMemebers(req, res){
+    const {id}= req.params;
+    // const ws =await Workspace.findById({id,include})/
+
+    res.status(StatusCodes.OK).json({'members':{"id":id,"name":"ahmed"}})
+}
+
+
 
 }
 

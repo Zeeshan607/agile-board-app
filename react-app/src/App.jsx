@@ -54,14 +54,13 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
 
 
 
-    const loadData=()=>{
-      if(ws_status=="idle"){
+
+      if( authToken && ws_status=="idle"){
         dispatch(fetchWorkspaces());
         setIsLoading(false)
       }
       
-    }
-    authToken?loadData():"";
+
 
     if(wsSliceErr.length){
       toast.error("Workspace Error:"+ wsSliceErr);
@@ -130,7 +129,7 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
               <i className="hamburger align-self-center"></i>
             </a>
 
-            <div className="header-options d-flex flex-row">
+            <div className="header-options d-flex flex-row justify-content-center align-items-center">
               {activeWorkspace ? (
                 <h6 className="m-0 d-inline">
                   {" "}

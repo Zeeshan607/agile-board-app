@@ -1,46 +1,53 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import "./boardView.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import React,{ useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import CustomRequest from "../utils/customRequest";
 import { fetchColumns, selectColumnsList, setColumnsList } from "../features/ColumnSlice.js";
 import Loading from "../components/Loading.jsx";
-import CreateNewTask from "../components/createNewTaskModal.jsx";
 import { selectActiveWorkspace } from "../features/workspaceSlice.js";
-import TaskList from "../components/TaskList.jsx";
 import { selectTasks, setTasksList,fetchTasks } from "../features/TaskSlice.js";
 import { selectBoardsList } from "../features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "../components/CreateBoardModel.jsx";
 import { setActiveBoard } from "../features/BoardSlice.js";
+import ColumnsList from "../components/ColumnsList.jsx";
 // REMEMBER we are using BoardStatus as Columns in client side app, in server side its logics are as BoardStatus
 
-const BoardView = () => {
+const BoardView =React.memo( () => {
   // const [searchParams, setSearchParams]=useSearchParams();
   const param = useParams();
   const boardSlug = param.slug;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [tasksForm, setTasksForm] = useState({ title: "", description: "" });
-  const [openNewTaskModal, setOpenNewTaskModal] = useState(false);
-  const openTaskModal = () => setOpenNewTaskModal(true);
-  const closeTaskModal = () => setOpenNewTaskModal(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openCreateBoardModel, setOpenCreateBoardModel] = useState(false);
-  const onOpenCreateBoardModal = () => setOpenCreateBoardModel(true);
-  const onCloseCreateBoardModal = () => setOpenCreateBoardModel(false);
+  const onOpenCreateBoardModal = useCallback(() => setOpenCreateBoardModel(true),[]);
+  const onCloseCreateBoardModal = useCallback(() => setOpenCreateBoardModel(false),[]);
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const columnsErr= useSelector(state=>state.columns.errors);
   const columnsStatus= useSelector(state=>state.columns.status);
   const wsStatus=useSelector(state=>state.workspace.status);
+  const boardStatus=useSelector(state=>state.boards.status);
   const taskStatus=useSelector(state=>state.tasks.status);
+  const activeWsId=useSelector(state=>state.workspace.active.id);
 
+  // useEffect(()=>{
+
+
+
+  // },[boardSlug])
   
   useEffect(() => {
-      if(wsStatus=="success"){
+    console.log('boardView component mounted');
 
+      dispatch(setActiveBoard({ slug: boardSlug }));
 
+    console.log(`ws status changed to ${wsStatus}`);
+      if(boardStatus=="success"){
+
+        console.log(wsStatus);
       if(columnsStatus=='idle'){
         dispatch(fetchColumns(boardSlug))
       }
@@ -52,13 +59,12 @@ const BoardView = () => {
       if(taskStatus=="idle"){
         dispatch(fetchTasks(boardSlug))
       }
-
-      dispatch(setActiveBoard({ slug: boardSlug }));
-
-
-
+  
     }
-  }, [boardSlug, dispatch, wsStatus]);
+
+
+  }, [boardSlug, dispatch, boardStatus]);
+
 
   // const loadBoardColumns = async (slug) => {
   //   setIsLoading(true);
@@ -73,20 +79,7 @@ const BoardView = () => {
   //   }
   // };
 
-  // const laodTasks = async (boardSlug) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const resp = await CustomRequest.get(
-  //       `/dashboard/board/${boardSlug}/tasks`
-  //     );
-  //     const tasks = await resp.data.tasks;
-  //     dispatch(setTasksList({ tasks: tasks }));
-  //     setIsLoading(false);
-  //   } catch (err) {
-  //     toast.error(err.response?.data?.msg);
-  //     setIsLoading(false);
-  //   }
-  // };
+
 
   const boards = useSelector(selectBoardsList);
   let options = boards?.map((b) => {
@@ -103,7 +96,7 @@ const BoardView = () => {
   // console.log(boardQuery)
 
   const columns = useSelector(selectColumnsList);
-  const tasks = useSelector(selectTasks);
+
 
 if( wsStatus !== "success"){
   return <Loading/>
@@ -154,113 +147,24 @@ if( wsStatus !== "success"){
       <div className="d-flex flex-row flex-wrap justify-content-start kanban-container">
         {isLoading ? (
           <p>
+        
             <i
               className="fa fa-spinner fa-spin"
               style={{ fontSize: "32px" }}
             ></i>
           </p>
         ) : columns.length ? (
-          columns.map((column) => (
-            <div className="card column" key={column.id}>
-              <div className="card-header bg-transparent">
-                <h1 className="card-title">{column.name}</h1>
-                <p className="card-subtitle">{column.description}</p>
-              </div>
-              <div className="card-body">
-                <ul className="list-unstyled tasks-list">
-                  <TaskList tasks={tasks} col_id={column.id} />
-                </ul>
-              </div>
-              <div className="card-footer bg-transparent">
-                <button
-                  onClick={() => openTaskModal(column.id)}
-                  className=" board-column-btn"
-                >
-                  <i className="fa fa-plus"></i> Add New Task{" "}
-                </button>
-                <CreateNewTask
-                  open={openNewTaskModal}
-                  onClose={closeTaskModal}
-                  column_id={column.id}
-                />
-              </div>
-            </div>
+          columns.map((column ,index) => (
+          <ColumnsList column={column} key={index} wsId={activeWsId}/>
           ))
         ) : (
           <p>0 Columns found..</p>
         )}
 
-        {/* <div className="card board">
-          <div className="card-header">
-            <h1 className="card-title">Queue</h1>
-            <p className="card-subtitle">All tasks assigned by project owner</p>
-          </div>
-          <div className="card-body">
-            <ul className="list-unstyled tasks-list">
-            <li className="task" draggable="true">
-                <a href="#" className="task-link">
-                  <div className="d-flex flex-row task-header">
-                    <div className="priority flex-fill">
-                      <span className="badge bg-danger" title="priority">
-                        High
-                      </span>
-                    </div>
-                    <div className="menu flex-fill text-end ">
-                      <div className="dropdown position-relative">
-                        <a
-                          href="#"
-                          data-bs-toggle="dropdown"
-                          data-bs-display="static"
-                          aria-expanded="true"
-                        >
-                          <i className=" fa fa-ellipsis-v"></i>
-                        </a>
-
-                        <div
-                          className="dropdown-menu dropdown-menu-end "
-                          data-bs-popper="static"
-                        >
-                          <a className="dropdown-item" href="#">
-                            Action
-                          </a>
-                          <a className="dropdown-item" href="#">
-                            Another action
-                          </a>
-                          <a className="dropdown-item" href="#">
-                            Something else here
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-
-
-
-                  </div>
-          
-                    <h4>Create landing page</h4>
-
-                  <div className="d-flex flex-row task-footer">
-                    <div className="added-by flex-fill">
-                      <a className="comments ms-2 text-decoration-none text-dark-light">
-                        <i className="fa fa-comments"></i>
-                           200+
-                      </a>
-                    </div>
-                    <div className="created_at flex-fill text-end">
-                     <span><b>Due:</b> 18 Jul 2018</span> 
-                    </div>
-                    
-                  </div>
-                  </a>
-                </li>
-            
-            </ul>
-          </div>
-        </div> */}
+   
       </div>
     </div>
   );
-};
+});
 
 export default BoardView;

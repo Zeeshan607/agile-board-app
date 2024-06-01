@@ -16,14 +16,12 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
 
     while (attempt < MAX_RETRIES) {
     try{
-        console.log(`Attempt ${attempt + 1}: Fetching workspaces...`);
+        // console.log(`Attempt ${attempt + 1}: Fetching workspaces...`);
 
         const resp = await CustomRequest.get(`/dashboard/workspaces`);
         return await resp.data;
 
     }catch(err){
-
-
         if (err.code === 'ECONNREFUSED' || (err.response && err.response.status === 500)) {
             attempt++;
             if (attempt < MAX_RETRIES) {
@@ -55,12 +53,15 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
       
     }
     }
-})
+});
+
+
 
 const initialState = {
     list:[],
     active:{},
     activeHasBoards:false,
+    members:[],
     status:"idle",
     error:[]
 
@@ -95,6 +96,9 @@ const workspace = createSlice({
             state.error.push(action.error.message);
                 console.log(action.error)
         })
+
+
+
   }
 });
 
