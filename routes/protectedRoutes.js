@@ -29,12 +29,13 @@ AuthRoutes.delete('/board/:id',validateBoardIdParam, boardController.delete);// 
 AuthRoutes.get('/board/:slug/columns', boardColumnController.index);// get all columns of specific board
 
 AuthRoutes.get('/board/:slug/tasks', tasksController.index);// get all tasks of specific board;
-AuthRoutes.post("task/store",validateTask, tasksController.store)
+AuthRoutes.post("/task/store",validateTask, tasksController.store)
 
 
 AuthRoutes.get('/users',userController.index)
 AuthRoutes.get('/workspaces', workspaceController.index);
-AuthRoutes.get('/workspace/:id/members', workspaceController.getMemebers)
-
+AuthRoutes.get('/workspace/:id/members', workspaceController.getMemebers);
+AuthRoutes.get('/workspace/:id/boards', workspaceController.getBoards);
+AuthRoutes.post('/set_last_active_workspace',userController.set_last_active_workspace);
 
 export default AuthRoutes;

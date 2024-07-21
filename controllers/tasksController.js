@@ -21,8 +21,9 @@ async index(req, res){
 
 
 async store(req, res){
-    const {name, description, column_id, board_id, assigned_to}=req.body;
-    const task = await  Task.create({name, description, column_id, board_id, assigned_to});
+    const {title, description, column_id, board_id, assigned_to}=req.body;
+    const task = await  Task.create({title, description, column_id, board_id, assigned_to});
+    res.status(StatusCodes.OK).json({task:task,msg:"Task created successfully"})
 }
 
 

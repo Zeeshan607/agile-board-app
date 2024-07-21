@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import CustomRequest from '../utils/customRequest.jsx';
-
+import { produce } from 'immer';
 
 
 
@@ -60,8 +60,6 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
 const initialState = {
     list:[],
     active:{},
-    activeHasBoards:false,
-    members:[],
     status:"idle",
     error:[]
 
@@ -75,26 +73,25 @@ const workspace = createSlice({
             state.list=action.payload.workspaces;
         },
         setActiveWorkspace:(state, action)=>{
-            const active=state.list.workspace.owned.filter(ws=> ws.is_active==true)??state.list.workspace.shared.filter(ws=> ws.is_active==true);
-            state.active=active[0];
+          // console.log(action.payload.wsId)
+          //   console.log(JSON.parse(JSON.stringify(state.list.workspace)));
+            const active=state.list.workspace.owned.find((ws)=> ws.id==action.payload.wsId)??state.list.workspace.shared.find(ws=> ws.id==action.payload.wsId);
+            // console.log(active)
+            state.active=active;
         }
   },
   extraReducers(builder){
         builder
         .addCase(fetchWorkspaces.pending, (state, action)=>{
-            state.status="loading";
+            state.status="pending";
         })
         .addCase(fetchWorkspaces.fulfilled, (state, action )=>{
             state.status="success"
             state.list =action.payload;
-            const active=state.list.workspace.owned.filter(ws=> ws.is_active==true)??state.list.workspace.shared.filter(ws=> ws.is_active==true);
-            state.active=active[0];
-            state.activeHasBoards =state.active.boards?.length > 0;
+      
         })
         .addCase(fetchWorkspaces.rejected, (state, action)=>{
             state.status="failed";
-            state.error.push(action.error.message);
-                console.log(action.error)
         })
 
 

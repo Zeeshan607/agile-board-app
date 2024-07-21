@@ -9,7 +9,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-
+import $ from "jquery";
 // page imports
 
 import { PersistGate } from 'redux-persist/integration/react';
@@ -19,7 +19,7 @@ import router from './routes.jsx';
 
 // global variables
 window.toast= toast;
-
+window.$=window.jQuery=$;
 
 
 

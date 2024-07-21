@@ -41,6 +41,7 @@ function Login() {
       const token = await resp.data?.token;
       const user = jwtDecode(token);
       dispatch(setUserLoginStatus({ token, user }));
+      
       toast.success(resp.data?.msg);
       navigate("/");
     } catch (err) {

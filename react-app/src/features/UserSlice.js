@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+
+// const fetchUsers
+
+
+
+
+
 const initialState = {
     list:[]
 }

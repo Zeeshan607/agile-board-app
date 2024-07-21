@@ -5,9 +5,11 @@ import FormRow from './FormRow.jsx';
 import FormTextarea from './FormTextarea.jsx';
 import SubmitBtn from './SubmitBtn.jsx';
 import {useDispatch, useSelector} from "react-redux";
-import { selectColumnsList, insertTaskInColumn } from '../features/ColumnSlice.js';
+import { selectColumnsList} from '../features/ColumnSlice.js';
 import { selectActiveBoard } from '../features/BoardSlice.js';
-
+import WsMembersSelect from "./WsMembersSelect.jsx";
+import CustomRequest from '../utils/customRequest.jsx';
+import {insertTaskInTasksList} from "../features/TaskSlice.js";
 
 const CreateNewTask=({open, onClose,column_id})=>{
     const [isLoading, setIsLoading]=useState(false);
@@ -18,23 +20,19 @@ const CreateNewTask=({open, onClose,column_id})=>{
     const dispatch= useDispatch();
 
 
-useEffect(()=>{
-console.log('task-modal mounted');
-},[])
-
-
                     
     const createTask=async (e)=>{
             e.target.classList.add('disabled');
             try{
-                const resp= await CustomRequest.post('/dashboard/task/create',formData);
+                const resp= await CustomRequest.post('/dashboard/task/store',tasksForm);
                     if(resp.status==200){
                         const task= await resp.data?.task;
+                        console.log(task)
                     //insert task in column's task list
-                    dispatch(insertTaskInColumn(task))
-                        toast.success("Task created successfully");
-                        e.target.classList.remove('disabled');
-                        onClose();
+                    dispatch(insertTaskInTasksList({"task":task}))
+                    toast.success("Task created successfully");
+                    e.target.classList.remove('disabled');
+                    onClose();
                     }
             
             }catch(err){
@@ -52,7 +50,7 @@ console.log('task-modal mounted');
                         <div className="col-12">
                             <Form>
                                 <FormRow type='text' name='title' labelText={'Title'}  onChange={(e)=> setTasksForm({...tasksForm, title:e.target.value})} />
-                                {/* <Select></Select> */}
+                                <WsMembersSelect  state={{tasksForm, setTasksForm}}  />
                                 <FormTextarea  name='description' labelText={'Description'}  onChange={(e)=> setTasksForm({... tasksForm, description:e.target.value})} />
                                 <SubmitBtn text="Save" onClick={createTask} />
                             </Form>

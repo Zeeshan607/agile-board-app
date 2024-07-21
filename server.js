@@ -3,11 +3,11 @@ import express from "express";
 import cors from 'cors';
 import  config  from './config/default.js';
 import morgan from 'morgan';
-import mongoos from "mongoose";
+// import mongoos from "mongoose";
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import cookieParser from 'cookie-parser';
-import  sequelize from "./db.js"
-
+// import  sequelize from "./db.js"
+import { initModels } from './models/index.js';
 
 
 
@@ -53,24 +53,32 @@ app.use('/api/v1/', Route);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 
-sequelize.sync({ force: false })// Set force to true to drop existing tables and recreate them
-    .then(() => {
-        console.log('Database synchronized successfully');
-        app.listen(config.port, async () => {
-          // await mongoos.connect(config.mongodb_uri);
-          console.log(`Server is running on port ${config.port} `);
-        });
-    }).catch((err) => {
-        // console.error('Error synchronizing database:', error);
-        console.error('Error: '+ err);
+// await sequelize.sync({ force:true })// Set force to true to drop existing tables and recreate them
+//     .then(() => {
+//         console.log('Database synchronized successfully');
+//         app.listen(config.port, async () => {
+//           // await mongoos.connect(config.mongodb_uri);
+//           console.log(`Server is running on port ${config.port} `);
+//         });
+//     }).catch((err) => {
+//         // console.error('Error synchronizing database:', error);
+//         console.error('Error: '+ err);
+//         process.exit(1);
+//     });
+
+try{
+
+  await initModels();
+  console.log('Database synchronized successfully');
+
+  app.listen(config.port, async () => {
+    console.log(`Server is running on port ${config.port} `);
+  });
+
+}catch(err){
+  console.error('Error: '+ err);
         process.exit(1);
-    });
+}
 
 
-// try{
-// // Start the server
 
-// }catch(err){
-//   console.log('Error: '+ err);
-//   process.exit(1);
-// }

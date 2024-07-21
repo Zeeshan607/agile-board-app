@@ -1,4 +1,4 @@
-import { configureStore, combineReducers, Tuple } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import userAuthReducer from "../features/UserAuthSlice.js";
 import responseReducer from "../features/ResponseSlice.js";
 import { persistReducer } from "redux-persist";
@@ -9,7 +9,7 @@ import userReducer from "../features/UserSlice.js";
 import workspaceReducer from "../features/workspaceSlice.js";
 import taskReducer from "../features/TaskSlice.js";
 import WorkspaceMembersReducer from "../features/WorkspaceMembersSlice.js";
-
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'; 
 
 const appReducer = combineReducers({
   userAuth: userAuthReducer,
@@ -36,7 +36,8 @@ const rootReducer= (state, action )=>{
 const persistConfig = {
   key: "root",
   version: 1,
-  whitelist: ["userAuth"],
+  stateReconciler: autoMergeLevel2,
+  whitelist: ["userAuth","workspace"],
   storage,
 };
 const pr = persistReducer(persistConfig, rootReducer);
@@ -45,5 +46,6 @@ const Store = configureStore({
   // middleware: () => new Tuple(thunk),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
+
 });
 export default Store;

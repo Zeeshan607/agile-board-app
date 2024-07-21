@@ -16,10 +16,6 @@ import "./TaskList.css";
 
 const TaskList=({task, parent})=>{
 
-const [isOpenTaskViewModel,setIsOpenTaskViewModel]=useState(false);
-const openTaskViewModel=()=>setIsOpenTaskViewModel(true);
-const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
-
 
   const {
     attributes,
@@ -39,7 +35,6 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
   // console.log(style);
 
    const handleTaskClick=(task_id)=>{
-      openTaskViewModel();
 
     }
 
@@ -101,7 +96,7 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                         
                       </div>
                       </div>
-                      <TaskViewModal onClose={closeTaskViewModel} task={task} col_name={parent.name} open={isOpenTaskViewModel}></TaskViewModal>
+                      <TaskViewModal></TaskViewModal>
                     </li>
     
         

@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 
+
 const sequelize = new Sequelize('kanban-board', 'root', '', {
         host: 'localhost',
         dialect: 'mysql',

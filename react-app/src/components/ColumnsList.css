@@ -1,0 +1,10 @@
+.column-drag-icon{
+    position: absolute;
+    right:0px;
+    top:10px;
+    cursor: pointer;
+}
+.column{
+    min-height: max-content;
+    /* height: fit-content; */
+}

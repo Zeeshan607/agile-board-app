@@ -1,5 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchWorkspaces} from "./workspaceSlice.js";
+import {authUserSelector} from "../utils/customSelectors.js";
+import CustomRequest from "../utils/customRequest.jsx";
+// import {authUserSelector} from "./UserAuthSlice.js";
+
+
+
+export const fetchBoardsByWsId=createAsyncThunk( "workspace/boards" , async (wsId, { rejectWithValue})=>{
+
+  try{
+      const resp= await CustomRequest.get(`dashboard/workspace/${wsId}/boards`);
+      return await resp.data.boards;
+
+  }catch(err){
+    if (err.response) {
+      // The server responded with a status code that falls out of the range of 2xx
+      return rejectWithValue(err.response.data);
+    } else if (err.request) {
+      // The request was made but no response was received
+      return rejectWithValue('No response from server');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log(err.message)
+      return rejectWithValue('Request error:'+err.message);
+    }
+  }
+
+
+});
+
+
+
+
 
 
 const initialState = {
@@ -36,12 +68,18 @@ const BoardSlice = createSlice({
     },
   },
   extraReducers(builder){
-    builder.addCase(fetchWorkspaces.fulfilled,(state, action)=>{
-      const wss=action.payload;
-      const activeWs= wss.workspace.owned.filter(ws=> ws.is_active==true)??wss.workspace.shared.filter(ws=> ws.is_active==true);
-       state.list=activeWs[0].boards.length?activeWs[0].boards:[];
-       state.status="success";
+    builder.addCase(fetchBoardsByWsId.pending,(state, action)=>{
+       state.status="pending";
     })
+    .addCase(fetchBoardsByWsId.fulfilled,(state, action)=>{
+      state.status="success";
+      state.list=action.payload;
+
+   })
+   .addCase(fetchBoardsByWsId.rejected,(state, action)=>{
+    state.status="rejected";
+    console.log(action.payload)
+ })
   }
 });
 

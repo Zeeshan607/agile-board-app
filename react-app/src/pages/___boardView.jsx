@@ -19,29 +19,27 @@ import { selectBoardsList } from "../features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "../components/CreateBoardModel.jsx";
 import { setActiveBoard } from "../features/BoardSlice.js";
-import ColumnsList from "../components/ColumnsList.jsx";
-// import {
-//   DndContext,
-//   useSensors,
-//   useSensor,
-//   closestCenter,
-//   closestCorners,
-//   rectIntersection,
-//   MouseSensor,
-//   TouchSensor,
-//   PointerSensor,
-//   KeyboardSensor,
-//   DragOverlay,
-// } from "@dnd-kit/core";
-// import {
-//   horizontalListSortingStrategy,
-//   SortableContext,
-//   sortableKeyboardCoordinates,
-// } from "@dnd-kit/sortable";
-import TaskList from "../components/TaskList.jsx";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-
-import {v1 as uuidv1} from 'uuid';
+import ColumnsList from "../components/___-ColumnsList.jsx";
+import {
+  DndContext,
+  useSensors,
+  useSensor,
+  closestCenter,
+  closestCorners,
+  rectIntersection,
+  MouseSensor,
+  TouchSensor,
+  PointerSensor,
+  KeyboardSensor,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import TaskList from "../components/___TaskList.jsx";
+// REMEMBER we are using BoardStatus as Columns in client side app, in server side its logics are as BoardStatus
 
 const BoardView = React.memo(() => {
   // const [searchParams, setSearchParams]=useSearchParams();
@@ -66,13 +64,13 @@ const BoardView = React.memo(() => {
   const boardStatus = useSelector((state) => state.boards.status);
   const taskStatus = useSelector((state) => state.tasks.status);
   const activeWsId = useSelector((state) => state.workspace.active.id);
-  // const mouseSensor = useSensor(MouseSensor); // Initialize mouse sensor
-  // const touchSensor = useSensor(TouchSensor); // Initialize touch sensor
-  // const pointerSensor = useSensor(PointerSensor); //initialize pointer sensor
-  // useSensor(KeyboardSensor, {
-  //   coordinateGetter: sortableKeyboardCoordinates,
-  // });
-  // const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
+  const mouseSensor = useSensor(MouseSensor); // Initialize mouse sensor
+  const touchSensor = useSensor(TouchSensor); // Initialize touch sensor
+  const pointerSensor = useSensor(PointerSensor); //initialize pointer sensor
+  useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  });
+  const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
 
   const [activeId, setActiveId] = useState(null);
   const [activeDragTask, setActiveDragTask] = useState({});
@@ -110,76 +108,125 @@ const BoardView = React.memo(() => {
 
   const handleDragOver = (event) => {
     // console.log(event)
-    // const { active, over } = event;
-    // // const overId=over.id;
-    // const id = active.id;
+    const { active, over } = event;
+    // const overId=over.id;
+    const id = active.id;
     // if (!over) return;
     console.log("drag-Over event");
     // console.log( "over "+over)
     console.log(event);
 
-  };
+    // Find the containers
+    // const activeContainer = active.data.current.type=="container"?active.data.current.parent?.id:null;
+    // const overContainer = over.data.current.type=="container"?over.data.current.parent?.id:null;
 
-  const handleDragEnd = (event) => {
-    const { 
-      draggableId:activeId, destination } = event;
-    console.log("on drag end triggering: ");
-    console.log(event);
+    // if (
+    //   !activeContainer ||
+    //   !overContainer ||
+    //   activeContainer === overContainer
+    // ) {
+    //   return;
+    // }
 
-if(activeId!== destination.droppableId){
-  dispatch(
-        updateTasksColumn({
-          column_id: destination.droppableId,
-          task_id: activeId,
-        })
-      );
-}
-    // if (!over) return;
+    //   const { id: overId } = over;
+    // if (overId === activeId) return;
+
+    // const overData = over.data.current;
+    // if (overData.type === "container") {
+    //   // Handle when a task is dragged over a column container
+    //   console.log('task dragged over container/column')
+    // } else if (overData.type === "task") {
+    //   // Handle when a task is dragged over another task
+    //   console.log('task draged over other task')
+    // }
 
     // const { id: overId } = over;
     // const { id: activeId } = active;
 
+    // if (overId === activeId) return;
+
     // const overData = over.data.current;
     // const activeData = active.data.current;
 
-    // if (
-    //   overData.type === "container" &&
-    //   activeData.sortable.index !== overData.sortable.index
-    // ) {
-    //   dispatch(
-    //     updateTasksColumn({
-    //       column_id: overId,
-    //       task_id: activeId,
-    //     })
-    //   );
-    // } else if (overData.type === "task") {
-    //   if (activeData.parent?.id !== overData.parent?.id) {
-    //     dispatch(
-    //       updateTasksColumn({
-    //         column_id: overId,
-    //         task_id: activeId,
-    //       })
-    //     );
-    //   } else {
-    //     console.log("task moving over task");
-    //   }
+    // if (overData.type === "container" && activeData.type === "task") {
+    //   // Handle when a task is dragged over an empty column
+    //   dispatch(updateTasksColumn({
+    //     "column_id": overId,
+    //     'task_id': activeId
+    //   }));
+    // } else if (overData.type === "task" && activeData.type === "task" && activeData.parent.id !== overData.parent.id) {
+    //   // Handle when a task is dragged over another task in a different column
+    //   dispatch(updateTasksColumn({
+    //     "column_id": overData.parent.id,
+    //     'task_id': activeId
+    //   }));
     // }
-
-    setActiveId(null);
   };
 
- 
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    console.log("on drag end triggering: ");
+    console.log(event);
+    //  if (!over) {
+    //   setActiveId(null);
+    //   return;
+    // }
+    // if condition for moving task from one column to other, even the column is completely empty
+    //  if(over.data.current.type =="container" || active.data.current.parent?.id != over.data.current.parent?.id){
+    //   console.log('can be pushed in new column')
+    //   console.log(over.data.current.parent && over.data.current.type =='item'?over.data.current.parent.id : over.id)
+    //   dispatch(updateTasksColumn({"column_id":over.data.current.parent && over.data.current.type =='item'?over.data.current.parent.id : over.id, 'task_id':active.id}))
+    // }
+    // if (over.data.current.type === "container" && active.data.current.parent?.id !== over.data.current.parent?.id) {
+    //   dispatch(updateTasksColumn({
+    //     "column_id": over.data.current.parent && over.data.current.type === 'item' ? over.data.current.parent.id : over.id,
+    //     'task_id': active.id
+    //   }));
+    // }
 
-  // let myuuid = uuidv1();
-    // console.log('Your UUID is: ' + myuuid);
+    if (!over) return;
 
-    // const grid = 8;
-// const getListStyle = isDraggingOver => ({
-//   background: isDraggingOver ? "lightblue" : "lightgrey",
-//   padding: grid,
-//   width: 250
-// });
+    const { id: overId } = over;
+    const { id: activeId } = active;
 
+    const overData = over.data.current;
+    const activeData = active.data.current;
+
+    if (
+      overData.type === "container" &&
+      activeData.sortable.index !== overData.sortable.index
+    ) {
+      dispatch(
+        updateTasksColumn({
+          column_id: overId,
+          task_id: activeId,
+        })
+      );
+    } else if (overData.type === "task") {
+      if (activeData.parent?.id !== overData.parent?.id) {
+        dispatch(
+          updateTasksColumn({
+            column_id: overId,
+            task_id: activeId,
+          })
+        );
+      } else {
+        console.log("task moving over task");
+      }
+    }
+    // if (overData.type === "container" && activeData.type === "task" && activeData.parent.id !== overId) {
+    //   dispatch(updateTasksColumn({
+    //     "column_id": overId,
+    //     'task_id': activeId
+    //   }));
+    // } else if (overData.type === "task" && activeData.type === "task" && activeData.parent.id !== overData.parent.id) {
+    //   dispatch(updateTasksColumn({
+    //     "column_id": overData.parent.id,
+    //     'task_id': activeId
+    //   }));
+    // }
+    setActiveId(null);
+  };
 
   const boards = useSelector(selectBoardsList);
   let options = boards?.map((b) => {
@@ -188,10 +235,9 @@ if(activeId!== destination.droppableId){
   const handleSelect = (e) => {
     // setSearchParams({ board: e.label });
   };
-  // const boardQuery = searchParams.get("slug");
-  // console.log(boardSlug)
-  const selectedBoard = boardSlug
-    ? { value: boardSlug, label: boardSlug }
+  const boardQuery = searchParams.get("slug");
+  const selectedBoard = boardQuery
+    ? { value: boardQuery, label: boardQuery }
     : { value: "null", label: "--select Board--" };
 
   // console.log(boardQuery)
@@ -245,8 +291,13 @@ if(activeId!== destination.droppableId){
       </div>
 
       <div className="d-flex flex-row flex-wrap justify-content-start kanban-container">
-      <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragOver}>
-      
+        <DndContext
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragOver={handleDragOver}
+          sensors={sensors}
+        >
+          {/* <SortableContext items={columns.map((column)=> column.id)} strategy={horizontalListSortingStrategy}> */}
           {isLoading ? (
             <p>
               <i
@@ -256,14 +307,6 @@ if(activeId!== destination.droppableId){
             </p>
           ) : columns.length ? (
             columns.map((column, index) => (
-
-
-
-        <Droppable droppableId={column.id.toString()} index={index} key={column.id}>
-             {(provided, snapshot) => (
-              <div   {...provided.droppableProps} ref={provided.innerRef}>
-
-
               <ColumnsList
                 column={column}
                 key={index}
@@ -271,20 +314,22 @@ if(activeId!== destination.droppableId){
                 draggingActiveId={activeId}
                 activeDragTask={activeDragTask}
               />
-             {provided.placeholder}
-
-              </div>
-
-              )}
-        </Droppable>
-
-
             ))
           ) : (
             <p>0 Columns found..</p>
           )}
-     
-        </DragDropContext>
+          {/* </SortableContext> */}
+          <DragOverlay>
+            {activeId ? (
+              <TaskList
+                task={activeDragTask}
+                parent={columns.map((col) => {
+                  return activeDragTask.column_id == col.id ? col : null;
+                })}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   );

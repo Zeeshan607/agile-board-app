@@ -53,6 +53,7 @@ const WorkspaceMembers = createSlice({
 }
 });
 
-export const {} = WorkspaceMembers.actions
+export const {} = WorkspaceMembers.actions;
+export const selectWorkspaceMembers= state=>state.workspaceMembers.members;
 
 export default WorkspaceMembers.reducer

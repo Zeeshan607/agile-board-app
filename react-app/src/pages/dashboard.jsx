@@ -9,8 +9,8 @@ import "./dashboard.css";
 const Dashboard = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [searchParams, setSearchParams]=useSearchParams();
-  const selectedBoard=searchParams.get('board');
+  // const [searchParams, setSearchParams]=useSearchParams();
+  // const selectedBoard=searchParams.get('board');
   const boards = useSelector(selectBoardsList);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const Dashboard = () => {
           // boards.filter()
       // }
       // loadBoardColumns(selectedBoard)
-  }, [selectedBoard]);
+  }, [boards]);
 
 
     // const loadBoardColumns=async(board)=>{
@@ -30,7 +30,7 @@ const Dashboard = () => {
     //       toast.error(err.response?.data?.msg);
     //     }
     // }
-
+// console.log(boards)
 
   
   return (

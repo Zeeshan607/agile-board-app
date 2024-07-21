@@ -6,3 +6,7 @@
 .content > [class^="container-"]{
     height: 100%;
 }
+.react-responsive-modal-modal{
+    border-radius: 10px;
+    padding:15px;
+}

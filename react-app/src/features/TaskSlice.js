@@ -37,6 +37,19 @@ const TaskSlice = createSlice({
   reducers: {
         setTasksList:(state, action)=>{
             state.list=action.payload.tasks;
+        },
+        insertTaskInTasksList:(state, action)=>{
+          state.list.push(action.payload.task);
+        },
+        updateTasksColumn:(state, action)=>{
+          const target_task=  state.list.filter(task=> task.id==action.payload.task_id)
+          target_task[0].column_id= action.payload.column_id;
+
+          state.list.map((task, index)=>{
+            if(task.id== action.payload.task_id){
+              state.list[index]=target_task[0]
+            }
+          })
         }
 
   },
@@ -55,7 +68,7 @@ const TaskSlice = createSlice({
 }
 });
 
-export const {setTasksList} = TaskSlice.actions;
+export const {setTasksList,insertTaskInTasksList,updateTasksColumn} = TaskSlice.actions;
 export const selectTasks=state=>state.tasks.list;
 
 export default TaskSlice.reducer

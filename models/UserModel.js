@@ -1,94 +1,66 @@
-import {DataTypes} from 'sequelize';
-import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
-import Role from './Role.js';
-import Workspace from './workspace.js';
-import UserWorkspace from './UserWorkspace.js'
+import { DataTypes } from "sequelize";
+import sequelize from "../db.js"; // Assuming you have a Sequelize instance set up
+// import Workspace from "./workspace.js";
+// import UserWorkspace from "./UserWorkspace.js";
+import { hashMake } from "../utils/helpers.js";
 
-const User = sequelize.define('User', {
-    // Define model attributes
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
-        // role_id:{
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     reference:{
-        //         model:Role,
-        //         key:'id'
-        //     }
-        // },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        }
+const User = sequelize.define("User", {
+  // Define model attributes
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
 
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  last_active_workspace:{
+    type:DataTypes.UUID,
+    allowNull:true,
+  }
 });
 
-// Relations
-// Role.hasMany(User,{onDelete: 'CASCADE',foreignKey:{ allowNull: false,name:"role_id"}});
-// User.belongsTo(Role,{as:"Role", foreignKey:{ allowNull: false,name:"role_id"}});
-       
 
-User.belongsToMany(Workspace,{
-onDelete: "CASCADE",
-through: UserWorkspace,
-foreignKey:'user_id',
-constraints:false,
-as:'workspace'})
+// User.belongsToMany(Workspace, {
+//   onDelete: "CASCADE",
+//   through: UserWorkspace,
+//   foreignKey: "user_id",
+//   constraints: false,
+//   as: "workspace",
+// });
 
-Workspace.belongsToMany(User, {
-    onDelete: "RESTRICT",
-    through:UserWorkspace,
-    foreignKey:'workspace_id',
-    constraints:false,
-    as:'users',
-})
+// Workspace.belongsToMany(User, {
+//   onDelete: "RESTRICT",
+//   through: UserWorkspace,
+//   foreignKey: "workspace_id",
+//   constraints: false,
+//   as: "users",
+// });
 
 //Methods
-User.prototype.hideSensitiveInfo=function(){
-   // Create a copy of the instance object
+User.prototype.hideSensitiveInfo = function () {
+  // Create a copy of the instance object
   const instance = this.toJSON();
   // Remove sensitive properties from the copy
   delete instance.password;
 
   return instance;
-
 };
 
 
 
-
-
-
 export default User;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import mongoose from 'mongoose';
 
@@ -97,13 +69,11 @@ export default User;
 //     email:String,
 //     password:String,
 //     role:{
-//         type:String, 
+//         type:String,
 //         enum: ['admin','user','developer','project_manager'],
 //         default:'admin'
 //     }
 
-
-    
 // },{timestamps:true})
 // UserSchema.methods.withoutPassword=function(){
 //     const obj=this.toObject();

@@ -1,7 +1,7 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-import Workspace from "./workspace.js";
-import User from "./UserModel.js";
+// import Workspace from "./workspace.js";
+// import User from "./UserModel.js";
 
 
 const UserWorkspace=  sequelize.define('UserWorkspace',{
@@ -26,11 +26,11 @@ const UserWorkspace=  sequelize.define('UserWorkspace',{
         //     key:'id',
         // }
     },
-    is_admin:{
-        type:DataTypes.BOOLEAN,
-        defaultValue:true,
-    },
-    is_owner:{
+    // is_admin:{
+    //     type:DataTypes.BOOLEAN,
+    //     defaultValue:true,
+    // },
+    is_shared:{
         type:DataTypes.BOOLEAN,
         defaultValue:true,
     }

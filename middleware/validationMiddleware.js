@@ -4,6 +4,7 @@ import User from "../models/UserModel.js";
 import Board from "../models/BoardModel.js";
 import Workspace from "../models/workspace.js";
 import Task from '../models/TaskModel.js';
+import BoardColumn from "../models/BoardColumnModel.js";
 
 
 const withValidationErrors = (validateValues) => {
@@ -114,9 +115,23 @@ export const validateTask= withValidationErrors([
   body('title').notEmpty().withMessage('Task title Required'),
   body('description').notEmpty().withMessage('Task Description required'),
   body('column_id').custom(async (val)=>{
-        const task=await Task.findById(val);
-        if(!task){
+        const column= await BoardColumn.findByPk(val);
+        if(!column){
           throw new NotFoundError(`No Task found with id ${val}`);
         }
-  }).withMessage('invalid column id')
+  }).withMessage('invalid column id'),
+
+  body("board_id").custom(async (val) => {
+
+    const board= await Board.findByPk(val);
+    // console.log(board)
+    if(!board) throw new NotFoundError(`No Board found with id ${val}`);
+  }).withMessage("invalid board id"),
+
+  body('assigned_to').custom(async (val)=>{
+    const user = await User.findByPk(val)
+      if (!user) {
+        throw new BadRequestError("User does not exit with this email id");
+      }
+  }).withMessage('invalid Member selected')
 ])

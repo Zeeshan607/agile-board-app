@@ -16,11 +16,10 @@ useEffect(()=>{
 const fetchUser=async()=>{
 
     try{
-        const resp= await CustomRequest.get("/dashboard/users");
-        const users= await resp.data.users;
-        dispatch(setUsersList({
-            users:users
-        }))
+  
+        // dispatch(setUsersList({
+        //     users:users
+        // }))
     }catch(err){
         toast.error(err.response?.data?.msg);
     }

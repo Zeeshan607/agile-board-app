@@ -19,14 +19,16 @@ import {
 import { toast } from "react-toastify";
 import CustomRequest from "./utils/customRequest.jsx";
 import AppResponse from "./components/AppResponse.jsx";
-import { selectBoardsList, setBoardsList } from "./features/BoardSlice.js";
+import { selectBoardsList, setBoardsList,fetchBoardsByWsId } from "./features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
+import WorkspaceSelectModal from "./components/SelectWorkspaceModal.jsx";
 import { jwtDecode } from "jwt-decode";
 import {
   fetchWorkspaces,
   selectActiveWorkspace,
-  selectWorkspaceErrors
+  selectWorkspaceErrors,
+  setActiveWorkspace 
 } from "./features/workspaceSlice.js";
 import Loading from "./components/Loading.jsx";
 
@@ -35,16 +37,21 @@ const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
-  // let [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const onOpenCreateBoardModal = () => setOpen(true);
   const onCloseCreateBoardModal = () => setOpen(false);
+
+  const [openWorkspaceSelectModal, setOpenWorkspaceSelectModal]=useState(false);
+
+  const openWorkspaceSelect=()=>setOpenWorkspaceSelectModal(true);
+  const closeWorkspaceSelect=()=>setOpenWorkspaceSelectModal(false);
+
   const ws_status=useSelector((state)=>state.workspace.status);
- const activeHasBoards= useSelector((state)=>state.workspace.activeHasBoards);
-  const currentUser = authToken ? jwtDecode(authToken) : null;
-  const activeWorkspace = useSelector(selectActiveWorkspace);
-const wsSliceErr= useSelector(selectWorkspaceErrors);
+  const activeHasBoards= useSelector((state)=>state.workspace.activeHasBoards);
+  const currentUser =useSelector(selectAuthenticatedUser);
+  const wsSliceErr= useSelector(selectWorkspaceErrors);
+  const activeWorkspace=useSelector(selectActiveWorkspace);
 
   useEffect(() => {
 
@@ -52,28 +59,47 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
       navigate("/login");
     }
 
-
-
-
-      if( authToken && ws_status=="idle"){
+      if(authToken && ws_status=="idle"){
         dispatch(fetchWorkspaces());
         setIsLoading(false)
       }
       
 
-
     if(wsSliceErr.length){
       toast.error("Workspace Error:"+ wsSliceErr);
     }
 
-    if(activeHasBoards){
-      if (activeWorkspace == {} && !activeWorkspace.boards?.length) {
-        onOpenCreateBoardModal();
-      } 
+    // console.log(Object.keys(activeWorkspace).length)
+    if(!currentUser.last_active_workspace){
+        openWorkspaceSelect();
     }
+
+    if(Object.keys(activeWorkspace).length==0 && ws_status=="success"){
+      dispatch(setActiveWorkspace({wsId:currentUser.last_active_workspace}));
+      setIsLoading(false);
+    }
+ 
+
+   
+
+    // if(activeHasBoards){
+    //   if (activeWorkspace == {} && !activeWorkspace.boards?.length) {
+    //     onOpenCreateBoardModal();
+    //   } 
+    // }
   
   
-  }, [authToken, dispatch, activeHasBoards, wsSliceErr]);
+  }, [currentUser,authToken, dispatch, activeWorkspace, ws_status, wsSliceErr]);
+
+
+
+  useEffect(()=>{
+
+    if(activeWorkspace && ws_status=='success' ){
+      dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
+      setIsLoading(false);
+    }
+  },[ws_status])
 
 
   const Logout = async () => {
@@ -86,43 +112,12 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
     }
   };
 
-  // fetching functions
-  // const LoadWorkspace = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const resp = await CustomRequest.get(`/dashboard/workspaces`);
-  //     const wss = await resp.data;
-  //     dispatch(setWorkspaceList({ workspaces: wss }));
-  //     dispatch(setActiveWorkspace());
-  //     setIsLoading(false);
-  //   } catch (err) {
-  //     toast.error(err.response?.data?.msg);
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  //  const loadBoards = async () => {
-  //    setIsLoading(true);
-  //    try {
-  //        const active_ws_id= activeWorkspace?activeWorkspace.id:null;
-
-  //      const resp = await CustomRequest.get(`dashboard/boards/${active_ws_id}`);
-  //      const boards = await resp.data;
-
-  //      boards.sort((a, b) => a.id - b.id);
-  //      dispatch(setBoardsList({ boards: boards }));
-  //      setIsLoading(false);
-  //    } catch (err) {
-  //      toast.error(err.response?.data?.msg);
-  //      setIsLoading(false);
-  //    }
-  //  };
-
+ 
   return (
     <React.Fragment>
       <div className="wrapper">
         <Sidebar></Sidebar>
-
+   
         <div className="main">
           <nav className="navbar navbar-expand navbar-light navbar-bg">
             <a className="sidebar-toggle js-sidebar-toggle">
@@ -404,7 +399,10 @@ const wsSliceErr= useSelector(selectWorkspaceErrors);
 
           <main className="content" id="page-content">
             {/* page content will be here */}
-            <AppResponse />
+            {/* <AppResponse /> */}
+            
+              <WorkspaceSelectModal open={openWorkspaceSelectModal} onClose={closeWorkspaceSelect} />
+            
             {isLoading ? (
                   <Loading/>
             ) : (

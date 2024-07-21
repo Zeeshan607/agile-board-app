@@ -1,8 +1,11 @@
+
+ // Assuming you have a Sequelize instance set up
+ import sequelize from '../db.js';
 import {DataTypes} from 'sequelize';
-import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
-import BoardColumn from './BoardColumnModel.js';
 import Board from './BoardModel.js'
-import User from './UserModel.js';
+import BoardColumn from './BoardColumnModel.js';
+
+// import User from './UserModel.js';
 
 
 const Task = sequelize.define('Task', {
@@ -22,51 +25,45 @@ const Task = sequelize.define('Task', {
     },
     priority:{
         type:DataTypes.INTEGER,
-        allowNull:false,
+        allowNull:true,
     },
     due_date:{
         type:DataTypes.DATE,
-        allowNull:false,
+        allowNull:true,
     },
     assigned_to:{
             type:DataTypes.INTEGER,
             allowNull:true,
-            references:{
-                model:User,
-                key:'id',
-            }
+            // references:{
+            //     model:'User',
+            //     key:'id',
+            // }
     },
     column_id:{
-        type:DataTypes.INTEGER,
+        type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
         allowNull:true,
-        references:{
-            model:BoardColumn,
-            key:'id',
-        },
+        // references:{
+        //     model:'BoardColumn',
+        //     key:'id',
+        // }
     },
     board_id:{
         type:DataTypes.INTEGER,
         allowNull:true,
-        references:{
-            model:Board,
-            key:'id',
-        },
+        // references:{
+        //     model:'Board',
+        //     key:'id',
+        // }
        }
 });
 //example of model relation defination in squalize model
 
-// Task.belongsTo(User,{as:"assigned_task", foreignKey:{ allowNull: false,name:"assigned_to"}});
 
-BoardColumn.hasMany(Task,{foreignKey:{ allowNull: false,name:"column_id"},onDelete: 'CASCADE',as:"Tasks"});
-Task.belongsTo(BoardColumn,{as:'Columns',onDelete: 'RESTRICT',foreignKey:{ allowNull: false,name:"column_id"}});
 
-Board.hasMany(Task,{
-    onDelete:"CASCADE",
-    foreignKey:'board_id',
-    as:'tasks'
-})
 
-Task.belongsTo(Board,{as:'boards',onDelete: 'RESTRICT',constraints:false,foreignKey:{ allowNull: false,name:"board_id"}});
+
+
 
 
 

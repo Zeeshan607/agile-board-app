@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 const initialState = {
   user: "",
   token: "",
@@ -18,13 +19,16 @@ const UserAuthSlice = createSlice({
       state.user = "";
       state.token = "";
     },
+    setUserLastActiveWorkspace:(state, action)=>{
+      state.user.last_active_workspace=action.payload.wsId;
+    }
   },
 });
 
-export const { setUserLoginStatus, setAuthenticatedUser, setUserLogoutStatus } =UserAuthSlice.actions;
+export const { setUserLoginStatus, setAuthenticatedUser, setUserLogoutStatus, setUserLastActiveWorkspace } =UserAuthSlice.actions;
 
-export const selectAuthenticatedUser = state => state.userAuth.user;
-export const selectAuthToken = state=> state.userAuth.token;
+export const selectAuthenticatedUser = (state) => state.userAuth.user;
+export const selectAuthToken = (state) => state.userAuth.token;
 
 
 export default UserAuthSlice.reducer;
