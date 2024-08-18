@@ -95,7 +95,7 @@ export const validateBoard = withValidationErrors([
   body("description").notEmpty().withMessage("Board description required"),
   body('ws_id').custom(async (val)=>{
 
-        const ws=await Workspace.findById(val);
+        const ws=await Workspace.findByPk(val);
 
         if(!ws) throw new NotFoundError(`No workspace found with id ${val}`);
 
@@ -105,7 +105,7 @@ export const validateBoardIdParam = withValidationErrors([
   param("id")
     .custom(async (val) => {
       // console.log(val)
-      const board= await Board.findById(val);
+      const board= await Board.findByPk(val);
       if(!board) throw new NotFoundError(`No Board found with id ${val}`);
     }).withMessage("invalid record id"),
 ]);
@@ -128,10 +128,15 @@ export const validateTask= withValidationErrors([
     if(!board) throw new NotFoundError(`No Board found with id ${val}`);
   }).withMessage("invalid board id"),
 
-  body('assigned_to').custom(async (val)=>{
-    const user = await User.findByPk(val)
-      if (!user) {
-        throw new BadRequestError("User does not exit with this email id");
-      }
-  }).withMessage('invalid Member selected')
+
+])
+
+export const validateParentTaskId=withValidationErrors([
+  param('task_id').custom(async (val)=>{
+    // console.log(val);
+    const task= await Task.findByPk(val);
+    if(!task){
+      throw new NotFoundError(`Task with id ${val} does not Exist`);
+    }
+  }).withMessage('invalid parameter task_id')
 ])

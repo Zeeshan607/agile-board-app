@@ -12,13 +12,13 @@ class BoardColumnController {
         console.log(slug)
         const board= await Board.findOne({where:{slug:slug}})
         if(!board) return res.status(StatusCodes.NOT_FOUND).json({'msg':`Board with name "${slug}"  not found`})
-        const columns= await BoardColumn.findAll({where:{boardId:board.id}, 
+        const columns= await BoardColumn.findAll({where:{boardId:board.id},order:[['order','ASC']] ,
             include: [{
               model: Task,
               as:"Tasks"
               // where: { column_id: sequelize.col('column.id') }
             }]
-    });
+    },{group:'boardId'});
        
        return  res.status(StatusCodes.OK).json({columns:columns});
     }

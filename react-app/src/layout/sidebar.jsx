@@ -1,28 +1,68 @@
-import react from "react";
-import { Link } from "react-router-dom";
+import react, {useEffect, useState} from "react";
+import { Link ,useNavigate} from "react-router-dom";
 import "./sidebar.css";
-import { useSelector } from "react-redux";
-import { selectActiveWorkspace, selectWorkspaceList } from "../features/workspaceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectActiveWorkspace, selectWorkspaceList, setActiveWorkspace, } from "../features/workspaceSlice.js";
+import { setUserLastActiveWorkspace } from "../features/UserAuthSlice.js";
+import CustomRequest from "../utils/customRequest";
+import { modalMethods } from "../features/modalSlice.js";
+
+
+
 
 export default function Sidebar() {
 
+  const [sortedWs, setSortedWs]=useState([]);
+  const workspaces=useSelector(selectWorkspaceList);
+  const ws_status=useSelector(state=>state.workspace.status)
+  const dispatch =useDispatch();
+  const navigate=useNavigate();
 
-const workspaces=useSelector(selectWorkspaceList);
-const ws_list=()=>{
-  const list=[];
-  workspaces.workspace.shared.map(ws=>{
-    ws.type='shared';
-    list.push(ws)
-  })
-  workspaces.workspace.owned.map(ws=>{
-    ws.type='owned';
-    list.push(ws)
-  })
-  return list
+useEffect(()=>{
+
+  let list=[]
+  if(ws_status=="success"){
+    const shared= workspaces.workspace.shared;
+    const owned= workspaces.workspace.owned;
+    shared.forEach(ws => {
+      list.push({ ...ws, type: 'shared' });
+    });
+  
+    owned.forEach(ws => {
+      list.push({ ...ws, type: 'owned' });
+    });
+
+  }
+      setSortedWs(list);
+
+},[ws_status]);
+
+
+const handleWorkspaceSwitch=async (id)=>{
+
+  try{
+    const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:id});
+    const status= resp.status;
+    // console.log(resp)
+    if(status==200){
+      dispatch(setActiveWorkspace({wsId:id}));
+      dispatch(setUserLastActiveWorkspace({wsId:id}))
+      toast.success('Workspace switched successfully');
+        navigate('/');
+    }
+  }catch(err){
+    toast.error("Error while switching workspace:"+err);
+  }
 }
+
+
+
+
 const active_ws=useSelector(selectActiveWorkspace);
 
-
+if(!active_ws){
+  modalMethods.openSelectWorkspaceModal();
+}
   return (
     <nav id="sidebar" className="sidebar js-sidebar">
       <div className="sidebar-content js-simplebar">
@@ -102,8 +142,8 @@ const active_ws=useSelector(selectActiveWorkspace);
                       </a>
                         <ul className="dropdown-menu dropdown-menu-dark dropend settings-workspace-list" aria-labelledby="subdropend">
                             {
-                              ws_list().length?ws_list().map(ws=>(
-                                <li><a className={"dropdown-item " + (active_ws.id==ws.id ? " bg-primary active" : '')} href="#">{ws.title}</a></li>
+                              sortedWs?sortedWs.map((ws,index)=>(
+                                <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title}</a></li>
                               )):''
                             }
                         

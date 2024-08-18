@@ -15,50 +15,29 @@ import {
   fetchTasks,
   updateTasksColumn,
 } from "../features/TaskSlice.js";
-import { selectBoardsList } from "../features/BoardSlice.js";
+import { selectActiveBoard, selectBoardsList } from "../features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "../components/CreateBoardModel.jsx";
-import { setActiveBoard } from "../features/BoardSlice.js";
+import { boardMethods } from "../features/BoardSlice.js";
 import ColumnsList from "../components/ColumnsList.jsx";
-// import {
-//   DndContext,
-//   useSensors,
-//   useSensor,
-//   closestCenter,
-//   closestCorners,
-//   rectIntersection,
-//   MouseSensor,
-//   TouchSensor,
-//   PointerSensor,
-//   KeyboardSensor,
-//   DragOverlay,
-// } from "@dnd-kit/core";
-// import {
-//   horizontalListSortingStrategy,
-//   SortableContext,
-//   sortableKeyboardCoordinates,
-// } from "@dnd-kit/sortable";
 import TaskList from "../components/TaskList.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-
-import {v1 as uuidv1} from 'uuid';
+import {useAuth} from "../hooks/useAuth.jsx";
+import CustomRequest from "../utils/customRequest.jsx";
+import { modalMethods, selectCreateBoardModal } from "../features/modalSlice.js";
+import { model } from "mongoose";
 
 const BoardView = React.memo(() => {
   // const [searchParams, setSearchParams]=useSearchParams();
   const param = useParams();
   const boardSlug = param.slug;
   const dispatch = useDispatch();
+  const auth=useAuth();
+  const last_active_board=auth.user.last_active_board;
   const [isLoading, setIsLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [openCreateBoardModel, setOpenCreateBoardModel] = useState(false);
-  const onOpenCreateBoardModal = useCallback(
-    () => setOpenCreateBoardModel(true),
-    []
-  );
-  const onCloseCreateBoardModal = useCallback(
-    () => setOpenCreateBoardModel(false),
-    []
-  );
+  const createBoardModel=useSelector(selectCreateBoardModal); 
+
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const columnsErr = useSelector((state) => state.columns.errors);
   const columnsStatus = useSelector((state) => state.columns.status);
@@ -66,26 +45,22 @@ const BoardView = React.memo(() => {
   const boardStatus = useSelector((state) => state.boards.status);
   const taskStatus = useSelector((state) => state.tasks.status);
   const activeWsId = useSelector((state) => state.workspace.active.id);
-  // const mouseSensor = useSensor(MouseSensor); // Initialize mouse sensor
-  // const touchSensor = useSensor(TouchSensor); // Initialize touch sensor
-  // const pointerSensor = useSensor(PointerSensor); //initialize pointer sensor
-  // useSensor(KeyboardSensor, {
-  //   coordinateGetter: sortableKeyboardCoordinates,
-  // });
-  // const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
+
 
   const [activeId, setActiveId] = useState(null);
   const [activeDragTask, setActiveDragTask] = useState({});
-
+  const activeBoard=useSelector(selectActiveBoard);
+  
   useEffect(() => {
-    console.log("boardView component mounted");
 
-    dispatch(setActiveBoard({ slug: boardSlug }));
 
-    console.log(`ws status changed to ${wsStatus}`);
+
+    dispatch(boardMethods.setActiveBoardData(boardSlug));
+
     if (boardStatus == "success") {
-      console.log(wsStatus);
-      if (columnsStatus == "idle") {
+   
+
+      if (columnsStatus == "idle" || columnsStatus == "success" ) {
         dispatch(fetchColumns(boardSlug));
       }
       if (columnsErr.length != 0) {
@@ -93,11 +68,14 @@ const BoardView = React.memo(() => {
           toast.error("Columns Error: " + err);
         });
       }
-      if (taskStatus == "idle") {
+      if (taskStatus == "idle"|| taskStatus == "success" ) {
         dispatch(fetchTasks(boardSlug));
       }
     }
-  }, [boardSlug, dispatch, boardStatus]);
+  }, [boardSlug, dispatch, boardStatus,columnsErr]);
+
+
+
 
   const handleDragStart = (event) => {
     // console.log(event)
@@ -115,7 +93,7 @@ const BoardView = React.memo(() => {
     // const id = active.id;
     // if (!over) return;
     console.log("drag-Over event");
-    // console.log( "over "+over)
+
     console.log(event);
 
   };
@@ -126,44 +104,22 @@ const BoardView = React.memo(() => {
     console.log("on drag end triggering: ");
     console.log(event);
 
-if(activeId!== destination.droppableId){
-  dispatch(
-        updateTasksColumn({
+      if(activeId!== destination.droppableId){
+        let data={
           column_id: destination.droppableId,
           task_id: activeId,
-        })
-      );
-}
-    // if (!over) return;
-
-    // const { id: overId } = over;
-    // const { id: activeId } = active;
-
-    // const overData = over.data.current;
-    // const activeData = active.data.current;
-
-    // if (
-    //   overData.type === "container" &&
-    //   activeData.sortable.index !== overData.sortable.index
-    // ) {
-    //   dispatch(
-    //     updateTasksColumn({
-    //       column_id: overId,
-    //       task_id: activeId,
-    //     })
-    //   );
-    // } else if (overData.type === "task") {
-    //   if (activeData.parent?.id !== overData.parent?.id) {
-    //     dispatch(
-    //       updateTasksColumn({
-    //         column_id: overId,
-    //         task_id: activeId,
-    //       })
-    //     );
-    //   } else {
-    //     console.log("task moving over task");
-    //   }
-    // }
+        }
+        dispatch( updateTasksColumn(data));
+            try{
+              const resp= CustomRequest.post('/dashboard/task_column/update',data);
+              if(resp.status==200){
+                toast.success('Task status updated');
+              }
+            }catch(err){
+                toast.error(err)
+            }
+        
+            }
 
     setActiveId(null);
   };
@@ -215,8 +171,10 @@ if(activeId!== destination.droppableId){
           ) : (
             "No active workspace"
           )}
-
+          {"        "}
+          <b className="text-success flex-nowrap">Board:</b>
           <div className=" input-group-inline ms-2">
+         
             <Select
               defaultValue={
                 selectedBoard
@@ -229,16 +187,16 @@ if(activeId!== destination.droppableId){
             />
             <button
               className="btn btn-transparent"
-              onClick={(e) => setOpenCreateBoardModel(true)}
+              onClick={() => modalMethods.openCreateBoardModal()}
             >
               <i className="fa fa-plus"></i>
             </button>
           </div>
 
           <CreateBoardModel
-            open={openCreateBoardModel}
+            open={createBoardModel}
             ws_id={activeWorkspace?.id}
-            onClose={onCloseCreateBoardModal}
+            onClose={modalMethods.closeCreateBoardModal}
           />
         </div>
         <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end"></div>
@@ -281,7 +239,7 @@ if(activeId!== destination.droppableId){
 
             ))
           ) : (
-            <p>0 Columns found..</p>
+            <Loading/>
           )}
      
         </DragDropContext>

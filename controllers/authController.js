@@ -59,6 +59,7 @@ class AuthController {
       email: user.email,
       name: user.username,
       last_active_workspace:user.last_active_workspace,
+      last_active_board:user.last_active_board,
     });
 
     const oneDay = 1000 * 60 * 60 * 24; //converting one Day into milliseconds

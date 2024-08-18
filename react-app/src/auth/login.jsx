@@ -19,11 +19,16 @@ function Login() {
   const dispatch = useDispatch();
   const token = useSelector(selectAuthToken);
 
+
+
   // component on load logic
   useEffect(() => {
     if (token) {
       navigate("/");
     }
+
+
+    
   }, [navigate]);
 
 
@@ -36,12 +41,12 @@ function Login() {
           password: form.password,
         };
 
+
     try {
       const resp = await CustomRequest.post("/auth/login", data);
       const token = await resp.data?.token;
       const user = jwtDecode(token);
       dispatch(setUserLoginStatus({ token, user }));
-      
       toast.success(resp.data?.msg);
       navigate("/");
     } catch (err) {

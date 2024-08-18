@@ -24,7 +24,11 @@ const BoardColumn = sequelize.define('BoardColumn', {
     },
     boardId:{
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        reference:{
+            model:'Board',
+            key:'id'
+        }
     },
     order:{
         type:DataTypes.INTEGER,

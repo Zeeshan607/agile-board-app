@@ -8,6 +8,7 @@ import {toast, ToastContainer } from 'react-toastify';
 import {
   createBrowserRouter,
   RouterProvider,
+  Routes,
 } from "react-router-dom";
 import $ from "jquery";
 // page imports
@@ -15,7 +16,7 @@ import $ from "jquery";
 import { PersistGate } from 'redux-persist/integration/react';
 import {persistStore} from 'redux-persist';
 import router from './routes.jsx';
-
+import { AuthProvider } from './hooks/useAuth.jsx';
 
 // global variables
 window.toast= toast;
@@ -30,8 +31,8 @@ let persister = persistStore(Store);
 root.render(
   <Provider store={Store}>
     <PersistGate persistor={persister}>
-      <RouterProvider router={router} />
-      <ToastContainer position='top-right'/>
+    <RouterProvider router={router} />
+     <ToastContainer position='top-right'/>
     </PersistGate>
   </Provider>
 )

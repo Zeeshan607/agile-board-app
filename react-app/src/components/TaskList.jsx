@@ -9,6 +9,7 @@ import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import { useDraggable } from '@dnd-kit/core';
 import "./TaskList.css";
+import moment from 'moment';
 
 
 
@@ -51,9 +52,22 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                     <div className="task-link" onClick={handleTaskClick}>
                       <div className="d-flex flex-row task-header">
                         <div className="priority flex-fill">
-                          <span className="badge bg-danger" title="priority">
-                            High
-                          </span>
+                          {
+                            task.priority==1?(
+                              <span className="badge bg-danger" title="priority">
+                                High
+                              </span>
+                            ): task.priority ==2?(
+                                  <span className="badge bg-warning" title="priority">
+                                   Medium
+                                  </span>
+                            ):(
+                            <span className="badge bg-secondary" title="priority">
+                              Normal
+                             </span>
+                             )
+                          }
+                         
                         </div>
                         <div className="menu flex-fill text-end ">
                           <div className="dropdown position-relative">
@@ -96,7 +110,7 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                           </a>
                         </div>
                         <div className="created_at flex-fill text-end">
-                          <span><b>Due:</b> 18 Jul 2018</span> 
+                          <span><b>Due:</b> {moment(task.due_date).format('DD-MM-YYYY')}</span> 
                         </div>
                         
                       </div>

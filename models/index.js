@@ -7,6 +7,8 @@ import Board from "./BoardModel.js";
 import UserWorkspace from "./UserWorkspace.js";
 import BoardColumn from "./BoardColumnModel.js";
 import Task from "./TaskModel.js";
+import SubTask from "./SubTask.js";
+import TaskDiscussion from "./TaskDiscussion.js";
 import {trunOffForeignKeyCheckAndTruncateTable,checkIfTableExists} from "../utils/helpers.js";
 // Define any associations here
 // For example: User.hasMany(Post);
@@ -68,7 +70,7 @@ User.belongsToMany(Workspace, {
 Workspace.belongsToMany(User, {
   through: UserWorkspace,
   foreignKey: 'workspace_id',
-  as: 'users'
+  as: 'usersWithAccess'
 });
 
 
@@ -109,16 +111,33 @@ User.hasMany(Task,{
   as:'assigned_tasks' });
 
 
+Task.hasMany(SubTask,{
+  onDelete:"CASCADE",
+  onUpdate:"RESTRICT",
+  foreignKey:{name:'task_id',allowNull:true},
+  as:'sub_tasks' 
+})
 
 
-
-
+Task.hasMany(TaskDiscussion,{
+  onDelete:"CASCADE",
+  onUpdate:"RESTRICT",
+  foreignKey:{name:'task_id',allowNull:true},
+  as:'discussions' 
+})
 
 
 
 const dbRefresh=false;
 const modelSeeding=false;
-
+const uid1=uuidv4();
+const uid2=uuidv4();
+const uid3=uuidv4();
+const uid4=uuidv4();
+const uid5=uuidv4();
+const uid6=uuidv4();
+const uid7=uuidv4();
+const uid8=uuidv4();
 
 
 const initModels = async () => {
@@ -171,6 +190,8 @@ const syncModels = async () => {
   await Board.sync({ force: dbRefresh });
   await BoardColumn.sync({ force: dbRefresh });
   await Task.sync({ force: dbRefresh });
+  await SubTask.sync({ force: dbRefresh });
+  await TaskDiscussion.sync({ force: dbRefresh });
 
   // Enable foreign key checks
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
@@ -227,8 +248,8 @@ if( await checkIfTableExists("workspaces")){
 if(workspace==0){
   try{
     await Workspace.bulkCreate([
-      {id:uuidv4(),title:"Agile Workspace-1",slug:"agile-workspace-1",visibility:'private', createdBy:1,is_active:true,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),title:"Agile Workspace-2",slug:"agile-workspace-2",visibility:'private', createdBy:2,is_active:false,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid1,title:"Agile Workspace-1",slug:"agile-workspace-1",visibility:'private', createdBy:1,is_active:true,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid2,title:"Agile Workspace-2",slug:"agile-workspace-2",visibility:'private', createdBy:2,is_active:false,createdAt:new Date(), updatedAt:new Date()},
     ])
   }catch(err){
     // console.log("failed to insert default workspace data into db error: " + err);
@@ -251,7 +272,7 @@ if((await checkIfTableExists('users')) && (await checkIfTableExists('workspaces'
       if(userCount <=2 && workspaceCount <=2 && uw_count === 0){
         try{
           const user=await User.findByPk(2);
-          const workspace=await Workspace.findOne({where:{slug:'agile-workspace-1'}});
+          const workspace=await Workspace.findOne({where:{id:uid1}});
             if(!workspace || !user){
               throw new Error('User or Workspace not found');
             }
@@ -281,8 +302,8 @@ if(await checkIfTableExists("boards")){
   if(bCount===0){
 
     try{
-      const ws1=  await Workspace.findOne({ where: { slug: 'agile-workspace-1' } });
-      const ws2=  await Workspace.findOne({ where: { slug: 'agile-workspace-2' } });
+      const ws1=  await Workspace.findOne({where:{id:uid1}});
+      const ws2=  await Workspace.findOne({where:{id:uid2}});
       if(!ws1 || !ws2){
         throw new Error("Workspace does not exist to create board")
       }
@@ -310,12 +331,12 @@ if(bcCount===0){
 
   try{
     await BoardColumn.bulkCreate([
-      {id:uuidv4(),name:"To Do",description:"List of all tasks that we have to do.",boardId:1,order:1,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),name:"In Progress",description:"All tasks that are under development",boardId:1,order:2,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),name:"Completed",description:"All completed tasks",boardId:1,order:3,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),name:"To Do",description:"List of all tasks that we have to do.",boardId:2,order:1,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),name:"In Progress",description:"All tasks that are under development",boardId:2,order:2,createdAt:new Date(), updatedAt:new Date()},
-      {id:uuidv4(),name:"Completed",description:"All completed tasks",boardId:2,order:3,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid3,name:"To Do",description:"List of all tasks that we have to do.",boardId:1,order:1,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid4,name:"In Progress",description:"All tasks that are under development",boardId:1,order:2,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid5,name:"Completed",description:"All completed tasks",boardId:1,order:3,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid6,name:"To Do",description:"List of all tasks that we have to do.",boardId:2,order:1,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid7,name:"In Progress",description:"All tasks that are under development",boardId:2,order:2,createdAt:new Date(), updatedAt:new Date()},
+      {id:uid8,name:"Completed",description:"All completed tasks",boardId:2,order:3,createdAt:new Date(), updatedAt:new Date()},
     ])
   }catch(err){
 
@@ -341,8 +362,8 @@ if(TaskCount ===0){
           if (!user) {
             throw new Error('User with id 2 does not exist.');
           }
-          const column1=await BoardColumn.findOne({where:{name:"To Do"}});
-          const column2=await BoardColumn.findOne({where:{name:"In Progress"}});
+          const column1=await BoardColumn.findOne({where:{id:uid3}});
+          const column2=await BoardColumn.findOne({where:{id:uid6}});
    
           if (!column1 || !column2) {
             throw new Error('column with given names does not exist.');
@@ -353,7 +374,7 @@ if(TaskCount ===0){
           if(user && column1 && column2){
               Task.bulkCreate([
                     {id:1, title:'Create about page',description:"page should have seo mechanism", priority:1,due_date:null,assigned_to:user.id, column_id:column1.id,board_id:1, createdAt:new Date(), updatedAt:new Date()},
-                    {id:2, title:'Create Shop page',description:"page should have seo mechanism", priority:2,due_date:null,assigned_to:user.id, column_id:column2.id,board_id:1,  createdAt:new Date(), updatedAt:new Date()},
+                    {id:2, title:'Create Shop page',description:"page should have seo mechanism", priority:2,due_date:null,assigned_to:user.id, column_id:column2.id,board_id:2,  createdAt:new Date(), updatedAt:new Date()},
                 ])
           }
                 

@@ -14,3 +14,5 @@
     works with Database technologies like MYSQL, MongoDB to develop backend API for a REACT app. 
 
     - First tried MongoDB it was easy, then i feel that is should use MYSQL so i am using Sequalize v6 
+
+    

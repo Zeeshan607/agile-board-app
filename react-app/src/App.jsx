@@ -31,65 +31,73 @@ import {
   setActiveWorkspace 
 } from "./features/workspaceSlice.js";
 import Loading from "./components/Loading.jsx";
-
+import { AuthProvider } from "./hooks/useAuth.jsx";
+import {useAuth} from "./hooks/useAuth.jsx";
+import EditableText from "./components/EditableTextInput.jsx";
+import { modalMethods, selectSelectWorkspaceModal } from "./features/modalSlice.js";
 
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
   const [isLoading, setIsLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const onOpenCreateBoardModal = () => setOpen(true);
-  const onCloseCreateBoardModal = () => setOpen(false);
+ 
+  const SelectWorkspaceModal=useSelector(selectSelectWorkspaceModal);
 
-  const [openWorkspaceSelectModal, setOpenWorkspaceSelectModal]=useState(false);
 
-  const openWorkspaceSelect=()=>setOpenWorkspaceSelectModal(true);
-  const closeWorkspaceSelect=()=>setOpenWorkspaceSelectModal(false);
 
   const ws_status=useSelector((state)=>state.workspace.status);
-  const activeHasBoards= useSelector((state)=>state.workspace.activeHasBoards);
   const currentUser =useSelector(selectAuthenticatedUser);
   const wsSliceErr= useSelector(selectWorkspaceErrors);
   const activeWorkspace=useSelector(selectActiveWorkspace);
+   const auth = useAuth();
 
+ 
+   const checkActiveWorkspace=()=>{
+    if(currentUser?.last_active_workspace!==null){
+      return true;
+    }
+    if(activeWorkspace){
+      return true;
+    }
+    return false;
+  }
+
+
+
+// console.log(currentUser.last_active_workspace)
   useEffect(() => {
-
+    // console.log('inside if condition useeffect rerender')
     if (!authToken) {
-      navigate("/login");
+      navigate('/login');
+      return;
     }
 
-      if(authToken && ws_status=="idle"){
-        dispatch(fetchWorkspaces());
-        setIsLoading(false)
-      }
-      
-
-    if(wsSliceErr.length){
-      toast.error("Workspace Error:"+ wsSliceErr);
-    }
-
-    // console.log(Object.keys(activeWorkspace).length)
-    if(!currentUser.last_active_workspace){
-        openWorkspaceSelect();
-    }
-
-    if(Object.keys(activeWorkspace).length==0 && ws_status=="success"){
-      dispatch(setActiveWorkspace({wsId:currentUser.last_active_workspace}));
+    if (authToken && ws_status === 'idle') {
+      dispatch(fetchWorkspaces());
       setIsLoading(false);
     }
- 
 
+    if (wsSliceErr.length) {
+      toast.error('Workspace Error: ' + wsSliceErr);
+    }
+
+    if (!checkActiveWorkspace()) {
+          dispatch(modalMethods.openSelectWorkspaceModal());
+          setIsLoading(false);
+
+    }else{
+      if (ws_status === 'success') {
+        console.log('in else of checkactiveworkspace')
+        dispatch(setActiveWorkspace({ wsId: currentUser.last_active_workspace }));
+        setIsLoading(false);
+      }
+    }
+    
+    // console.log(checkActiveWorkspace());
    
+  }, [authToken,  ws_status, wsSliceErr, dispatch, navigate]);
 
-    // if(activeHasBoards){
-    //   if (activeWorkspace == {} && !activeWorkspace.boards?.length) {
-    //     onOpenCreateBoardModal();
-    //   } 
-    // }
-  
-  
-  }, [currentUser,authToken, dispatch, activeWorkspace, ws_status, wsSliceErr]);
 
 
 
@@ -99,22 +107,33 @@ const App = () => {
       dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
       setIsLoading(false);
     }
-  },[ws_status])
+ 
+  },[activeWorkspace])
 
 
-  const Logout = async () => {
-    try {
-      const resp = await CustomRequest.get("/auth/logout");
-      dispatch(setUserLogoutStatus());
-      navigate("/login");
-    } catch (err) {
-      toast.error(err.response?.data?.msg);
-    }
+
+  const Logout = async() => {
+    // console.log(auth)
+     await auth.logout();
+    // try {
+    //   const resp = await CustomRequest.get("/auth/logout");
+    //   dispatch(setUserLogoutStatus());
+    //   navigate("/login");
+    // } catch (err) {
+    //   toast.error(err.response?.data?.msg);
+    // }
+
   };
 
+
+
+  const handleWorkspaceNameEdit=()=>{
+    
+  }
  
   return (
     <React.Fragment>
+      {/* <AuthProvider> */}
       <div className="wrapper">
         <Sidebar></Sidebar>
    
@@ -127,10 +146,10 @@ const App = () => {
             <div className="header-options d-flex flex-row justify-content-center align-items-center">
               {activeWorkspace ? (
                 <h6 className="m-0 d-inline">
-                  {" "}
-                  <b className="text-success">Workspace:</b>{" "}
+                  <b className="text-success">Workspace:</b>
                   <span title="Default Workspace">
-                    {activeWorkspace.title}{" "}
+                    {/* {activeWorkspace.title} */}
+                    {<EditableText initialText={activeWorkspace.title} saveMethod={handleWorkspaceNameEdit} />}
                   </span>
                 </h6>
               ) : (
@@ -388,7 +407,7 @@ const App = () => {
                       Help Center
                     </a>
                     <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="#" onClick={Logout}>
+                    <a className="dropdown-item" href="#" onClick={()=>Logout()}>
                       Log out
                     </a>
                   </div>
@@ -399,9 +418,9 @@ const App = () => {
 
           <main className="content" id="page-content">
             {/* page content will be here */}
-            {/* <AppResponse /> */}
+    
             
-              <WorkspaceSelectModal open={openWorkspaceSelectModal} onClose={closeWorkspaceSelect} />
+              <WorkspaceSelectModal open={SelectWorkspaceModal} onClose={modalMethods.closeSelectWorkspaceModal()} />
             
             {isLoading ? (
                   <Loading/>
@@ -413,6 +432,7 @@ const App = () => {
           <Footer></Footer>
         </div>
       </div>
+      {/* </AuthProvider> */}
     </React.Fragment>
   );
 };

@@ -50,7 +50,47 @@ const TaskSlice = createSlice({
               state.list[index]=target_task[0]
             }
           })
-        }
+        },
+        updateTaskTitle:(state, action)=>{
+          const target_task=  state.list.filter(task=> task.id==action.payload.task_id)
+          target_task[0].title= action.payload.title;
+
+          state.list.map((task, index)=>{
+            if(task.id== action.payload.task_id){
+              state.list[index]=target_task[0]
+            }
+          })
+        },
+        updateTaskDueDate:(state, action)=>{
+          const target_task=  state.list.filter(task=> task.id==action.payload.task_id)
+          target_task[0].due_date= action.payload.due_date;
+
+          state.list.map((task, index)=>{
+            if(task.id== action.payload.task_id){
+              state.list[index]=target_task[0]
+            }
+          })
+        },
+        updateTaskPriority:(state, action)=>{
+          const target_task=  state.list.filter(task=> task.id==action.payload.task_id)
+          target_task[0].priority= action.payload.priority;
+
+          state.list.map((task, index)=>{
+            if(task.id== action.payload.task_id){
+              state.list[index]=target_task[0]
+            }
+          })
+        },
+        updateTaskDescription:(state, action)=>{
+          const target_task=  state.list.filter(task=> task.id==action.payload.task_id)
+          target_task[0].description= action.payload.description;
+
+          state.list.map((task, index)=>{
+            if(task.id== action.payload.task_id){
+              state.list[index]=target_task[0]
+            }
+          })
+        },
 
   },
   extraReducers(builder){
@@ -68,7 +108,64 @@ const TaskSlice = createSlice({
 }
 });
 
-export const {setTasksList,insertTaskInTasksList,updateTasksColumn} = TaskSlice.actions;
+export const {setTasksList,insertTaskInTasksList,updateTasksColumn, updateTaskTitle,updateTaskDueDate, updateTaskPriority, updateTaskDescription} = TaskSlice.actions;
 export const selectTasks=state=>state.tasks.list;
 
 export default TaskSlice.reducer
+
+
+export const taskMethods={
+    editTaskTitle:(task_id, update)=> async(dispatch)  => {
+        try{
+            const resp= await CustomRequest.post('/dashboard/task/'+task_id+'/meta/update',update);
+              if(resp.status==200){
+                dispatch(updateTaskTitle({"task_id":task_id, "title":update.title}))
+                  toast.success('Task Title udpated successfully.');
+              }
+          }catch(err){
+              console.log(err)
+              toast.error("Error while trying to update Title.");
+        
+        } 
+    },
+    editTaskDueDate:(task_id, update)=> async(dispatch)  => {
+      try{
+          const resp= await CustomRequest.post('/dashboard/task/'+task_id+'/meta/update',update);
+            if(resp.status==200){
+              dispatch(updateTaskDueDate({"task_id":task_id, "due_date":update.due_date}))
+                toast.success('Task due date udpated successfully.');
+            }
+        }catch(err){
+            console.log(err)
+            toast.error("Error while trying to update due date.");
+      
+      }
+    },
+      editTaskPriority:(task_id, update)=> async(dispatch)  => {
+        try{
+            const resp= await CustomRequest.post('/dashboard/task/'+task_id+'/meta/update',update);
+              if(resp.status==200){
+                dispatch(updateTaskPriority({"task_id":task_id, "priority":update.priority}))
+                  toast.success('Task priority udpated successfully.');
+              }
+          }catch(err){
+              console.log(err)
+              toast.error("Error while trying to update priority.");
+        
+        } 
+  },
+  editTaskDescription:(task_id, update)=> async(dispatch)  => {
+    try{
+        const resp= await CustomRequest.post('/dashboard/task/'+task_id+'/meta/update',update);
+          if(resp.status==200){
+            dispatch(updateTaskDescription({"task_id":task_id, "description":update.description}))
+              toast.success('Task Description udpated successfully.');
+          }
+      }catch(err){
+          console.log(err)
+          toast.error("Error while trying to update Description.");
+    
+    } 
+}
+
+}

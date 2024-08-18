@@ -88,3 +88,18 @@ export const selectBoardsList = (state) => state.boards.list;
 export const selectActiveBoard = (state) => state.boards.activeBoard?state.boards.activeBoard:null;
 
 export default BoardSlice.reducer;
+
+
+export const boardMethods={
+   setActiveBoardData:(slug)=> async(dispatch)=>{
+    try{
+      const resp=await CustomRequest.post('/dashboard/user/setLastActiveboard/',{boardSlug:slug});
+          if(resp.status==200){
+            dispatch(setActiveBoard({slug:slug}))
+          }
+    }catch(err){
+        toast.error(err);
+    }
+
+  }
+}

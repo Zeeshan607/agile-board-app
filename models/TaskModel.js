@@ -34,27 +34,27 @@ const Task = sequelize.define('Task', {
     assigned_to:{
             type:DataTypes.INTEGER,
             allowNull:true,
-            // references:{
-            //     model:'User',
-            //     key:'id',
-            // }
+            references:{
+                model:'User',
+                key:'id',
+            }
     },
     column_id:{
         type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
         allowNull:true,
-        // references:{
-        //     model:'BoardColumn',
-        //     key:'id',
-        // }
+        references:{
+            model:'BoardColumn',
+            key:'id',
+        }
     },
     board_id:{
         type:DataTypes.INTEGER,
         allowNull:true,
-        // references:{
-        //     model:'Board',
-        //     key:'id',
-        // }
+        references:{
+            model:'Board',
+            key:'id',
+        }
        }
 });
 //example of model relation defination in squalize model

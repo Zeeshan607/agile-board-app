@@ -10,6 +10,10 @@ import workspaceReducer from "../features/workspaceSlice.js";
 import taskReducer from "../features/TaskSlice.js";
 import WorkspaceMembersReducer from "../features/WorkspaceMembersSlice.js";
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'; 
+import modalReducer from '../features/modalSlice.js';
+import taskDiscussionReducer from "../features/TaskDiscussionSlice.js";
+import subTaskReducer from "../features/SubTaskSlice.js"
+
 
 const appReducer = combineReducers({
   userAuth: userAuthReducer,
@@ -21,6 +25,10 @@ const appReducer = combineReducers({
   workspace: workspaceReducer,
   tasks: taskReducer,
   workspaceMembers:WorkspaceMembersReducer ,
+  modals: modalReducer,
+  taskDiscussions:taskDiscussionReducer,
+  subTasks:subTaskReducer,
+
 });
 
 

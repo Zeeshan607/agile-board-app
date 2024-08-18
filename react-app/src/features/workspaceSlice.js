@@ -59,7 +59,7 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
 
 const initialState = {
     list:[],
-    active:{},
+    active:'',
     status:"idle",
     error:[]
 
@@ -73,10 +73,10 @@ const workspace = createSlice({
             state.list=action.payload.workspaces;
         },
         setActiveWorkspace:(state, action)=>{
-          // console.log(action.payload.wsId)
-          //   console.log(JSON.parse(JSON.stringify(state.list.workspace)));
             const active=state.list.workspace.owned.find((ws)=> ws.id==action.payload.wsId)??state.list.workspace.shared.find(ws=> ws.id==action.payload.wsId);
-            // console.log(active)
+            // if(!active){
+            //   state.active=null;
+            // }
             state.active=active;
         }
   },
@@ -107,3 +107,5 @@ export const selectWorkspaceErrors=state=>state.workspace.error;
 
 
 export default workspace.reducer
+
+

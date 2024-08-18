@@ -11,8 +11,10 @@ const WorkspaceSelectModal= ({open, onClose})=>{
 
   let ws_list= useSelector(selectWorkspaceList);
   const [isLoading, setIsLoading]=useState(true);
+  const activeWs=useSelector(selectActiveWorkspace);
+  const defaultValue=activeWs?{value:activeWs.id,label:activeWs.title}:null;
+  const dispatch=useDispatch();
 
-  //  console.log(ws_list)
 
 
 useEffect(()=>{
@@ -23,9 +25,9 @@ useEffect(()=>{
 
 },[ ws_list])
 
-    const activeWs=useSelector(selectActiveWorkspace);
-    const defaultValue=activeWs?{value:activeWs.id,label:activeWs.title}:null;
-    const dispatch=useDispatch();
+    // const activeWs=useSelector(selectActiveWorkspace);
+    // const defaultValue=activeWs?{value:activeWs.id,label:activeWs.title}:null;
+    // const dispatch=useDispatch();
 
     let options = ws_list.workspace?.owned?.map((w) => {
       return { value: w.id, label: w.title };
@@ -34,11 +36,11 @@ useEffect(()=>{
     });
     const handleSelect = async (e) => {
 
-   console.log(e.value)
+
         try{
           const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:e.value});
           const status= resp.status;
-          console.log(resp)
+          // console.log(resp)
           if(status==200){
             dispatch(setActiveWorkspace({wsId:e.value}));
             dispatch(setUserLastActiveWorkspace({wsId:e.value}))

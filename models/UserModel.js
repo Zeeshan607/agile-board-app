@@ -28,25 +28,14 @@ const User = sequelize.define("User", {
   last_active_workspace:{
     type:DataTypes.UUID,
     allowNull:true,
+  },
+  last_active_board:{
+    type:DataTypes.INTEGER,
+    allowNull:true,
   }
 });
 
 
-// User.belongsToMany(Workspace, {
-//   onDelete: "CASCADE",
-//   through: UserWorkspace,
-//   foreignKey: "user_id",
-//   constraints: false,
-//   as: "workspace",
-// });
-
-// Workspace.belongsToMany(User, {
-//   onDelete: "RESTRICT",
-//   through: UserWorkspace,
-//   foreignKey: "workspace_id",
-//   constraints: false,
-//   as: "users",
-// });
 
 //Methods
 User.prototype.hideSensitiveInfo = function () {
@@ -61,6 +50,18 @@ User.prototype.hideSensitiveInfo = function () {
 
 
 export default User;
+
+
+
+
+
+
+
+
+
+
+
+
 
 // import mongoose from 'mongoose';
 
