@@ -36,8 +36,10 @@ AuthRoutes.get('/task/:task_id/subtasks',validateParentTaskId, SubTasksControlle
 
 AuthRoutes.post('/subtask/store', SubTasksController.store);
 AuthRoutes.patch('/subtask/:id/update', SubTasksController.update);
+AuthRoutes.patch('/subtask/:id/mark_as_complete', SubTasksController.markAsComplete);
+AuthRoutes.patch('/subtask/:id/mark_as_in_complete', SubTasksController.markAsInComplete);
 AuthRoutes.delete('/subtask/:id/delete', SubTasksController.destroy);
-
+AuthRoutes.delete('/task/:task_id/subtasks/delete_all', SubTasksController.destroyAllWithParentId);
 
 
 

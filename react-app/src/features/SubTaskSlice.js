@@ -48,21 +48,40 @@ const SubTaskSlice = createSlice({
     addNewSubTask:(state, action)=>{
       state.list.push(action.payload.subtask);
     },
-    markSubTaskAsComplete:(state, action )=>{
-        state.list.map(t=>{
-          if(t.id=action.payload.subtask_id){
-            t.is_completed=true;
-          }
-        })
-    },
-    markSubTaskAsInComplete:(state, action )=>{
-      state.list.map(t=>{
-        if(t.id=action.payload.subtask_id){
-          t.is_completed=false;
+    updateSubTask:(state, action )=>{
+      // const target_task= state.list.filter(task=> task.id==action.payload.subTask.id);
+      // target_task[0].due_date= action.payload.due_date;
+      state.list.map((t, index)=>{
+        if(t.id== action.payload.subtask.id){
+          state.list[index]=action.payload.subtask;
         }
       })
     },
-    
+    deleteSubTask:(state, action)=>{
+        let  newList=state.list.filter(t=> t.id !== action.payload.subtask.id);
+        state.list=newList;
+    },
+    markSubTaskAsComplete:(state, action )=>{
+      const target_task= state.list.find(task=> task.id==action.payload.subtask_id);
+      target_task.is_completed= true;
+      state.list.map((t, index)=>{
+        if(t.id== action.payload.subtask_id){
+          state.list[index]=target_task;
+        }
+      })
+    },
+    markSubTaskAsInComplete:(state, action )=>{
+      const target_task= state.list.find(task=> task.id==action.payload.subtask_id);
+      target_task.is_completed= false;
+      state.list.map((t, index)=>{
+        if(t.id== action.payload.subtask_id){
+          state.list[index]=target_task;
+        }
+      })
+    },
+    deleteAllSubTasks:(state,action)=>{
+      state.list=[];
+    }
     
     
   },
@@ -82,7 +101,7 @@ const SubTaskSlice = createSlice({
   }
 });
 
-export const {setParentTask, addNewSubTask, markSubTaskAsComplete, markSubTaskAsInComplete } = SubTaskSlice.actions
+export const {setParentTask, addNewSubTask, updateSubTask,deleteSubTask,deleteAllSubTasks, markSubTaskAsComplete, markSubTaskAsInComplete } = SubTaskSlice.actions
 export const selectCurrentParentTask=(state)=>state.subTasks.parent_task;
 export const selectSubTaskList=(state)=>state.subTasks.list;
 
@@ -93,12 +112,69 @@ export const subTaskMethods={
         const resp= await CustomRequest.post(`/dashboard/subtask/store`, {'task_id':task_id,'description':subTask});
           if(resp.status==200){
             dispatch(addNewSubTask({"subtask": resp.data.subTask}));
-            toast.sucess('Sub Task added successfully');
+            toast.success('Sub Task added successfully');
           }
       }catch(err){
           toast.error(err) ;
       }
 
+  },
+  updateSubTask:(subTask)=> async(dispatch)=>{
+    try{
+      const resp= await CustomRequest.patch(`/dashboard/subtask/${subTask.id}/update`, {'subTask':subTask});
+        if(resp.status==200){
+          dispatch(updateSubTask({"subtask": resp.data.subTask}));
+          toast.success('Sub Task updated successfully');
+        }
+    }catch(err){
+        toast.error(err) ;
+    }
+  },
+  markAsComplete:(id)=>async(dispatch)=>{
+    try{
+      const resp= await CustomRequest.patch(`/dashboard/subtask/${id}/mark_as_complete`, {'is_completed':1});
+        if(resp.status==200){
+          dispatch(markSubTaskAsComplete({"subtask_id": resp.data.subTask.id}));
+          toast.success('Sub Task marked as complete successfully');
+        }
+    }catch(err){
+        toast.error(err) ;
+    }
+
+
+  },
+  markAsInComplete:(id)=>async(dispatch)=>{
+    try{
+      const resp= await CustomRequest.patch(`/dashboard/subtask/${id}/mark_as_in_complete`,  {'is_completed':0});
+        if(resp.status==200){
+          dispatch(markSubTaskAsInComplete({"subtask_id": resp.data.subTask.id}));
+          toast.success('Sub Task marked as in-complete successfully');
+        }
+    }catch(err){
+        toast.error(err) ;
+    }
+  },
+  delete:(id)=> async(dispatch)=>{
+    try{
+      const resp= await CustomRequest.delete(`/dashboard/subtask/${id}/delete`);
+        if(resp.status==200){
+          dispatch(deleteSubTask({"subtask": resp.data.subTask}));
+          toast.success('Sub Task deleted successfully');
+        }
+    }catch(err){
+        toast.error(err) ;
+    }
+  },
+  deleteAllSubTasks:(parent_task_id)=> async (dispatch)=>{
+    try{
+      const resp= await CustomRequest.delete(`/dashboard/task/${parent_task_id}/subtasks/delete_all`);
+        if(resp.status==200){
+          dispatch(deleteAllSubTasks());
+          toast.success('Sub Tasks list deleted successfully');
+        }
+    }catch(err){
+        toast.error(err) ;
+    }
   }
 
 }
