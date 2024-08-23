@@ -19,7 +19,7 @@ const Task = sequelize.define('Task', {
         allowNull:false,
     },
     description:{
-        type:DataTypes.STRING,
+        type:DataTypes.TEXT('long'),
         allowNull:false,
     
     },

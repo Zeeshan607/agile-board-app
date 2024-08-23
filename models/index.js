@@ -126,6 +126,19 @@ Task.hasMany(TaskDiscussion,{
   as:'discussions' 
 })
 
+User.hasMany(TaskDiscussion,{
+  onDelete:"CASCADE",
+  onUpdate:"RESTRICT",
+  foreignKey:{name:'user_id',allowNull:true},
+  as:'comments' 
+})
+TaskDiscussion.belongsTo(User,{
+  onDelete:"RESTRICT",
+  onUpdate:"RESTRICT",
+  constraints:false,
+  foreignKey:{name:'user_id',allowNull:true},
+  as:'user' 
+})
 
 
 const dbRefresh=false;

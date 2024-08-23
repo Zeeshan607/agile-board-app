@@ -35,6 +35,10 @@ import { AuthProvider } from "./hooks/useAuth.jsx";
 import {useAuth} from "./hooks/useAuth.jsx";
 import EditableText from "./components/EditableTextInput.jsx";
 import { modalMethods, selectSelectWorkspaceModal } from "./features/modalSlice.js";
+import "froala-editor/css/froala_editor.pkgd.min.css";
+// import "froala-editor/css/plugins/image.min.css";
+import "froala-editor/css/froala_style.min.css";
+
 
 const App = () => {
   const dispatch = useDispatch();
@@ -420,7 +424,7 @@ const App = () => {
             {/* page content will be here */}
     
             
-              <WorkspaceSelectModal open={SelectWorkspaceModal} onClose={modalMethods.closeSelectWorkspaceModal()} />
+              <WorkspaceSelectModal open={SelectWorkspaceModal}  />
             
             {isLoading ? (
                   <Loading/>

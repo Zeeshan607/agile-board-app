@@ -18,6 +18,9 @@ import SubTasks from "./SubTasks.jsx";
 import TaskDiscussion from "./TaskDiscussion/TaskDiscussion.jsx";
 import { selectSubTaskList, subTaskMethods } from "../features/SubTaskSlice.js";
 import Swal from "sweetalert2";
+import "./taskViewModal.css";
+import { taskDiscussionMethods } from "../features/TaskDiscussionSlice.js";
+
 
 const TaskViewModal = ({ open, onClose, task, col_name }) => {
   const [ddInputFocus, setDdInputFocus] = useState(false);
@@ -106,6 +109,19 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
       }
     });
   };
+  const handleDeleteAllDiscussion=(e,parent_task_id)=>{
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete all Discussion.",
+      showCancelButton: true,
+      confirmButtonText: "Yes Delete",
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        dispatch(taskDiscussionMethods.deleteCompleteDiscussion(parent_task_id));
+      }
+    });
+  }
 
   return (
     <Modal
@@ -113,7 +129,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
       onClose={onClose}
       center
       id={task.id}
-      classNames={{ modal: ["container-lg", "py-4", ""] }}
+      classNames={{ modal: ["container-lg", "py-4", "taskViewModal"] }}
       focusTrapped={false}
     >
       <h1 className="text-uppercase">{task.title}</h1>
@@ -210,8 +226,11 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
               ""
             )}
           </div>
-
-          <div className="form-group my4">
+        </div>
+      </div>
+      <div className="row mx-0">
+        <div className="col-12 p-0">
+        <div className="form-group ">
             <label htmlFor="description">Descripiton</label>
             <WysiwygTextarea task_id={task.id} description={task.description} />
           </div>
@@ -253,7 +272,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
               <h3 className="">Discussion</h3>
             </div>
             <div className="col-6  text-end">
-              <button className="btn btn-sm btn-outline-primary">
+              <button className="btn btn-sm btn-outline-primary" onClick={(e)=>handleDeleteAllDiscussion(e,task.id)}>
                 {" "}
                 Delete all
               </button>

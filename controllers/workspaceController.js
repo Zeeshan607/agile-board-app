@@ -48,7 +48,7 @@ async index(req,res){
 async getMemebers(req, res){
     const {id}= req.params;
     const ws =await Workspace.findOne({where:{id},include:[{model:User, as:'usersWithAccess'}]});
-    console.log(ws);
+    // console.log(ws);
     res.status(StatusCodes.OK).json({"members":ws})
 }
 

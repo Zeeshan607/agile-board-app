@@ -9,7 +9,9 @@ import roleController from "../controllers/roleController.js";
 import workspaceController from "../controllers/workspaceController.js";
 import tasksController from "../controllers/tasksController.js";
 import SubTasksController from "../controllers/subTasksController.js";
-
+import taskDiscussionController from "../controllers/taskDiscussionController.js";
+import editorUploadService from "../services/editorUploadService.js";
+import { upload } from "../utils/StorageConfig.js";
 
 
 
@@ -42,6 +44,8 @@ AuthRoutes.delete('/subtask/:id/delete', SubTasksController.destroy);
 AuthRoutes.delete('/task/:task_id/subtasks/delete_all', SubTasksController.destroyAllWithParentId);
 
 
+AuthRoutes.get('/task/:id/discussions', taskDiscussionController.index)
+
 
 AuthRoutes.get('/users',userController.index);
 AuthRoutes.get('/workspaces', workspaceController.index);
@@ -50,14 +54,19 @@ AuthRoutes.get('/workspace/:id/boards', workspaceController.getBoards);
 AuthRoutes.post('/set_last_active_workspace',userController.set_last_active_workspace);
 AuthRoutes.post('/user/setLastActiveboard', userController.set_last_active_board);
 
+AuthRoutes.post('/comment/store',taskDiscussionController.store);
+AuthRoutes.patch('/comment/:id/udpate',taskDiscussionController.update);
+AuthRoutes.delete('/comment/:id/destroy',taskDiscussionController.destroy);
+
+AuthRoutes.delete('/task/:task_id/discussion/destroy_all',taskDiscussionController.destroy_all)
 
 
 
-
-
-
-
-
+//images upload from editor related routes
+AuthRoutes.use('/uploads', express.static('uploads'));
+AuthRoutes.post('/editor/image/upload',upload.single('file'), editorUploadService.imageUpload);
+AuthRoutes.post('/editor/image/remove_uploaded', editorUploadService.imageDeleteUploaded);
+AuthRoutes.get('/editor/image_manager/get_uploads_files_list', editorUploadService.getUploadsDirectoryToListFiles);
 
 
 

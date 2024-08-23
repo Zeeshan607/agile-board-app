@@ -12,6 +12,8 @@ import AuthRoutes from "./protectedRoutes.js";
     Route.post('/auth/login',ValidateUserCredentials, AuthController.login);
     Route.use('/dashboard',AuthenticateUser, AuthRoutes)
    Route.get('/auth/logout',AuthController.logout);
+   
+// Route.use('/uploads', express.static('uploads'));
 // Add more routes as needed
 
 export default Route;

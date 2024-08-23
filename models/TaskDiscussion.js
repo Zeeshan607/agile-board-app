@@ -11,7 +11,7 @@ const TaskDiscussion = sequelize.define('TaskDiscussion', {
         autoIncrement: true
     },
     message:{
-        type:DataTypes.STRING,
+        type:DataTypes.TEXT('long'),
         allowNull:false,
     },
     user_id:{

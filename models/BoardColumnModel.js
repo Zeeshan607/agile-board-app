@@ -19,7 +19,7 @@ const BoardColumn = sequelize.define('BoardColumn', {
        allowNull:false
     },
     description:{
-        type:DataTypes.STRING,
+        type:DataTypes.TEXT('long'),
         allowNull:false
     },
     boardId:{
