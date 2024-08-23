@@ -122,7 +122,6 @@ export const taskDiscussionMethods = {
       );
     }
   },
-
   deleteCompleteDiscussion:(parent_task_id)=>async(dispatch)=>{
   try {
       const resp = await CustomRequest.delete(`/dashboard/task/${parent_task_id}/discussion/destroy_all`);
