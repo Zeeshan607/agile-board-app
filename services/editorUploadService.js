@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import path, { dirname } from "path";
 import fs from "node:fs";
-import { upload } from "../utils/StorageConfig.js";
 import { fileURLToPath } from "url";
 
 // Get the __filename and __dirname equivalents
@@ -10,9 +9,7 @@ var __dirname = dirname(__filename);
 
 class editorUploadService {
   async imageUpload(req, res) {
-    // console.log(req.file);
     if (req.file) {
-      // upload.single(image);
       const filePath = `/api/v1/dashboard/uploads/${req.file.filename}`;
 
       res.status(StatusCodes.OK).json({ link: filePath });

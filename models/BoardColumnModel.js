@@ -13,7 +13,6 @@ const BoardColumn = sequelize.define('BoardColumn', {
       primaryKey: true,
       unique:true,
     },
- 
     name:{
        type: DataTypes.STRING,
        allowNull:false
@@ -34,7 +33,6 @@ const BoardColumn = sequelize.define('BoardColumn', {
         type:DataTypes.INTEGER,
         allowNull:false
     },
-
     is_deleted:{
         type:DataTypes.DATE,
         default:null

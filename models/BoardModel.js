@@ -23,10 +23,10 @@ const Board = sequelize.define('Board', {
     workspace_id:{
         type: DataTypes.UUID,
         allowNull:true,
-        // references:{
-        //     model:'Workspace',
-        //     key:'id'
-        // }
+        references:{
+            model:'Workspace',
+            key:'id'
+        }
     },
     description:{
         type:DataTypes.TEXT('long'),

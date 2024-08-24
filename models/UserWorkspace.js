@@ -11,25 +11,22 @@ const UserWorkspace=  sequelize.define('UserWorkspace',{
         autoIncrement: true
     },
     workspace_id:{
-        type:DataTypes.UUIDV1,
+        type:DataTypes.UUIDV4,
         allowNull:false,
-        // references:{
-        //     model:Workspace,
-        //     key:"id"
-        // }
+        references:{
+            model:'Workspace',
+            key:"id"
+        }
     },
     user_id:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        // references:{
-        //     model:User,
-        //     key:'id',
-        // }
+        references:{
+            model:'User',
+            key:'id',
+        }
     },
-    // is_admin:{
-    //     type:DataTypes.BOOLEAN,
-    //     defaultValue:true,
-    // },
+   
     is_shared:{
         type:DataTypes.BOOLEAN,
         defaultValue:true,

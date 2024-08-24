@@ -199,7 +199,9 @@ const BoardView = React.memo(() => {
             onClose={modalMethods.closeCreateBoardModal}
           />
         </div>
-        <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end"></div>
+        <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end">
+        <button className="btn btn-primary" title="Give access of this workspace to someone you know."><i className="fa fa-user-plus mx-1"></i>Invite</button>
+        </div>
       </div>
 
       <div className="d-flex flex-row flex-wrap justify-content-start kanban-container">

@@ -26,7 +26,7 @@ const User = sequelize.define("User", {
     allowNull: false,
   },
   last_active_workspace:{
-    type:DataTypes.UUID,
+    type:DataTypes.UUIDV4,
     allowNull:true,
   },
   last_active_board:{

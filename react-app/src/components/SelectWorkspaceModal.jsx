@@ -14,26 +14,50 @@ import { modalMethods } from "../features/modalSlice.js";
 
 
 const WorkspaceSelectModal = ({ open, onClose }) => {
-  let ws_list = useSelector(selectWorkspaceList);
   const [isLoading, setIsLoading] = useState(true);
+  const [optionsList,setOptionsList]=useState([]);
+  let ws_list = useSelector(selectWorkspaceList);
   const activeWs = useSelector(selectActiveWorkspace);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (Object.keys(ws_list).length !== 0) {
+
+    // if (Object.keys(ws_list).length !== 0) {
+  
+    // }
+
+    let list=[]
+    if(Object.keys(ws_list).length !== 0){
+      const shared= ws_list.workspace?.shared;
+      const owned=ws_list.workspace?.owned;
+      shared.forEach(ws => {
+
+         const newObj={...ws,title: ws.title+' (shared)'}
+
+        list.push({ value: newObj.id, label: newObj.title });
+      });
+      owned.forEach(ws => {
+        list.push({ value: ws.id, label: ws.title });
+      });
+
+      setOptionsList(list);
       setIsLoading(false);
     }
+
+
   }, [ws_list]);
 
 
-  let options =
-    ws_list.workspace?.owned?.map((w) => {
-      return { value: w.id, label: w.title };
-    }) ??
-    ws_list.workspace?.shared?.map((w) => {
-      return { value: w.id, label: w.title };
-    });
+  // let options =
+  //   ws_list.workspace?.owned?.map((w) => {
+  //     return { value: w.id, label: w.title };
+  //   }) ??
+  //   ws_list.workspace?.shared?.map((w) => {
+  //     return { value: w.id, label: w.title };
+  //   });
+
+
     const defaultValue = activeWs
     ? { value: activeWs.id, label: activeWs.title }
     : null;
@@ -65,6 +89,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
     height: "300px",
   };
 
+  console.log(ws_list)
   return (
     <Modal
       open={open}
@@ -91,7 +116,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
               <Select
                 defaultValue={selectedWorkspace}
                 onChange={handleSelect}
-                options={options}
+                options={optionsList}
                 placeholder="0 Workspace found"
                 id="workspace-select"
                 isLoading={isLoading}

@@ -10,6 +10,7 @@ import Task from "./TaskModel.js";
 import SubTask from "./SubTask.js";
 import TaskDiscussion from "./TaskDiscussion.js";
 import {trunOffForeignKeyCheckAndTruncateTable,checkIfTableExists} from "../utils/helpers.js";
+import config from "../config/default.js";
 // Define any associations here
 // For example: User.hasMany(Post);
 
@@ -141,8 +142,8 @@ TaskDiscussion.belongsTo(User,{
 })
 
 
-const dbRefresh=false;
-const modelSeeding=false;
+const dbRefresh=config.db_refresh;
+const modelSeeding=config.db_refresh;
 const uid1=uuidv4();
 const uid2=uuidv4();
 const uid3=uuidv4();

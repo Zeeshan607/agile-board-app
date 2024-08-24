@@ -143,7 +143,7 @@ if(!active_ws){
                         <ul className="dropdown-menu dropdown-menu-dark dropend settings-workspace-list" aria-labelledby="subdropend">
                             {
                               sortedWs?sortedWs.map((ws,index)=>(
-                                <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title}</a></li>
+                                <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title} <small>{(ws.type=="shared"?' (Shared)':'')}</small></a></li>
                               )):''
                             }
                         
