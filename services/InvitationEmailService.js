@@ -35,6 +35,7 @@ class InvitationEmailService{
           `, // HTML body
         };
       
+        
         try {
           const info = await this.transporter.sendMail(mailOptions);
           console.log('Invitation sent: ' + info.response);
