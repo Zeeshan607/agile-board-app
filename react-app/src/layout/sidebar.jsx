@@ -93,12 +93,7 @@ if(!active_ws){
               <span className="align-middle">Members</span>
             </Link>
           </li>
-          {/* <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/boards"}>
-              <i className="align-middle" data-feather="user"></i>
-              <span className="align-middle">Workspace</span>
-            </Link>
-          </li> */}
+         
      
 
 
