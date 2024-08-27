@@ -1,7 +1,7 @@
 import Board from '../models/BoardModel.js';
 import BoardColumn from '../models/BoardColumnModel.js';
 import StatusCodes from 'http-status-codes';
-import Workspace from '../models/workspace.js';
+import Workspace from '../models/Workspace.js';
 
 class BoardController{
 
@@ -25,8 +25,13 @@ constructor(){}
 // create
  async store (req, res) {
     const { name, description, ws_id } = req.body;
+    const workspace=await Workspace.findByPk(ws_id);
+    if(!workspace){
+      return res.status(StatusCodes.NOT_FOUND).json({error:"Workspace with given Id is not found"});
+    }
+    console.log(workspace);
     const slug= name.replaceAll(' ','-');
-    const board=await Board.create({name, description,slug:slug, workspace_id:ws_id});
+    const board=await Board.create({name, description,'slug':slug, 'workspace_id':workspace.id});
     const def_boardstatus=await BoardColumn.bulkCreate([
       {name:'To Do', description:"List of all tasks that we have to do.",boardId:board.id,createdBy:req.user.userId,order:1},
       {name:'In Progress', description:"All tasks that are under development",boardId:board.id,createdBy:req.user.userId,order:2},

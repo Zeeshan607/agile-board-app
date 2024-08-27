@@ -12,6 +12,7 @@ import SubTasksController from "../controllers/subTasksController.js";
 import taskDiscussionController from "../controllers/taskDiscussionController.js";
 import editorUploadService from "../services/editorUploadService.js";
 import { upload } from "../utils/StorageConfig.js";
+import InvitationController from "../controllers/InvitationController.js";
 
 
 
@@ -49,6 +50,9 @@ AuthRoutes.get('/task/:id/discussions', taskDiscussionController.index)
 
 AuthRoutes.get('/users',userController.index);
 AuthRoutes.get('/workspaces', workspaceController.index);
+AuthRoutes.post('/workspace/:id/update',workspaceController.update)
+AuthRoutes.post('/workspace/store', workspaceController.store);
+
 AuthRoutes.get('/workspace/:id/members', workspaceController.getMemebers);
 AuthRoutes.get('/workspace/:id/boards', workspaceController.getBoards);
 AuthRoutes.post('/set_last_active_workspace',userController.set_last_active_workspace);
@@ -68,6 +72,7 @@ AuthRoutes.post('/editor/image/upload',upload.single('file'), editorUploadServic
 AuthRoutes.post('/editor/image/remove_uploaded', editorUploadService.imageDeleteUploaded);
 AuthRoutes.get('/editor/image_manager/get_uploads_files_list', editorUploadService.getUploadsDirectoryToListFiles);
 
+AuthRoutes.post('/send_invite_to_member', InvitationController.sendInvite);
 
 
 

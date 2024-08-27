@@ -3,7 +3,6 @@ import { Model, DataTypes, ENUM } from "sequelize";
 import sequelize from "../db.js";
 import User from "./UserModel.js";
 import {v1 as uuidv1} from 'uuid';
-import workspaceController from "../controllers/workspaceController.js";
 import Board from "./BoardModel.js";
 
 const Workspace =sequelize.define('Workspace',{
@@ -15,6 +14,12 @@ const Workspace =sequelize.define('Workspace',{
     title:{
       type:DataTypes.STRING,
       allowNull:false,
+      unique:true,
+      set(value){
+      const slug = value.split(' ').join('-');
+        this.setDataValue('slug',slug.toLowerCase());
+        this.setDataValue('title',value)
+      }
     },
     slug:{
       type:DataTypes.STRING,

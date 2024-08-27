@@ -21,14 +21,13 @@ import Swal from "sweetalert2";
 import "./taskViewModal.css";
 import { taskDiscussionMethods } from "../features/TaskDiscussionSlice.js";
 
-
 const TaskViewModal = ({ open, onClose, task, col_name }) => {
   const [ddInputFocus, setDdInputFocus] = useState(false);
   const [textInputFocus, setTextInputFocus] = useState(false);
   const [dueDate, setDueDate] = useState(task.due_date);
   const [title, setTitle] = useState(task.title);
   const dispatch = useDispatch();
-  const subTasksList=useSelector(selectSubTaskList); 
+  const subTasksList = useSelector(selectSubTaskList);
 
   const handleSelect = async (e) => {
     if (e.value != "") {
@@ -109,7 +108,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
       }
     });
   };
-  const handleDeleteAllDiscussion=(e,parent_task_id)=>{
+  const handleDeleteAllDiscussion = (e, parent_task_id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You want to delete all Discussion.",
@@ -118,10 +117,12 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        dispatch(taskDiscussionMethods.deleteCompleteDiscussion(parent_task_id));
+        dispatch(
+          taskDiscussionMethods.deleteCompleteDiscussion(parent_task_id)
+        );
       }
     });
-  }
+  };
 
   return (
     <Modal
@@ -230,7 +231,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
       </div>
       <div className="row mx-0">
         <div className="col-12 p-0">
-        <div className="form-group ">
+          <div className="form-group ">
             <label htmlFor="description">Descripiton</label>
             <WysiwygTextarea task_id={task.id} description={task.description} />
           </div>
@@ -244,19 +245,16 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
               <h3 className="">Sub Tasks</h3>
             </div>
             <div className="col-6  text-end">
-                {
-                    subTasksList.length?(
-
-                        <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={(e) => handleDeleteAllSubTask(e, task.id)}
-                      >
-                        Delete all
-                      </button>
-
-                    ):''
-                }
-          
+              {subTasksList.length ? (
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={(e) => handleDeleteAllSubTask(e, task.id)}
+                >
+                  Delete all
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           </div>
 
@@ -272,10 +270,16 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
               <h3 className="">Discussion</h3>
             </div>
             <div className="col-6  text-end">
-              <button className="btn btn-sm btn-outline-primary" onClick={(e)=>handleDeleteAllDiscussion(e,task.id)}>
-                {" "}
-                Delete all
-              </button>
+              {task.discussionsCount > 0 ? (
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={(e) => handleDeleteAllDiscussion(e, task.id)}
+                >
+                  Delete all
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           </div>
           <TaskDiscussion task={task} />

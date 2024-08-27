@@ -21,7 +21,7 @@ export default function Sidebar() {
 useEffect(()=>{
 
   let list=[]
-  if(ws_status=="success"){
+  if(Object.keys(workspaces).length !== 0){
     const shared= workspaces.workspace.shared;
     const owned= workspaces.workspace.owned;
     shared.forEach(ws => {
@@ -35,7 +35,7 @@ useEffect(()=>{
   }
       setSortedWs(list);
 
-},[ws_status]);
+},[workspaces ]);
 
 
 const handleWorkspaceSwitch=async (id)=>{
@@ -80,25 +80,25 @@ if(!active_ws){
             </Link>
           </li>
 
-          {/* <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/boards"}>
-              <i className="align-middle" data-feather="user"></i>
-              <span className="align-middle">Board</span>
-            </Link>
-          </li> */}
-          <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/users"}>
-              <i className="align-middle" data-feather="user"></i>
-              <span className="align-middle">Team</span>
-            </Link>
-          </li>
+      
           <li className="sidebar-item">
             <Link className="sidebar-link" to={"/boards"}>
               <i className="align-middle" data-feather="user"></i>
               <span className="align-middle">Boards</span>
             </Link>
           </li>
-
+          <li className="sidebar-item">
+            <Link className="sidebar-link" to={"/workspace_members"}>
+              <i className="align-middle" data-feather="user"></i>
+              <span className="align-middle">Members</span>
+            </Link>
+          </li>
+          {/* <li className="sidebar-item">
+            <Link className="sidebar-link" to={"/boards"}>
+              <i className="align-middle" data-feather="user"></i>
+              <span className="align-middle">Workspace</span>
+            </Link>
+          </li> */}
      
 
 
@@ -137,10 +137,10 @@ if(!active_ws){
               <div className="dropdown-menu dropdown-menu-sm dropdown-menu-dark py-3 " aria-labelledby="settingsdropup">
                 
                       <li className="dropend hoverable-dropdown">
-                      <a className="dropdown-item  "  id="subdropend" data-bs-toggle="dropdown" aria-expanded="false" href="#">Workspace
+                      <a className="dropdown-item  "  id="subdropend" data-bs-toggle="dropdown" aria-expanded="false" href="#">Switch
                         <i className="fa fa-angle-right drop-icon"></i>
                       </a>
-                        <ul className="dropdown-menu dropdown-menu-dark dropend settings-workspace-list" aria-labelledby="subdropend">
+                        <ul className="dropdown-menu dropdown-menu-dark dropend settings-workspace-list"  style={{minWidth:"250px"}} aria-labelledby="subdropend">
                             {
                               sortedWs?sortedWs.map((ws,index)=>(
                                 <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title} <small>{(ws.type=="shared"?' (Shared)':'')}</small></a></li>
@@ -151,8 +151,8 @@ if(!active_ws){
                         </ul>
                  
                       </li>
-                    <li><a className="dropdown-item" href="#">Another action</a></li>
-                    <li><a className="dropdown-item" href="#">Something else here</a></li>
+                    <li><a className="dropdown-item" href="#">Setting & Privacy</a></li>
+   
                  
               </div>
               </div>

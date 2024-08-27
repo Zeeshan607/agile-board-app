@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import CustomRequest from "../utils/customRequest.jsx";
+import { incrementDiscussionCount,  decrementDiscussionCount} from "./TaskSlice.js";
+
 
 export const fetchTaskDiscussions = createAsyncThunk(
   "dashboard/task/discussions",
@@ -86,6 +88,7 @@ export const taskDiscussionMethods = {
       });
       if (resp.status == 200) {
         dispatch(addNewComment({ comment: resp.data.comment }));
+        dispatch(incrementDiscussionCount({'task_id':task_id,"count":1}))
         toast.success("Comment added successfully.");
       }
     } catch (err) {
@@ -109,11 +112,12 @@ export const taskDiscussionMethods = {
       );
     }
   },
-  deleteComment: (comment_id) => async (dispatch) => {
+  deleteComment: (comment_id,task_id) => async (dispatch) => {
     try {
       const resp = await CustomRequest.delete(`/dashboard/comment/${comment_id}/destroy`);
       if (resp.status == 200) {
         dispatch(deleteComment({'comment_id':comment_id}));
+        dispatch(decrementDiscussionCount({"task_id":task_id}))
         toast.success("Comment deleted successfully.");
       }
     } catch (err) {

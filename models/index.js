@@ -11,6 +11,7 @@ import SubTask from "./SubTask.js";
 import TaskDiscussion from "./TaskDiscussion.js";
 import {trunOffForeignKeyCheckAndTruncateTable,checkIfTableExists} from "../utils/helpers.js";
 import config from "../config/default.js";
+import Invitation from './Invitation.js';
 // Define any associations here
 // For example: User.hasMany(Post);
 
@@ -80,7 +81,7 @@ Workspace.belongsToMany(User, {
 
 // boardModel.js
 Workspace.hasMany(Board,{
-    onDelete:"CASCADE",
+    onDelete:"RESTRICT",
     foreignKey:'workspace_id',
     as:'boards'
   })
@@ -142,8 +143,8 @@ TaskDiscussion.belongsTo(User,{
 })
 
 
-const dbRefresh=config.db_refresh;
-const modelSeeding=config.db_refresh;
+const dbRefresh=false;
+const modelSeeding=false;
 const uid1=uuidv4();
 const uid2=uuidv4();
 const uid3=uuidv4();
@@ -155,7 +156,7 @@ const uid8=uuidv4();
 
 
 const initModels = async () => {
-
+console.log('db-refresh status'+config.db_refresh)
   try {
 
     await syncModels();
@@ -206,6 +207,7 @@ const syncModels = async () => {
   await Task.sync({ force: dbRefresh });
   await SubTask.sync({ force: dbRefresh });
   await TaskDiscussion.sync({ force: dbRefresh });
+  await Invitation.sync({ force: dbRefresh })
 
   // Enable foreign key checks
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');

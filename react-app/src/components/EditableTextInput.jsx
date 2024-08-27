@@ -45,29 +45,24 @@ const EditableTextInput = ({ initialText, saveMethod  }) => {
     <div onDoubleClick={handleDoubleClick} className='d-inline'>
       {isEditing ? (
      
-<div className="input-group mb-3 input d-inline">
-<input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-          onKeyDown={handleInputKeyDown}
-          autoFocus
-          className='form-control-sm form-control-inline'
-        />
-  <button className="btn btn-sm btn-secondary" type="button" onClick={saveMethod} id="button-addon2">save</button>
-</div>
-
-
-
-
-
-
-
+        <div className="input-group ">
+        <input
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
+                  onKeyDown={handleInputKeyDown}
+                  autoFocus
+                  className='form-control-sm form-control-inline'
+                />
+          <button className="btn btn-sm btn-secondary " type="button" onClick={()=>saveMethod(inputValue)} id="button-addon2">update</button>
+        </div>
 
 
       ) : (
-        <span>{initialText}</span>
+        <span>{initialText}
+                   <sup style={{top:'-.9em'}}><small style={{fontSize:'8px'}}><i className="fas fa-edit"></i></small></sup>
+                   </span>
       )}
     </div>
   );

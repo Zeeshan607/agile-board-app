@@ -22,11 +22,6 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-
-    // if (Object.keys(ws_list).length !== 0) {
-  
-    // }
-
     let list=[]
     if(Object.keys(ws_list).length !== 0){
       const shared= ws_list.workspace?.shared;

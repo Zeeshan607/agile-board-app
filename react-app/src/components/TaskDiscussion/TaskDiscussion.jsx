@@ -25,9 +25,14 @@ export default function TaskDiscussion({task}) {
   },[dispatch])
 
   const handleCommentSave = () => {
-    dispatch(taskDiscussionMethods.createNewComment(comment,task.id));
-      setComment('');
-      setIsAddingNew(false);
+    if(!comment){
+      setIsAddingNew(true);
+    }else{
+        dispatch(taskDiscussionMethods.createNewComment(comment,task.id));
+        setComment('');
+        setIsAddingNew(false);
+    }
+
   };
 
 
@@ -46,10 +51,15 @@ export default function TaskDiscussion({task}) {
             
             <div className="row mx-0  mt-2">
               <div className="col-12 text-end pe-0">
-                <button type="button" className="btn btn-outline-secondary me-2" onClick={()=>setIsAddingNew(false)}>Cencel</button>
+                {
+                  isAddingNew?(
+                    <button type="button" className="btn btn-outline-secondary me-2" onClick={()=>setIsAddingNew(false)}>Cencel</button>
+                  ):('')
+                }
+
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className={"btn btn-primary"+ (!isAddingNew?" disabled":'')}
                   onClick={() => handleCommentSave()}
                 >
                   Comment

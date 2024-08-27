@@ -91,6 +91,24 @@ const TaskSlice = createSlice({
             }
           })
         },
+        incrementDiscussionCount:(state,action)=>{
+          const target_task=state.list.find(task=>task.id==action.payload.task_id);
+            target_task.discussionsCount+=1;
+            state.list.map((task, index)=>{
+              if(task.id== action.payload.task_id){
+                state.list[index]=  target_task
+              }
+            })
+        },
+        decrementDiscussionCount:(state,action)=>{
+          const target_task=state.list.find(task=>task.id==action.payload.task_id);
+            target_task.discussionsCount-=1;
+            state.list.map((task, index)=>{
+              if(task.id== action.payload.task_id){
+                state.list[index]=  target_task
+              }
+            })
+        }
 
   },
   extraReducers(builder){
@@ -108,7 +126,7 @@ const TaskSlice = createSlice({
 }
 });
 
-export const {setTasksList,insertTaskInTasksList,updateTasksColumn, updateTaskTitle,updateTaskDueDate, updateTaskPriority, updateTaskDescription} = TaskSlice.actions;
+export const {setTasksList,insertTaskInTasksList,updateTasksColumn, updateTaskTitle,updateTaskDueDate, updateTaskPriority, updateTaskDescription, incrementDiscussionCount,  decrementDiscussionCount} = TaskSlice.actions;
 export const selectTasks=state=>state.tasks.list;
 
 export default TaskSlice.reducer

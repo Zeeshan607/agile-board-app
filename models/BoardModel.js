@@ -24,7 +24,7 @@ const Board = sequelize.define('Board', {
         type: DataTypes.UUID,
         allowNull:true,
         references:{
-            model:'Workspace',
+            model:'Workspaces',
             key:'id'
         }
     },

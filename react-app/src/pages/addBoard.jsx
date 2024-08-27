@@ -1,20 +1,28 @@
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import { Form, useNavigate } from "react-router-dom";
 import FormRow from "../components/FormRow.jsx";
 import FormTextarea from "../components/FormTextarea.jsx";
 import SubmitBtn from "../components/SubmitBtn.jsx";
 import CustomRequest from "../utils/customRequest.jsx";
 import {toast} from 'react-toastify';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import { insertBoard } from "../features/BoardSlice.js";
+import { selectActiveWorkspace } from "../features/workspaceSlice.js";
 
 
 const AddBoard = () => {
   const [form, setForm ]= useState({});
    const navigate= useNavigate();
    const dispatch= useDispatch()
+  const activeWs=useSelector(selectActiveWorkspace);
 
+  useEffect(()=>{
+    setForm({...form, ws_id:activeWs.id});
+  },[activeWs])
+
+  
 const addBoard=async ()=>{
+
       try{
        const resp=await CustomRequest.post('/dashboard/board/create',form);
           const status=  resp.status;

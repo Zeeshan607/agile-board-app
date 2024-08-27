@@ -1,4 +1,4 @@
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import "./boardView.css";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect, useCallback } from "react";
@@ -15,27 +15,27 @@ import {
   fetchTasks,
   updateTasksColumn,
 } from "../features/TaskSlice.js";
-import { selectActiveBoard, selectBoardsList } from "../features/BoardSlice.js";
+import { selectActiveBoard, selectBoardsList, boardMethods } from "../features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "../components/CreateBoardModel.jsx";
-import { boardMethods } from "../features/BoardSlice.js";
 import ColumnsList from "../components/ColumnsList.jsx";
 import TaskList from "../components/TaskList.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {useAuth} from "../hooks/useAuth.jsx";
 import CustomRequest from "../utils/customRequest.jsx";
 import { modalMethods, selectCreateBoardModal } from "../features/modalSlice.js";
-import { model } from "mongoose";
+
+
 
 const BoardView = React.memo(() => {
-  // const [searchParams, setSearchParams]=useSearchParams();
+
   const param = useParams();
   const boardSlug = param.slug;
   const dispatch = useDispatch();
+  const navigate= useNavigate();
   const auth=useAuth();
-  const last_active_board=auth.user.last_active_board;
+  // const last_active_board=auth.user.last_active_board;
   const [isLoading, setIsLoading] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const createBoardModel=useSelector(selectCreateBoardModal); 
 
   const activeWorkspace = useSelector(selectActiveWorkspace);
@@ -49,7 +49,7 @@ const BoardView = React.memo(() => {
 
   const [activeId, setActiveId] = useState(null);
   const [activeDragTask, setActiveDragTask] = useState({});
-  const activeBoard=useSelector(selectActiveBoard);
+  // const activeBoard=useSelector(selectActiveBoard);
   
   useEffect(() => {
 
@@ -83,17 +83,11 @@ const BoardView = React.memo(() => {
     const { id } = active;
     setActiveId(id);
     setActiveDragTask(active.data.current.task);
-    // console.log(active)
+
   };
 
   const handleDragOver = (event) => {
-    // console.log(event)
-    // const { active, over } = event;
-    // // const overId=over.id;
-    // const id = active.id;
-    // if (!over) return;
     console.log("drag-Over event");
-
     console.log(event);
 
   };
@@ -126,9 +120,7 @@ const BoardView = React.memo(() => {
 
  
 
-  // let myuuid = uuidv1();
-    // console.log('Your UUID is: ' + myuuid);
-
+  
     // const grid = 8;
 // const getListStyle = isDraggingOver => ({
 //   background: isDraggingOver ? "lightblue" : "lightgrey",
@@ -139,18 +131,20 @@ const BoardView = React.memo(() => {
 
   const boards = useSelector(selectBoardsList);
   let options = boards?.map((b) => {
-    return { value: b.id, label: b.slug };
+    return { value: b.slug, label: b.slug };
   });
-  const handleSelect = (e) => {
-    // setSearchParams({ board: e.label });
+
+  const handleSelect = (op) => {
+      dispatch(boardMethods.setActiveBoardData(op.value));
+      navigate(`/board-view/${op.value}`);
+
   };
-  // const boardQuery = searchParams.get("slug");
-  // console.log(boardSlug)
+
   const selectedBoard = boardSlug
     ? { value: boardSlug, label: boardSlug }
     : { value: "null", label: "--select Board--" };
 
-  // console.log(boardQuery)
+
 
   const columns = useSelector(selectColumnsList);
 
@@ -181,7 +175,7 @@ const BoardView = React.memo(() => {
                   ? selectedBoard
                   : { value: "null", label: "--select Board--" }
               }
-              onChange={handleSelect}
+              onChange={(op)=>handleSelect(op)}
               options={options}
               placeholder="0 board found"
             />
@@ -200,7 +194,7 @@ const BoardView = React.memo(() => {
           />
         </div>
         <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end">
-        <button className="btn btn-primary" title="Give access of this workspace to someone you know."><i className="fa fa-user-plus mx-1"></i>Invite</button>
+  
         </div>
       </div>
 

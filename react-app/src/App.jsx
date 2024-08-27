@@ -6,6 +6,7 @@ import {
   useLocation,
   Navigate,
   useSearchParams,
+  Link,
 } from "react-router-dom";
 import Sidebar from "./layout/sidebar.jsx";
 import Footer from "./layout/footer.jsx";
@@ -19,7 +20,11 @@ import {
 import { toast } from "react-toastify";
 import CustomRequest from "./utils/customRequest.jsx";
 import AppResponse from "./components/AppResponse.jsx";
-import { selectBoardsList, setBoardsList,fetchBoardsByWsId } from "./features/BoardSlice.js";
+import {
+  selectBoardsList,
+  setBoardsList,
+  fetchBoardsByWsId,
+} from "./features/BoardSlice.js";
 import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
 import WorkspaceSelectModal from "./components/SelectWorkspaceModal.jsx";
@@ -28,97 +33,144 @@ import {
   fetchWorkspaces,
   selectActiveWorkspace,
   selectWorkspaceErrors,
-  setActiveWorkspace 
+  setActiveWorkspace,
+  selectWorkspaceList,
+  selectWsStatus,
 } from "./features/workspaceSlice.js";
 import Loading from "./components/Loading.jsx";
 import { AuthProvider } from "./hooks/useAuth.jsx";
-import {useAuth} from "./hooks/useAuth.jsx";
-import EditableText from "./components/EditableTextInput.jsx";
-import { modalMethods, selectSelectWorkspaceModal } from "./features/modalSlice.js";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-// import "froala-editor/css/plugins/image.min.css";
-import "froala-editor/css/froala_style.min.css";
+import { useAuth } from "./hooks/useAuth.jsx";
 
+import {
+  modalMethods,
+  selectSelectWorkspaceModal,
+} from "./features/modalSlice.js";
+import "froala-editor/css/froala_editor.pkgd.min.css";
+import "froala-editor/css/froala_style.min.css";
+import CreateWorkspaceModal from "./components/createWorkspaceModal.jsx";
 
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector(selectAuthToken);
   const [isLoading, setIsLoading] = useState(true);
- 
-  const SelectWorkspaceModal=useSelector(selectSelectWorkspaceModal);
 
+  const SelectWorkspaceModal = useSelector(selectSelectWorkspaceModal);
 
+  const workspaceList = useSelector(selectWorkspaceList);
+  const ws_status = useSelector(selectWsStatus);
+  const currentUser = useSelector(selectAuthenticatedUser);
+  const wsSliceErr = useSelector(selectWorkspaceErrors);
+  const activeWorkspace = useSelector(selectActiveWorkspace);
+  const auth = useAuth();
+  console.log(ws_status);
 
-  const ws_status=useSelector((state)=>state.workspace.status);
-  const currentUser =useSelector(selectAuthenticatedUser);
-  const wsSliceErr= useSelector(selectWorkspaceErrors);
-  const activeWorkspace=useSelector(selectActiveWorkspace);
-   const auth = useAuth();
-
- 
-   const checkActiveWorkspace=()=>{
-    if(currentUser?.last_active_workspace!==null){
+  const checkActiveWorkspace = () => {
+    if (currentUser?.last_active_workspace !== null) {
       return true;
     }
-    if(activeWorkspace){
+    if (activeWorkspace) {
       return true;
     }
     return false;
-  }
+  };
 
 
-
-// console.log(currentUser.last_active_workspace)
   useEffect(() => {
-    // console.log('inside if condition useeffect rerender')
     if (!authToken) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
-    if (authToken && ws_status === 'idle') {
-      dispatch(fetchWorkspaces());
-      setIsLoading(false);
+    if (authToken) {
+      if (ws_status === "idle" || workspaceList.length==0) {
+        // Fetch workspaces only if they haven't been fetched yet
+        dispatch(fetchWorkspaces());
+      }
     }
+  }, [authToken, ws_status,workspaceList, dispatch]);
 
+
+ 
+  // useEffect(() => {
+    // console.log('inside if condition useeffect rerender')
+    // if (!authToken) {
+    //   navigate("/login");
+    //   return;
+    // }
+
+    // if (authToken) {
+    //   if (Object.keys(workspaceList).length === 0) {
+    //     dispatch(fetchWorkspaces());
+    //   }
+    //   setIsLoading(false);
+    // }
+
+  //   if (wsSliceErr.length) {
+  //     toast.error("Workspace Error: " + wsSliceErr);
+  //   }
+
+  //   if (!checkActiveWorkspace()) {
+  //     dispatch(modalMethods.openSelectWorkspaceModal());
+  //     setIsLoading(false);
+  //   } else {
+  //     if (ws_status === "success") {
+  //       // console.log('in else of checkactiveworkspace')
+  //       dispatch(
+  //         setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+  //       );
+  //       setIsLoading(false);
+  //     }
+  //   }
+
+  //   // console.log(checkActiveWorkspace());
+  // }, [authToken, workspaceList,  dispatch, navigate]);
+
+  useEffect(() => {
     if (wsSliceErr.length) {
-      toast.error('Workspace Error: ' + wsSliceErr);
+      toast.error("Workspace Error: " + wsSliceErr);
     }
 
     if (!checkActiveWorkspace()) {
-          dispatch(modalMethods.openSelectWorkspaceModal());
-          setIsLoading(false);
-
-    }else{
-      if (ws_status === 'success') {
-        console.log('in else of checkactiveworkspace')
-        dispatch(setActiveWorkspace({ wsId: currentUser.last_active_workspace }));
-        setIsLoading(false);
+      if (ws_status === "success" && workspaceList.length > 0) {
+        // If there's a workspace list, but no active workspace, set the last active workspace
+        dispatch(
+          setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+        );
+      } else {
+        // Otherwise, open modal to select workspace
+        dispatch(modalMethods.openSelectWorkspaceModal());
+      }
+    } else {
+      if (ws_status === "success") {
+        dispatch(
+          setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+        );
       }
     }
-    
-    // console.log(checkActiveWorkspace());
-   
-  }, [authToken,  ws_status, wsSliceErr, dispatch, navigate]);
+
+    setIsLoading(false);
+  }, [ws_status, workspaceList, activeWorkspace, currentUser, dispatch]);
 
 
 
-
-  useEffect(()=>{
-
-    if(activeWorkspace && ws_status=='success' ){
+  // useEffect(() => {
+  //   if (activeWorkspace && ws_status == "success") {
+  //     dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
+  //     setIsLoading(false);
+  //   }
+  // }, [activeWorkspace]);
+  useEffect(() => {
+    if (activeWorkspace && ws_status === "success") {
       dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
       setIsLoading(false);
     }
- 
-  },[activeWorkspace])
+  }, [activeWorkspace, ws_status, currentUser, dispatch]);
 
 
-
-  const Logout = async() => {
+  const Logout = async () => {
     // console.log(auth)
-     await auth.logout();
+    await auth.logout();
     // try {
     //   const resp = await CustomRequest.get("/auth/logout");
     //   dispatch(setUserLogoutStatus());
@@ -126,47 +178,26 @@ const App = () => {
     // } catch (err) {
     //   toast.error(err.response?.data?.msg);
     // }
-
   };
 
-
-
-  const handleWorkspaceNameEdit=()=>{
-    
-  }
- 
   return (
     <React.Fragment>
       {/* <AuthProvider> */}
       <div className="wrapper">
         <Sidebar></Sidebar>
-   
+
         <div className="main">
           <nav className="navbar navbar-expand navbar-light navbar-bg">
             <a className="sidebar-toggle js-sidebar-toggle">
               <i className="hamburger align-self-center"></i>
             </a>
 
-            <div className="header-options d-flex flex-row justify-content-center align-items-center">
-              {activeWorkspace ? (
-                <h6 className="m-0 d-inline">
-                  <b className="text-success">Workspace:</b>
-                  <span title="Default Workspace">
-                    {/* {activeWorkspace.title} */}
-                    {<EditableText initialText={activeWorkspace.title} saveMethod={handleWorkspaceNameEdit} />}
-                  </span>
-                </h6>
-              ) : (
-                "No active workspace"
-              )}
-              <button className="btn btn-primary mx-2">
-                <i className="fa fa-plus "></i> Create
-              </button>
-            </div>
+            <div className="header-options d-flex flex-row justify-content-center align-items-center"></div>
 
             <div className="navbar-collapse collapse">
               <ul className="navbar-nav navbar-align">
-                <li className="nav-item dropdown">
+                <li className="nav-item"></li>
+                {/* <li className="nav-item dropdown">
                   <a
                     className="nav-icon dropdown-toggle"
                     href="#"
@@ -357,7 +388,7 @@ const App = () => {
                       </a>
                     </div>
                   </div>
-                </li>
+                </li> */}
                 <li className="nav-item dropdown">
                   <a
                     className="nav-icon dropdown-toggle d-inline-block d-sm-none"
@@ -384,25 +415,31 @@ const App = () => {
                     )}
                   </a>
                   <div className="dropdown-menu dropdown-menu-end">
-                    <a className="dropdown-item" href="pages-profile.html">
+                    <Link className="dropdown-item" to="/profile">
                       <i className="align-middle me-1" data-feather="user"></i>{" "}
                       Profile
-                    </a>
-                    <a className="dropdown-item" href="#">
+                    </Link>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={() =>
+                        dispatch(modalMethods.openCreateWorkspaceModal())
+                      }
+                    >
                       <i
                         className="align-middle me-1"
                         data-feather="pie-chart"
                       ></i>{" "}
-                      Analytics
+                      Create Workspace
                     </a>
                     <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="index.html">
+                    {/* <a className="dropdown-item" href="index.html">
                       <i
                         className="align-middle me-1"
                         data-feather="settings"
                       ></i>{" "}
                       Settings & Privacy
-                    </a>
+                    </a> */}
                     <a className="dropdown-item" href="#">
                       <i
                         className="align-middle me-1"
@@ -411,7 +448,11 @@ const App = () => {
                       Help Center
                     </a>
                     <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="#" onClick={()=>Logout()}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={() => Logout()}
+                    >
                       Log out
                     </a>
                   </div>
@@ -422,15 +463,11 @@ const App = () => {
 
           <main className="content" id="page-content">
             {/* page content will be here */}
-    
-            
-              <WorkspaceSelectModal open={SelectWorkspaceModal}  />
-            
-            {isLoading ? (
-                  <Loading/>
-            ) : (
-              <Outlet></Outlet>
-            )}
+
+            <WorkspaceSelectModal open={SelectWorkspaceModal} />
+            <CreateWorkspaceModal />
+
+            {isLoading ? <Loading /> : <Outlet></Outlet>}
           </main>
 
           <Footer></Footer>

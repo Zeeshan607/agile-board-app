@@ -57,7 +57,7 @@ console.log('function working');
       <div className="row mx-0">
         <div className="col-12 text-end">
           <Link to={"/add-board"} className="btn btn-primary">
-            Add
+            Create New Board
           </Link>
         </div>
       </div>
@@ -65,7 +65,7 @@ console.log('function working');
       {/* <AppResponse/> */}
 
       <div className="row mx-0 mt-3">
-        <div className="col-12 text-center">
+        <div className="col-12 ">
           {isLoading ? (
             <p>
               <i

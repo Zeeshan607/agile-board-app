@@ -8,10 +8,10 @@ const Invitation = sequelize.define("Invitation", {
     autoIncrement: true,
   },
   workspace_id: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: "Workspace",
+      model: "Workspaces",
       key: "id",
     },
   },
@@ -33,4 +33,5 @@ const Invitation = sequelize.define("Invitation", {
     allowNull: false,
   },
 });
+
 export default Invitation;

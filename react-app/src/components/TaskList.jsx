@@ -105,12 +105,12 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                       <div className="d-flex flex-row task-footer">
                         <div className="added-by flex-fill">
                           <a className="comments ms-2 text-decoration-none text-dark-light">
-                            <i className="fa fa-comments"></i>
-                                200+
+                            <i className="fa fa-comments me-1"></i>
+                               {task.discussionsCount>0?task.discussionsCount+"+":task.discussionsCount}
                           </a>
                         </div>
                         <div className="created_at flex-fill text-end">
-                          <span><b>Due:</b> {moment(task.due_date).format('DD-MM-YYYY')}</span> 
+                          <span><b>Due:</b> { !task.due_date?("No time limit"):(moment(task.due_date).format('DD-MM-YYYY'))}</span> 
                         </div>
                         
                       </div>

@@ -2,62 +2,159 @@ import User from "../models/UserModel.js";
 import { StatusCodes } from "http-status-codes";
 import Workspace from "../models/Workspace.js";
 import Board from "../models/BoardModel.js";
-import Task from '../models/TaskModel.js';
+import Task from "../models/TaskModel.js";
 import { Op } from "sequelize";
 import UserWorkspace from "../models/UserWorkspace.js";
 class workspaceController {
+  constructor() {}
 
-constructor(){}
+  async index(req, res) {
+    // get all workspaces to which current user is admin or member
+    // const user_workspace = await User.findOne({
+    //   where: { id: req.user.userId },
+    //   include: [
+    //     {
+    //       model: Workspace,
+    //       as: "ownedWorkspaces",
+    //       include: [
+    //         {
+    //           model: Board,
+    //           as: "boards",
+    //           include: [{ model: Task, as: "tasks" }],
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       model: Workspace,
+    //       as: "sharedWorkspaces",
+    //       include: [
+    //         {
+    //           model: Board,
+    //           as: "boards",
+    //           include: [{ model: Task, as: "tasks" }],
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // });
 
-async index(req,res){
+    // const formated_ws = {};
 
-    // get all workspaces to which current user is admin or member 
-    const user_workspace= await User.findOne({where:{id:req.user.userId},
-        include:[
-            {
-              model: Workspace,
-              as: 'ownedWorkspaces',  
-              include: [
-                { model: Board, as: 'boards', include: [{ model: Task, as: 'tasks' }] }
-              ]
-            },
-            {
-              model: Workspace,
-              as: 'sharedWorkspaces',
-              include: [
-                { model: Board, as: 'boards', include: [{ model: Task, as: 'tasks' }] }
-              ]
-            }
-       ]
+    // formated_ws["shared"] = user_workspace.sharedWorkspaces;
+    // formated_ws["owned"] = user_workspace.ownedWorkspaces;
+
+    const userWorkspaces = await Workspace.findAll({
+      where: {
+        [Op.or]: [
+          { createdBy: req.user.userId },
+          { '$usersWithAccess.UserWorkspace.user_id$': req.user.userId }
+        ]
+      },
+      include: [
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'username'], // Adjust attributes as necessary
+        },
+        {
+          model: User,
+          as: 'usersWithAccess',
+          attributes: ['id', 'username'], // Adjust attributes as necessary
+          through: {
+            attributes: ['is_shared']
+          }
+        },
+        {
+          model: Board,
+          as: 'boards',
+          include: [{ model: Task, as: 'tasks' }]
+        }
+      ]
     });
+    
+    // Categorize workspaces
+    const formated_ws = {
+      owned: [],
+      shared: []
+    };
+    
+    userWorkspaces.forEach(ws => {
+      if (ws.createdBy === req.user.userId) {
+        formated_ws.owned.push(ws);
+      } else {
+        formated_ws.shared.push(ws);
+      }
+    });
+    
 
-    const formated_ws={};
-
-    formated_ws['shared']=user_workspace.sharedWorkspaces;
-    formated_ws['owned']=user_workspace.ownedWorkspaces;
 
 
 
-    res.status(StatusCodes.OK).json({"workspace":formated_ws});
 
 
+    res.status(StatusCodes.OK).json({ workspace: formated_ws });
+  }
 
-}
-
-// ,where:{createdBy:{[Op.ne]:req.user.userId}}
-async getMemebers(req, res){
-    const {id}= req.params;
-    const ws =await Workspace.findOne({where:{id},include:[{model:User, as:'usersWithAccess'}]});
+  // ,where:{createdBy:{[Op.ne]:req.user.userId}}
+  async getMemebers(req, res) {
+    const { id } = req.params;
+    const ws = await Workspace.findOne({
+      where: { id },
+      include: [{ model: User, as: "usersWithAccess" }],
+    });
     // console.log(ws);
-    res.status(StatusCodes.OK).json({"members":ws})
+    res.status(StatusCodes.OK).json({ members: ws });
+  }
+
+  async getBoards(req, res) {
+    const { id } = req.params;
+    const ws = await Workspace.findOne({
+      where: { id },
+      include: [{ model: Board, as: "boards" }],
+    });
+    // console.log(ws);
+    res.status(StatusCodes.OK).json({ boards: ws.boards });
+  }
+  async getById(req, res) {
+    const { id } = req.params;
+    const ws = await Workspace.findByPk(id);
+    res.status(StatusCodes.OK).json({ workspace: ws });
+  }
+
+  async store(req, res){
+      const {title}=req.body;
+   try {
+    const ws = await Workspace.create({
+      title: title,
+      createdBy: req.user.userId,
+    });
+    res.status(StatusCodes.OK).json({ workspace: ws });
+  } catch (error) {
+
+    // console.log(error.code);
+    if (error.name==="SequelizeUniqueConstraintError") {
+      // Handle Sequelize validation error
+      res.status(StatusCodes.BAD_REQUEST).json({
+        type: 'Validation error',
+        message: error.errors.map((err) => err.message),
+      });
+    } else {
+      // Handle other types of errors
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error',
+        details: error.message,
+      });
+    }
+  }
 }
 
-async getBoards(req, res){
-    const {id}= req.params;
-    const ws =await Workspace.findOne({where:{id},include:[{model:Board, as:'boards'}]})
-    // console.log(ws);
-    res.status(StatusCodes.OK).json({"boards":ws.boards})
-}
+  async update(req, res){
+    const {id}=req.params;
+    const {title}=req.body;
+    const ws = await Workspace.findByPk(id);
+    const updated_ws=await ws.update({'title':title});
+    res.status(StatusCodes.OK).json({ workspace:updated_ws});
+  }
 
 }
 

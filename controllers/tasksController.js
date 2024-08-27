@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import Board from '../models/BoardModel.js';
 import Task from '../models/TaskModel.js';
 import { NotFoundError } from "../errors/customErrors.js";
+import TaskDiscussion from "../models/TaskDiscussion.js";
+import sequelize from "../db.js";
 
 class TaskController {
 
@@ -14,7 +16,13 @@ async index(req, res){
     if(!board){
         throw new NotFoundError(`board with given slug: ${slug} not found`);
     }
-    const tasks= await Task.findAll({where:{board_id:board.id}})
+    const tasks= await Task.findAll({where:{board_id:board.id}, attributes: {
+        include: [
+          // Add a count of Taskdiscussions
+          [sequelize.fn('COUNT', sequelize.col('discussions.id')), 'discussionsCount']
+        ]
+      },include:[{model:TaskDiscussion,as:'discussions', attributes:[]}], group: ['Task.id']});
+    
     res.status(StatusCodes.OK).json({'tasks':tasks })
 }
 

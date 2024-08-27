@@ -49,7 +49,7 @@ export default function CommentsList({list}) {
       }
     };
   
-  const handleCommentDelete =(id)=>{
+  const handleCommentDelete =(id,task_id)=>{
     Swal.fire({
       title:'Are you sure?',
       text:"You want to delet this Comment. You won't be able to retrive it again.",
@@ -58,7 +58,7 @@ export default function CommentsList({list}) {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        dispatch(taskDiscussionMethods.deleteComment(id));
+        dispatch(taskDiscussionMethods.deleteComment(id,task_id));
       } 
     });
   }
@@ -98,7 +98,7 @@ export default function CommentsList({list}) {
                     <div className="row mx-0">
                       <div className="col-12 p-0">
                           <small className='text-decoration-underline me-2 comment-actions' onClick={()=>HandleCommentEdit(comment)}>Edit</small>
-                          <small className='text-decoration-underline comment-actions' onClick={()=>handleCommentDelete(comment.id)}>Delete</small>
+                          <small className='text-decoration-underline comment-actions' onClick={()=>handleCommentDelete(comment.id, comment.task_id)}>Delete</small>
                       </div>
                     </div>
                   </div>
