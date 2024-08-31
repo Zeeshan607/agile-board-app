@@ -94,7 +94,7 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
 
 const initialState = {
     list:{},
-    active:null,
+    active:{},
     status:"idle",
     error:[]
 
