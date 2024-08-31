@@ -6,8 +6,9 @@ import SubmitBtn from "../components/SubmitBtn.jsx";
 import CustomRequest from "../utils/customRequest.jsx";
 import {toast} from 'react-toastify';
 import {useDispatch, useSelector} from 'react-redux';
-import { insertBoard } from "../features/BoardSlice.js";
+import { boardMethods, insertBoard } from "../features/BoardSlice.js";
 import { selectActiveWorkspace } from "../features/workspaceSlice.js";
+import { formToJSON } from "axios";
 
 
 const AddBoard = () => {
@@ -23,20 +24,24 @@ const AddBoard = () => {
   
 const addBoard=async ()=>{
 
-      try{
-       const resp=await CustomRequest.post('/dashboard/board/create',form);
-          const status=  resp.status;
-          if(status==200){
-            toast.success('Board Created successfully')
-            const board= await resp.data.board;
-           dispatch(insertBoard({board:board}))
-          }
-          navigate('/boards')
+        dispatch(boardMethods.create(form));
+        navigate('/boards');
+
+      // try{
+      //  const resp=await CustomRequest.post('/dashboard/board/create',form);
+      //     const status=  resp.status;
+      //     if(status==200){
+      //       toast.success('Board Created successfully')
+      //       const board= await resp.data.board;
+      //      dispatch(insertBoard({board:board}))
+      //     }
+      //     navigate('/boards')
 
 
-      }catch(err){
-        toast.error(err.response?.data?.msg)
-      }
+      // }catch(err){
+      //   toast.error(err.response?.data?.msg)
+      // }
+
 }
 
 

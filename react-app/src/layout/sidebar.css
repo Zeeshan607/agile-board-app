@@ -7,7 +7,7 @@
     position: absolute;
     inset: auto auto 0px 0px;
     margin: 0px;
-    transform: translate(170px, 20px);
+    transform: translate(160px, 20px);
 }
 .hoverable-dropdown>.dropdown-toggle:active { 
   /*Without this, clicking will make it sticky*/

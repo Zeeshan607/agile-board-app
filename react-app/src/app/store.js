@@ -14,6 +14,24 @@ import taskDiscussionReducer from "../features/TaskDiscussionSlice.js";
 import subTaskReducer from "../features/SubTaskSlice.js"
 
 
+const preventDuplicateWorkspaceFetch = store => next => action => {
+  const { getState } = store;
+  
+  // Check if `fetchWorkspaces` thunk is being dispatched
+  if (action.type === 'dashboard/workspaces/pending') {
+    const fetchStatus = getState().workspaceSlice.status;
+    
+    // If it's already pending, prevent dispatch
+    if (fetchStatus === 'pending') {
+      return;
+    }
+  }
+  
+  return next(action);
+};
+
+
+
 const appReducer = combineReducers({
   userAuth: userAuthReducer,
   response: responseReducer,

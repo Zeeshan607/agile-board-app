@@ -13,30 +13,22 @@ function Invitation() {
     const navigate=useNavigate();
     const [invitedWorkspace, setInvitedWorkspace]=useState(null);
 
-    useEffect(()=>{
-
-        if(!token || !workspace_id){
-            navigate('/page_not_found')
-        }
-
-       getWorkspaceById(workspace_id);
-
-    },[workspace_id,token])
+ 
 
    const getWorkspaceById=async (ws_id)=>{
-    try{
-        const resp= await CustomRequest.get(`/workspace/${ws_id}`);
-        if(resp.status===200){
-          if(resp.data.workspace){
-            setInvitedWorkspace(resp.data.workspace)
-          }else{
-            toast.error('Invalid Invite URL');
+      try{
+          const resp= await CustomRequest.get(`/workspace/${ws_id}`);
+          if(resp.status===200){
+            if(resp.data.workspace){
+              setInvitedWorkspace(resp.data.workspace)
+            }else{
+              toast.error('Invalid Invite URL');
+            }
+                
           }
-              
-        }
-    }catch(err){
-            toast.error(err);
-    }
+      }catch(err){
+              toast.error(err);
+      }
 
     }
 
@@ -82,6 +74,19 @@ function Invitation() {
           toast.error('Oops! Something when wrong. please try again or contact administrator');
       }
     }
+
+
+    useEffect(()=>{
+
+      if(!token || !workspace_id){
+          navigate('/page_not_found')
+      }
+
+     getWorkspaceById(workspace_id);
+
+  },[workspace_id,token])
+
+
 
   return (
     <main className="d-flex w-100">

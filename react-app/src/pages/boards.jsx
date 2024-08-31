@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CustomRequest from "../utils/customRequest";
 import { toast } from "react-toastify";
 import { Modal } from "react-responsive-modal";
-import { setBoardsList,selectBoardsList, removeBoard } from "../features/BoardSlice.js";
+import { setBoardsList,selectBoardsList, removeBoard, boardMethods } from "../features/BoardSlice.js";
 import Swal from "sweetalert2";
 
 const Boards = () => {
@@ -23,7 +23,7 @@ const Boards = () => {
   const del = (e, id) => {
     e.target.classList.add("disabled");
     // window.confirm("Delete the item?");
-console.log('function working');
+// console.log('function working');
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -34,17 +34,7 @@ console.log('function working');
       confirmButtonText: "Yes, delete it!",
     }).then( async (result) => {
       if (result.isConfirmed) {
-          try {
-            console.log('clicked yes, runing request')
-          const resp = await CustomRequest.delete(`/dashboard/board/${id}`);
-          const del_id= await resp.data?.board_id;
-          dispatch(removeBoard({id:del_id}));
-          e.target.classList.remove("disabled");
-          toast.success(resp.data?.msg);
-          } catch (err) {
-            toast.error(err.response?.data?.msg);
-            e.target.classList.remove("disabled");
-          }
+          dispatch(boardMethods.delete(id));
         }
         e.target.classList.remove("disabled");
     });
@@ -87,17 +77,12 @@ console.log('function working');
                   {boards.length ? (
                     boards.map((board) => (
                       <tr key={board.id}>
-                        <td onClick={onOpenModal}>
-                          <b className="text-primary cursor-pointer ">
+                        <td >
+                          <b >
                             {board.name}
                           </b>
                         </td>
-                        {/* <td>{ board.description.slice(0, board.description.length/2) +'....'}</td> */}
-                        <Modal open={open} onClose={onCloseModal} center>
-                          <h2>{board.name}</h2>
-                          <hr />
-                          <p>{board.description}</p>
-                        </Modal>
+                     
                         <td>
                           <Link
                             to={`/edit-board/${board.id}`}

@@ -2,6 +2,7 @@ import User from "../models/UserModel.js";
 import { comparePassword } from "../utils/helpers.js";
 import {
   BadRequestError,
+  NotFoundError,
   UnauthenticatedError,
 } from "../errors/customErrors.js";
 import { createJwt } from "../utils/Jwt.js";
@@ -10,7 +11,9 @@ import config from "../config/default.js";
 import Board from "../models/BoardModel.js";
 import { hashMake } from "../utils/helpers.js";
 // import Role from "../app/__old/__Role.js";
-import Workspace from "../models/workspace.js";
+import Workspace from "../models/Workspace.js";
+import Invitation from "../models/Invitation.js";
+import UserWorkspace from "../models/UserWorkspace.js";
 
 async function isExistingUser(email) {
   const user = await User.findOne({ where: { email: email } });
@@ -22,22 +25,30 @@ class AuthController {
 
   // register function
   async register(req, res) {
-    //  console.log(this.hello)
-    // const isFirstAccount = (await User.count()) === 0;
-    // const isExisting=await isExistingUser(req.body.email);
-
-    // req.body.role_id = isFirstAccount && !isExisting ? '1' : '3';
-
     const hashedPass = await hashMake(req.body.password);
     req.body.password = hashedPass;
 
-    req.body.workspace = { title: "Agile-Workspace", admin: 1 };
+    // req.body.workspace = { title: "Agile-Workspace", admin: 1 };
 
-    const user = await User.create(req.body, {
-      include: [{ model: Workspace, as: "workspace" }],
-    });
-    if (!user)
+    const user = await User.create(req.body);
+
+    if (!user){
       throw new BadRequestError("OOPs! something went wrong. please try again");
+      }
+
+     const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id});
+
+      const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});
+
+      if(!invite){
+        return res.status(StatusCodes.OK)
+        .json({ msg: "Account Created successfully" });
+      }else{
+        const workspace=await Workspace.findByPk(invite.workspace_id);
+        if(workspace){
+          await UserWorkspace.create({'workspace_id':workspace.id,'user_id':user.id, 'is_shared':1});
+        }
+      }
 
     return res
       .status(StatusCodes.OK)
@@ -48,12 +59,25 @@ class AuthController {
   async login(req, res) {
     // console.log(req.body)
     const user = await User.findOne({ where: { email: req.body.email } });
+
     const isValidUser =
       user && (await comparePassword(req.body.password, user.password));
-
     if (!isValidUser) throw new UnauthenticatedError("invalid credentials");
 
-    // console.log(user);
+    const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});
+    if(invite){
+      // console.log('inside invite if conditions')
+      const workspace=await Workspace.findByPk(invite.workspace_id);
+      const userWorkspaceConnection= await UserWorkspace.findOne({where:{'workspace_id':workspace.id,'user_id':user.id, 'is_shared':1}});
+      if(!userWorkspaceConnection){
+        if(invite && workspace){
+          await UserWorkspace.create({'workspace_id':workspace.id,'user_id':user.id, 'is_shared':1});
+         }
+      }
+    }
+ 
+   
+
     let token = createJwt({
       userId: user.id,
       email: user.email,

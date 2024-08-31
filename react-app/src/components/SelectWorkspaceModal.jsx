@@ -84,7 +84,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
     height: "300px",
   };
 
-  console.log(ws_list)
+  // console.log(ws_list)
   return (
     <Modal
       open={open}

@@ -36,7 +36,7 @@ const BoardView = React.memo(() => {
   const auth=useAuth();
   // const last_active_board=auth.user.last_active_board;
   const [isLoading, setIsLoading] = useState(false);
-  const createBoardModel=useSelector(selectCreateBoardModal); 
+
 
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const columnsErr = useSelector((state) => state.columns.errors);
@@ -181,17 +181,13 @@ const BoardView = React.memo(() => {
             />
             <button
               className="btn btn-transparent"
-              onClick={() => modalMethods.openCreateBoardModal()}
+              onClick={() => dispatch(modalMethods.openCreateBoardModal())}
             >
               <i className="fa fa-plus"></i>
             </button>
           </div>
 
-          <CreateBoardModel
-            open={createBoardModel}
-            ws_id={activeWorkspace?.id}
-            onClose={modalMethods.closeCreateBoardModal}
-          />
+        
         </div>
         <div className="col-12 col-sm-12 col-md-6 col-lg-6 text-end">
   

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import {
   Outlet,
@@ -44,10 +44,12 @@ import { useAuth } from "./hooks/useAuth.jsx";
 import {
   modalMethods,
   selectSelectWorkspaceModal,
+  selectCreateBoardModal
 } from "./features/modalSlice.js";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/css/froala_style.min.css";
 import CreateWorkspaceModal from "./components/createWorkspaceModal.jsx";
+import SendInvitationModal from "./components/SendInvitationModal.jsx";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -59,22 +61,25 @@ const App = () => {
 
   const workspaceList = useSelector(selectWorkspaceList);
   const ws_status = useSelector(selectWsStatus);
-  const currentUser = useSelector(selectAuthenticatedUser);
+
   const wsSliceErr = useSelector(selectWorkspaceErrors);
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const auth = useAuth();
-  console.log(ws_status);
+  const currentUser = auth.user;
+  const modalOpenedRef = useRef(false);
+  // console.log(ws_status);
 
   const checkActiveWorkspace = () => {
-    if (currentUser?.last_active_workspace !== null) {
-      return true;
+    if (currentUser?.last_active_workspace !== null && !activeWorkspace) {
+      return { inDb: true, inStore: false };
+    } else if (activeWorkspace && currentUser?.last_active_workspace == null) {
+      return { inDb: false, inStore: true };
+    } else if (activeWorkspace && currentUser?.last_active_workspace !== null) {
+      return { inDb: true, inStore: true };
+    } else {
+      return { inDb: false, inStore: false };
     }
-    if (activeWorkspace) {
-      return true;
-    }
-    return false;
   };
-
 
   useEffect(() => {
     if (!authToken) {
@@ -83,83 +88,46 @@ const App = () => {
     }
 
     if (authToken) {
-      if (ws_status === "idle" || workspaceList.length==0) {
-        // Fetch workspaces only if they haven't been fetched yet
-        dispatch(fetchWorkspaces());
+      if (Object.keys(workspaceList).length == 0) {
+        if (ws_status === "idle" || ws_status === "failed") {
+          // Fetch workspaces only if they haven't been fetched yet
+          console.log("fetch workspace dispatch");
+          dispatch(fetchWorkspaces());
+        }
       }
     }
-  }, [authToken, ws_status,workspaceList, dispatch]);
-
-
- 
-  // useEffect(() => {
-    // console.log('inside if condition useeffect rerender')
-    // if (!authToken) {
-    //   navigate("/login");
-    //   return;
-    // }
-
-    // if (authToken) {
-    //   if (Object.keys(workspaceList).length === 0) {
-    //     dispatch(fetchWorkspaces());
-    //   }
-    //   setIsLoading(false);
-    // }
-
-  //   if (wsSliceErr.length) {
-  //     toast.error("Workspace Error: " + wsSliceErr);
-  //   }
-
-  //   if (!checkActiveWorkspace()) {
-  //     dispatch(modalMethods.openSelectWorkspaceModal());
-  //     setIsLoading(false);
-  //   } else {
-  //     if (ws_status === "success") {
-  //       // console.log('in else of checkactiveworkspace')
-  //       dispatch(
-  //         setActiveWorkspace({ wsId: currentUser.last_active_workspace })
-  //       );
-  //       setIsLoading(false);
-  //     }
-  //   }
-
-  //   // console.log(checkActiveWorkspace());
-  // }, [authToken, workspaceList,  dispatch, navigate]);
+  }, [authToken, ws_status, workspaceList, dispatch]);
 
   useEffect(() => {
     if (wsSliceErr.length) {
       toast.error("Workspace Error: " + wsSliceErr);
     }
+    const { inDb, inStore } = checkActiveWorkspace();
+    console.log("checkActiveWorkspace result:", { inDb, inStore });
 
-    if (!checkActiveWorkspace()) {
-      if (ws_status === "success" && workspaceList.length > 0) {
-        // If there's a workspace list, but no active workspace, set the last active workspace
-        dispatch(
-          setActiveWorkspace({ wsId: currentUser.last_active_workspace })
-        );
-      } else {
-        // Otherwise, open modal to select workspace
-        dispatch(modalMethods.openSelectWorkspaceModal());
-      }
-    } else {
-      if (ws_status === "success") {
-        dispatch(
-          setActiveWorkspace({ wsId: currentUser.last_active_workspace })
-        );
+    if (ws_status !== "idle" && !modalOpenedRef.current) {
+      if (ws_status === "success" && Object.keys(workspaceList).length > 0) {
+        if (!inDb) {
+          console.log("No active workspace in DB, opening modal");
+          dispatch(modalMethods.openSelectWorkspaceModal());
+          modalOpenedRef.current = true; // Prevent multiple modal openings
+        } else if (!inStore) {
+          console.log(
+            "Active workspace in DB but not in store, setting active workspace"
+          );
+          dispatch(
+            setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+          );
+        }
       }
     }
 
     setIsLoading(false);
-  }, [ws_status, workspaceList, activeWorkspace, currentUser, dispatch]);
+  }, [ws_status, activeWorkspace, dispatch]);
 
 
 
-  // useEffect(() => {
-  //   if (activeWorkspace && ws_status == "success") {
-  //     dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
-  //     setIsLoading(false);
-  //   }
-  // }, [activeWorkspace]);
+
   useEffect(() => {
     if (activeWorkspace && ws_status === "success") {
       dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
@@ -168,21 +136,14 @@ const App = () => {
   }, [activeWorkspace, ws_status, currentUser, dispatch]);
 
 
+
   const Logout = async () => {
-    // console.log(auth)
     await auth.logout();
-    // try {
-    //   const resp = await CustomRequest.get("/auth/logout");
-    //   dispatch(setUserLogoutStatus());
-    //   navigate("/login");
-    // } catch (err) {
-    //   toast.error(err.response?.data?.msg);
-    // }
   };
 
   return (
     <React.Fragment>
-      {/* <AuthProvider> */}
+
       <div className="wrapper">
         <Sidebar></Sidebar>
 
@@ -440,7 +401,12 @@ const App = () => {
                       ></i>{" "}
                       Settings & Privacy
                     </a> */}
-                    <a className="dropdown-item" href="#">
+                    <a className="dropdown-item" href="#" onClick={(e)=>
+                    {if (window.confirm('Click Ok to go to our contact page, Cancel to Stay here')){
+                      window.open('https://www.muhammadzeeshan.dev/#contact-section', '_blank');
+                      };}
+                    }>
+  
                       <i
                         className="align-middle me-1"
                         data-feather="help-circle"
@@ -466,6 +432,8 @@ const App = () => {
 
             <WorkspaceSelectModal open={SelectWorkspaceModal} />
             <CreateWorkspaceModal />
+            <SendInvitationModal />
+            <CreateBoardModel ws_id={activeWorkspace?.id} />
 
             {isLoading ? <Loading /> : <Outlet></Outlet>}
           </main>

@@ -5,6 +5,10 @@ import Board from "../models/BoardModel.js";
 import Task from "../models/TaskModel.js";
 import { Op } from "sequelize";
 import UserWorkspace from "../models/UserWorkspace.js";
+import Invitation from "../models/Invitation.js";
+
+
+
 class workspaceController {
   constructor() {}
 
@@ -85,12 +89,6 @@ class workspaceController {
         formated_ws.shared.push(ws);
       }
     });
-    
-
-
-
-
-
 
     res.status(StatusCodes.OK).json({ workspace: formated_ws });
   }
@@ -100,10 +98,10 @@ class workspaceController {
     const { id } = req.params;
     const ws = await Workspace.findOne({
       where: { id },
-      include: [{ model: User, as: "usersWithAccess" }],
+      include: [{ model: User, as: "usersWithAccess" },{model:User, as:'creator'}],
     });
     // console.log(ws);
-    res.status(StatusCodes.OK).json({ members: ws });
+    res.status(StatusCodes.OK).json({ workspaceWithMembers: ws });
   }
 
   async getBoards(req, res) {
@@ -156,6 +154,35 @@ class workspaceController {
     res.status(StatusCodes.OK).json({ workspace:updated_ws});
   }
 
+  async removeUserAccessToWorkspace(req, res){
+    const {user_id, workspace_id}=req.body;
+    if(req.user.userId!==user_id){
+      return res.status(StatusCodes.BAD_REQUEST).json({'error':"Action forbiden: you are not autherize to perform this action"});
+    }
+   try{
+    const userWs=await UserWorkspace.destroy({where:{"user_id":user_id,"workspace_id":workspace_id}});
+    const user=await User.findByPk(user_id);
+    const removeInvite=await Invitation.destroy({where:{"invited_user_email":user.email, 'workspace_id':workspace_id}});
+     const workspace=await Workspace.findOne({where:{createdBy:user.id}, order: [['createdAt', 'DESC']]});
+
+      await user.update({'last_active_workspace':workspace.id});
+
+    return res.status(StatusCodes.OK).json({'user_created_latest_workspace':workspace});
+   }catch(err){
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'error':'Oops! something went wrong.'})
+   }
+
+   
+
+  }
+
+
+
+
+
 }
+
+
+
 
 export default new workspaceController();

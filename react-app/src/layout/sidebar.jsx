@@ -2,10 +2,12 @@ import react, {useEffect, useState} from "react";
 import { Link ,useNavigate} from "react-router-dom";
 import "./sidebar.css";
 import { useDispatch, useSelector } from "react-redux";
-import { selectActiveWorkspace, selectWorkspaceList, setActiveWorkspace, } from "../features/workspaceSlice.js";
+import { selectActiveWorkspace, selectWorkspaceList, setActiveWorkspace, wsMethods, } from "../features/workspaceSlice.js";
 import { setUserLastActiveWorkspace } from "../features/UserAuthSlice.js";
 import CustomRequest from "../utils/customRequest";
 import { modalMethods } from "../features/modalSlice.js";
+import { useAuth } from "../hooks/useAuth.jsx";
+import Loading from "../components/Loading.jsx";
 
 
 
@@ -17,6 +19,8 @@ export default function Sidebar() {
   const ws_status=useSelector(state=>state.workspace.status)
   const dispatch =useDispatch();
   const navigate=useNavigate();
+const {user}=useAuth();
+const authUser=user;
 
 useEffect(()=>{
 
@@ -40,34 +44,34 @@ useEffect(()=>{
 
 const handleWorkspaceSwitch=async (id)=>{
 
-  try{
-    const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:id});
-    const status= resp.status;
-    // console.log(resp)
-    if(status==200){
-      dispatch(setActiveWorkspace({wsId:id}));
-      dispatch(setUserLastActiveWorkspace({wsId:id}))
-      toast.success('Workspace switched successfully');
-        navigate('/');
-    }
-  }catch(err){
-    toast.error("Error while switching workspace:"+err);
-  }
+  // try{
+  //   const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:id});
+  //   const status= resp.status;
+  //   if(status==200){
+  //     dispatch(setActiveWorkspace({wsId:id}));
+  //     dispatch(setUserLastActiveWorkspace({wsId:id}));
+  //     toast.success('Workspace switched successfully');
+  //       navigate('/');
+  //   }
+  // }catch(err){
+  //   toast.error("Error while switching workspace:"+err);
+  // }
+
+  dispatch(wsMethods.switchWorkspace("FROM_SIDEBAR",id));
+  navigate('/');
 }
-
-
-
 
 const active_ws=useSelector(selectActiveWorkspace);
-
-if(!active_ws){
-  modalMethods.openSelectWorkspaceModal();
+if(Object.keys(workspaces).length==0 && ws_status !=="success" ){
+return <i className="fa fa-spinner fa-spin"></i>
 }
+
+
   return (
     <nav id="sidebar" className="sidebar js-sidebar">
       <div className="sidebar-content js-simplebar">
-        <a className="sidebar-brand" href="index.html">
-          <span className="align-middle">AdminKit</span>
+        <a className="sidebar-brand" href="/">
+          <span className="align-middle">Agile Board</span>
         </a>
 
         <ul className="sidebar-nav">
@@ -137,9 +141,14 @@ if(!active_ws){
                       </a>
                         <ul className="dropdown-menu dropdown-menu-dark dropend settings-workspace-list"  style={{minWidth:"250px"}} aria-labelledby="subdropend">
                             {
-                              sortedWs?sortedWs.map((ws,index)=>(
-                                <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title} <small>{(ws.type=="shared"?' (Shared)':'')}</small></a></li>
-                              )):''
+                              !active_ws?(
+                                  <li><i className="fa fa-spinner fa-spin"></i></li>
+                              ):(
+                                sortedWs?sortedWs.map((ws,index)=>(
+                                  <li key={index}><a className={"dropdown-item " + (active_ws?.id==ws.id ? " bg-primary active" : '')} href="#" onClick={()=>handleWorkspaceSwitch(ws.id)}>{ws.title} <small>{(ws.type=="shared"?' (Shared)':'')}</small></a></li>
+                                )):''
+                              )
+                           
                             }
                         
                         

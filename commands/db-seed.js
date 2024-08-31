@@ -15,9 +15,8 @@ import { v1 as uuidv1, v4 as uuidv4 } from "uuid";
 
 // 
 // import { hashMake } from"../utils/helpers.js" ;
-const myModule = await import("../utils/helpers.js");
-// import { hashMake } from myModule;
-console.log(myModule);
+const helpers = await import("../utils/helpers.js");
+
 import User from "../models/UserModel.js";
 import Workspace from "../models/Workspace.js";
 import Board from "../models/BoardModel.js";
@@ -60,7 +59,7 @@ const seedModels = async () => {
               id: 1,
               username: "Zeeshan",
               email: "zeeshanawan1998@gmail.com",
-              password: await hashMake("Shani-1998"),
+              password: await helpers.hashMake("Shani-1998"),
               createdAt: new Date(),
               updatedAt: new Date(),
             },
@@ -68,7 +67,7 @@ const seedModels = async () => {
               id: 2,
               username: "M-Zeeshan",
               email: "muhammadzeeshan5420@gmail.com",
-              password: await hashMake("Shani-1998"),
+              password: await helpers.hashMake("Shani-1998"),
               createdAt: new Date(),
               updatedAt: new Date(),
             },

@@ -18,6 +18,9 @@ class InvitationController{
             if(!workspace){
                 return res.status(StatusCodes.NOT_FOUND).json({'error':"workspace with given Id Not found"});
             }
+            if(workspace.createdBy !==req.user.userId){
+                return res.status(StatusCodes.FORBIDDEN).json({"error":"You are not allowd to send invitations. Only admin of workspace can send Invites"})
+                }            
             const now = moment();
             // Add one day to the current time
             const nextDay = now.add(1, 'days');

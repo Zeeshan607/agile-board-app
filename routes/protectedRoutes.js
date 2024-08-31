@@ -52,6 +52,8 @@ AuthRoutes.get('/users',userController.index);
 AuthRoutes.get('/workspaces', workspaceController.index);
 AuthRoutes.post('/workspace/:id/update',workspaceController.update)
 AuthRoutes.post('/workspace/store', workspaceController.store);
+AuthRoutes.post('/user_leaving_workspace',workspaceController.removeUserAccessToWorkspace);
+
 
 AuthRoutes.get('/workspace/:id/members', workspaceController.getMemebers);
 AuthRoutes.get('/workspace/:id/boards', workspaceController.getBoards);

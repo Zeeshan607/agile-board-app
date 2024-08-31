@@ -14,7 +14,7 @@ const UserWorkspace=  sequelize.define('UserWorkspace',{
         type:DataTypes.UUIDV4,
         allowNull:false,
         references:{
-            model:'Workspace',
+            model:'Workspaces',
             key:"id"
         }
     },
@@ -22,7 +22,7 @@ const UserWorkspace=  sequelize.define('UserWorkspace',{
         type:DataTypes.INTEGER,
         allowNull:false,
         references:{
-            model:'User',
+            model:'Users',
             key:'id',
         }
     },

@@ -25,7 +25,7 @@ const BoardColumn = sequelize.define('BoardColumn', {
         type:DataTypes.INTEGER,
         allowNull:false,
         reference:{
-            model:'Board',
+            model:'Boards',
             key:'id'
         }
     },

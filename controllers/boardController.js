@@ -29,7 +29,7 @@ constructor(){}
     if(!workspace){
       return res.status(StatusCodes.NOT_FOUND).json({error:"Workspace with given Id is not found"});
     }
-    console.log(workspace);
+    // console.log(workspace);
     const slug= name.replaceAll(' ','-');
     const board=await Board.create({name, description,'slug':slug, 'workspace_id':workspace.id});
     const def_boardstatus=await BoardColumn.bulkCreate([
@@ -46,8 +46,8 @@ async update(req, res){
   if(!board){
     return res.status(404).json({'msg':`Board with ${id} not found`});
   }
-    const b=await board.update(req.body)
-   return res.status(StatusCodes.OK).json({msg:"Board updated successfully"});
+    const ub=await board.update(req.body)
+   return res.status(StatusCodes.OK).json({"board":ub,msg:"Board updated successfully"});
  }
 
 //  async 

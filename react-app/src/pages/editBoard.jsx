@@ -5,13 +5,15 @@ import FormTextarea from "../components/FormTextarea.jsx";
 import SubmitBtn from "../components/SubmitBtn.jsx";
 import {toast} from "react-toastify";
 import CustomRequest from "../utils/customRequest.jsx";
+import { boardMethods } from "../features/BoardSlice.js";
+import { useDispatch } from "react-redux";
 
 const EditBoard=()=>{
     const [form, setForm] = useState({});
     const navigate = useNavigate();
     const param = useParams();
     const boardId = param.id;
-  
+    const dispatch=useDispatch();
     useEffect(() => {
       try {
         loadEditableBoard(boardId);
@@ -33,15 +35,9 @@ const EditBoard=()=>{
     const update = (e) => {
       e.preventDefault();
       e.target.classList.add("disabled");
-      try {
-        const req = CustomRequest.patch(`/dashboard/board/${boardId}`, form);
-        e.target.classList.remove("disabled");
-        toast.success('Board udpated successfully')
-        navigate('/boards')
-      } catch (err) {
-        toast.error(err.response?.data?.msg);
-        e.target.classList.remove("disabled");
-      }
+       dispatch(boardMethods.update(form, boardId));
+       e.target.classList.remove("disabled");
+       navigate('/boards');
     };
   
     return (

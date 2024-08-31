@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchWorkspaces} from "./workspaceSlice.js";
+// import { fetchWorkspaces} from "./workspaceSlice.js";
 import {authUserSelector} from "../utils/customSelectors.js";
 import CustomRequest from "../utils/customRequest.jsx";
+import { modalMethods } from "./modalSlice.js";
 // import {authUserSelector} from "./UserAuthSlice.js";
 
 
@@ -53,6 +54,13 @@ const BoardSlice = createSlice({
     insertBoard:(state, action)=>{
       state.list.push(action.payload.board);
     },
+    editBoard:(state, action )=>{
+      state.list.map((board,index)=>{
+        if(board.id==action.payload.id){
+          state.list[index]=action.payload.board;
+        }
+      })
+    },
     removeBoard:(state, action)=>{
       const newBoards= state.list.filter(b=> b.id != action.payload.id)
       state.list= newBoards;
@@ -83,7 +91,7 @@ const BoardSlice = createSlice({
   }
 });
 
-export const { setBoardsList, setActiveBoard, insertBoard, removeBoard } = BoardSlice.actions;
+export const { setBoardsList, setActiveBoard, insertBoard, removeBoard,editBoard } = BoardSlice.actions;
 export const selectBoardsList = (state) => state.boards.list;
 export const selectActiveBoard = (state) => state.boards.activeBoard?state.boards.activeBoard:null;
 
@@ -101,5 +109,52 @@ export const boardMethods={
         toast.error(err);
     }
 
+  },
+  create:(data)=>async(dispatch,getState)=>{
+    const modalState=getState().modals;
+    try{
+      const resp=await CustomRequest.post('/dashboard/board/create',data);
+      if(resp.status==200){
+        dispatch(insertBoard({'board':resp.data.board}));
+        toast.success('Board Created successfully');
+        if(modalState.createBoardModal){
+          dispatch(modalMethods.closeCreateBoardModal());
+        }
+
+      }
+ 
+  }catch(err){
+    console.log(err);
+      toast.error(err.response?.data?.msg);
+      if(modalState.createBoardModal){
+        dispatch(modalMethods.closeCreateBoardModal());
+      }
+  }
+
+  },
+  update:(data, id)=>async(dispatch)=>{
+    try {
+      const resp =await CustomRequest.patch(`/dashboard/board/${id}`, data);
+      if(resp.status==200){
+        dispatch(editBoard({'id':id, 'board':resp.data.board}));
+        toast.success('Board udpated successfully')
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response?.data?.msg);
+
+    }
+  },
+  delete:(id)=>async(dispatch)=>{
+    try {
+    const resp = await CustomRequest.delete(`/dashboard/board/${id}`);
+    const del_id= await resp.data?.board_id;
+    dispatch(removeBoard({id:del_id}));
+    toast.success(resp.data?.msg);
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response?.data?.msg);
+
+    }
   }
 }

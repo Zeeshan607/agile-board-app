@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import CustomRequest from '../utils/customRequest.jsx';
 import { produce } from 'immer';
 import { modalMethods } from './modalSlice.js';
-
+import { setUserLastActiveWorkspace } from "../features/UserAuthSlice.js";
 
 
 // Utility function to add delay
@@ -93,8 +93,8 @@ export const fetchWorkspaces=createAsyncThunk('dashboard/workspaces',async(_,{re
 
 
 const initialState = {
-    list:[],
-    active:'',
+    list:{},
+    active:null,
     status:"idle",
     error:[]
 
@@ -105,7 +105,7 @@ const workspace = createSlice({
   initialState,
   reducers: {
         setWorkspaceList:(state, action)=>{
-            state.list=action.payload.workspaces;
+            state.list=action.payload.workspace;
         },
         setActiveWorkspace:(state, action)=>{
             const active=state.list.workspace.owned.find((ws)=> ws.id==action.payload.wsId)??state.list.workspace.shared.find(ws=> ws.id==action.payload.wsId);
@@ -120,8 +120,11 @@ const workspace = createSlice({
               state.active.title=action.payload.workspace.title;
             }
           }
-          
-    
+        },
+        removeWorkspaceFromSharedWsList:(state, action)=>{
+          const newSharedWsList=state.list.workspace.shared.filter(ws=>ws.id!==action.payload.workspace_id);
+          const newObj={workspace:{...state.list.workspace, shared:newSharedWsList}}
+          state.list=newObj;
         }
   },
   extraReducers(builder){
@@ -143,7 +146,7 @@ const workspace = createSlice({
   }
 });
 
-export const {setActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace} = workspace.actions
+export const {setActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace,        removeWorkspaceFromSharedWsList} = workspace.actions
 
 export const selectActiveWorkspace=state=>state.workspace.active;
 export const selectWorkspaceList=state=>state.workspace.list;
@@ -190,5 +193,36 @@ export const wsMethods={
       }
 
     }
+  },
+  switchWorkspace:(dispatch_source, ws_id)=>async(dispatch)=>{
+
+    if(dispatch_source=="FROM_SIDEBAR"){
+      try{
+        const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:ws_id});
+        const status= resp.status;
+        if(status==200){
+          dispatch(setActiveWorkspace({wsId:ws_id}));
+          dispatch(setUserLastActiveWorkspace({wsId:ws_id}));
+          toast.success('Workspace switched successfully');
+        }
+      }catch(err){
+        toast.error("Error while switching workspace:"+err);
+      }
+    }
+    if(dispatch_source=="FROM_WORKSPACE_LEAVE"){
+      try{
+        const resp= await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:ws_id});
+        const status= resp.status;
+        if(status==200){
+          dispatch(setActiveWorkspace({wsId:ws_id}));
+          dispatch(setUserLastActiveWorkspace({wsId:ws_id}));
+          toast.success('Workspace switched successfully');
+        }
+      }catch(err){
+        toast.error("Error while switching workspace:"+err);
+      }
+    }
+    
   }
+
 }
