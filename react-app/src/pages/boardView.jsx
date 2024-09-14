@@ -304,7 +304,7 @@ const BoardView = React.memo(() => {
                                   activeDragTask={activeDragTask}
                                   provided={provided}
                                 />
-                                {/* {provided.placeholder} */}
+                              
                               </div>
                             )}
                           </Droppable>

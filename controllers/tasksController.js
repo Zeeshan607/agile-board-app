@@ -32,8 +32,6 @@ async index(req, res){
   //   group: ['Task.id', 'columns.id'],
   //   order: [['column_id', 'ASC'], ['order', 'ASC']]
   // })
-
-      
       const columnsTasks= await BoardColumn.findAll({where:{boardId:board.id},attributes: ['id', 'name','description'],
           include:[
                 {
@@ -49,7 +47,6 @@ async index(req, res){
                     {model:TaskDiscussion, as:'discussions', attributes:[]}
                   ]
                 }
-          
           ],
           group: ['Tasks.id', 'BoardColumn.id'],
           order: [['order','ASC'],[{ model: Task, as: 'Tasks' }, 'order', 'ASC']]
