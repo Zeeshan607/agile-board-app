@@ -3,6 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 // Initial state
 const initialState = {
   viewTaskModal: false,
+  createNewTaskModal:false,
+  createNewColumnModal:false,
   selectWorkspaceModal: false,
   createBoardModal: false,
   sendInvitationModal:false,
@@ -20,6 +22,18 @@ const modalSlice = createSlice({
     closeViewTaskModal: (state) => {
       state.viewTaskModal = false;
     },
+    openCreateNewTaskModal:(state)=>{
+      state.createNewTaskModal=true;
+    },
+    closeCreateNewTaskModal:(state)=>{
+      state.createNewTaskModal=false;
+    },
+    openCreateNewColumnModal:(state)=>{
+      state.createNewColumnModal=true;
+    },
+    closeCreateNewColumnModal:(state)=>{
+      state.createNewColumnModal=false;
+    },
     openSelectWorkspaceModal: (state) => {
       state.selectWorkspaceModal = true;
     },
@@ -32,7 +46,6 @@ const modalSlice = createSlice({
     closeCreateBoardModal: (state) => {
       state.createBoardModal = false;
     },
-
     openSendInvitationModal:(state)=>{
       state.sendInvitationModal=true;
     },
@@ -54,6 +67,10 @@ const modalSlice = createSlice({
 export const {
   openViewTaskModal,
   closeViewTaskModal,
+  openCreateNewTaskModal,
+  closeCreateNewTaskModal,
+  openCreateNewColumnModal,
+  closeCreateNewColumnModal,
   openSelectWorkspaceModal,
   closeSelectWorkspaceModal,
   openCreateBoardModal,
@@ -69,10 +86,12 @@ export default modalSlice.reducer;
 
 // Export selectors
 export const selectViewTaskModal = (state) => state.modals.viewTaskModal;
+export const selectCreateNewTaskModal=(state)=>state.modals.createNewTaskModal;
 export const selectSelectWorkspaceModal = (state) => state.modals.selectWorkspaceModal;
 export const selectCreateBoardModal = (state) => state.modals.createBoardModal;
 export const selectSendInvitationModal=(state)=>state.modals.sendInvitationModal;
 export const selectCreateWorkspaceModal=(state)=>state.modals.createWorkspaceModal;
+export const selectCreateNewColumnModal=(state)=>state.modals.createNewColumnModal;
 // Global methods
 export const modalMethods = {
     openViewTaskModal: () => (dispatch) => {
@@ -80,6 +99,18 @@ export const modalMethods = {
     },
     closeViewTaskModal: () => (dispatch) => {
       dispatch(closeViewTaskModal());
+    },
+    openCreateNewTaskModal:()=>(dispatch)=>{
+      dispatch(openCreateNewTaskModal());
+    },
+    closeCreateNewTaskModal:()=>(dispatch)=>{
+      dispatch(closeCreateNewTaskModal());
+    },
+    openCreateNewColumnModal:()=>(dispatch)=>{
+      dispatch(openCreateNewColumnModal());
+    },
+    closeCreateNewColumnModal:()=>(dispatch)=>{
+      dispatch(closeCreateNewColumnModal());
     },
     openSelectWorkspaceModal: () => (dispatch) => {
       dispatch(openSelectWorkspaceModal());

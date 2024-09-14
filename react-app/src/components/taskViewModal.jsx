@@ -20,8 +20,10 @@ import { selectSubTaskList, subTaskMethods } from "../features/SubTaskSlice.js";
 import Swal from "sweetalert2";
 import "./taskViewModal.css";
 import { taskDiscussionMethods } from "../features/TaskDiscussionSlice.js";
+import {columnsTaskMethods} from "../features/ColumnsTasksSlice.js"
 
-const TaskViewModal = ({ open, onClose, task, col_name }) => {
+
+const TaskViewModal = ({ open, onClose, task, col }) => {
   const [ddInputFocus, setDdInputFocus] = useState(false);
   const [textInputFocus, setTextInputFocus] = useState(false);
   const [dueDate, setDueDate] = useState(task.due_date);
@@ -32,7 +34,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
   const handleSelect = async (e) => {
     if (e.value != "") {
       let update = { ["priority"]: e.value };
-      dispatch(taskMethods.editTaskPriority(task.id, update));
+      dispatch(columnsTaskMethods.editTaskPriority(task.id, update));
     }
   };
 
@@ -59,7 +61,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
     e.target.classList.add("disabled");
     if (title != "") {
       let update = { ["title"]: title };
-      dispatch(taskMethods.editTaskTitle(task.id, update));
+      dispatch(columnsTaskMethods.editTaskTitle( task.id, update));
       e.target.classList.remove("disabled");
       setTextInputFocus(false);
     }
@@ -69,7 +71,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
     e.target.classList.add("disabled");
     if (dueDate != "") {
       let update = { ["due_date"]: moment(dueDate).format("YYYY-MM-DD") };
-      dispatch(taskMethods.editTaskDueDate(task.id, update));
+      dispatch(columnsTaskMethods.editTaskDueDate( task.id, update));
       e.target.classList.remove("disabled");
       setDdInputFocus(false);
     }
@@ -137,7 +139,7 @@ const TaskViewModal = ({ open, onClose, task, col_name }) => {
       <span>
         In List{" "}
         <b>
-          <small className="text-primary">{col_name}</small>
+          <small className="text-primary">{col.name}</small>
         </b>
       </span>
       <br />

@@ -36,6 +36,7 @@ import {
   setActiveWorkspace,
   selectWorkspaceList,
   selectWsStatus,
+  wsMethods
 } from "./features/workspaceSlice.js";
 import Loading from "./components/Loading.jsx";
 import { AuthProvider } from "./hooks/useAuth.jsx";
@@ -70,55 +71,78 @@ const App = () => {
   // console.log(ws_status);
 
   const checkActiveWorkspace = () => {
-    if (currentUser?.last_active_workspace !== null && !activeWorkspace) {
+    const activeWs=Object.keys(activeWorkspace).length;
+    if (currentUser?.last_active_workspace !== null && !activeWs) {
       return { inDb: true, inStore: false };
-    } else if (activeWorkspace && currentUser?.last_active_workspace == null) {
+    } else if (activeWs && currentUser?.last_active_workspace == null) {
       return { inDb: false, inStore: true };
-    } else if (activeWorkspace && currentUser?.last_active_workspace !== null) {
+    } else if (activeWs && currentUser?.last_active_workspace !== null) {
       return { inDb: true, inStore: true };
     } else {
       return { inDb: false, inStore: false };
     }
   };
+  const handleDefaultWorkspaceSelection=(list)=>{
+    const shared= list.workspace?.shared;
+    const owned=list.workspace?.owned;
+    if (owned.length==1 && shared.length==0){
+      if(owned[0].is_default){
+        try{
+          dispatch(wsMethods.setActiveWorkspace(owned[0].id));
+          dispatch(modalMethods.closeSelectWorkspaceModal());
+          return true;
+        }catch(err){
+          console.log(err);
+          return false;
+        }
 
-  useEffect(() => {
+      }
+    }
+  }  
+
+
+
+  useEffect(() => {//useEffect for check if user is login or not and if login then fetch workspaces
     if (!authToken) {
       navigate("/login");
       return;
     }
-
     if (authToken) {
       if (Object.keys(workspaceList).length == 0) {
         if (ws_status === "idle" || ws_status === "failed") {
           // Fetch workspaces only if they haven't been fetched yet
-          console.log("fetch workspace dispatch");
           dispatch(fetchWorkspaces());
         }
       }
     }
   }, [authToken, ws_status, workspaceList, dispatch]);
 
+
+
   useEffect(() => {
-    if (wsSliceErr.length) {
-      toast.error("Workspace Error: " + wsSliceErr);
-    }
+    // if (wsSliceErr.length) {
+    //   toast.error("Workspace Error: " + wsSliceErr);
+    // }
     const { inDb, inStore } = checkActiveWorkspace();
     console.log("checkActiveWorkspace result:", { inDb, inStore });
 
     if (ws_status !== "idle" && !modalOpenedRef.current) {
       if (ws_status === "success" && Object.keys(workspaceList).length > 0) {
-        if (!inDb) {
-          console.log("No active workspace in DB, opening modal");
-          dispatch(modalMethods.openSelectWorkspaceModal());
-          modalOpenedRef.current = true; // Prevent multiple modal openings
-        } else if (!inStore) {
-          console.log(
-            "Active workspace in DB but not in store, setting active workspace"
-          );
-          dispatch(
-            setActiveWorkspace({ wsId: currentUser.last_active_workspace })
-          );
-        }
+        
+            if (!inDb) {
+              // console.log("No active workspace in DB, opening modal");
+              if(!handleDefaultWorkspaceSelection(workspaceList)){
+                  dispatch(modalMethods.openSelectWorkspaceModal());
+                  modalOpenedRef.current = true; // Prevent multiple modal openings
+                }
+
+            } else if (!inStore) {
+              dispatch(
+                setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+              );
+            }
+    
+
       }
     }
 
@@ -128,7 +152,7 @@ const App = () => {
 
 
 
-  useEffect(() => {
+  useEffect(() => {//useEffect for fetching boards if workspaces are fetched correctly and there is an active workspace loaded;
     if (activeWorkspace && ws_status === "success") {
       dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
       setIsLoading(false);
@@ -149,7 +173,7 @@ const App = () => {
 
         <div className="main">
           <nav className="navbar navbar-expand navbar-light navbar-bg">
-            <a className="sidebar-toggle js-sidebar-toggle">
+            <a className="sidebar-toggle js-sidebar-toggle" onClick={()=>{$('#sidebar').toggleClass('collapsed')}}>
               <i className="hamburger align-self-center"></i>
             </a>
 
@@ -365,7 +389,7 @@ const App = () => {
                     data-bs-toggle="dropdown"
                   >
                     <img
-                      src="/img/avatars/avatar.jpg"
+                      src={currentUser.image??"/img/avatars/person-placeholder.png"}
                       className="avatar img-fluid rounded me-1"
                       alt="Charles Hall"
                     />{" "}

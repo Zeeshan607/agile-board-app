@@ -25,7 +25,7 @@ export const fetchColumns=createAsyncThunk("fetch/board/columns", async (slug, {
 const initialState= {
         list:[],
         status:"idle",
-        errors:[]
+        errors:[],
 }
 
 const ColumnSlice = createSlice({
@@ -45,6 +45,9 @@ const ColumnSlice = createSlice({
           });
           state.list=newList;
 
+        },
+        clearErrors: (state) => {
+          state.errors = []; // Clear errors from state
         }
   },
   extraReducers(builder){
@@ -54,15 +57,15 @@ const ColumnSlice = createSlice({
       .addCase(fetchColumns.fulfilled, (state, action)=>{
         state.list=action.payload;
         state.status="success";
-  })
-  .addCase(fetchColumns.rejected, (state, action)=>{
-    state.status="failed";
-    state.errors.push(action.error.message)
-})
+      })
+      .addCase(fetchColumns.rejected, (state, action)=>{
+        state.status="failed";
+        state.errors.push(action.error.message)
+       })
   }
 });
 
-export const {setColumnsList, insertTaskInColumn} = ColumnSlice.actions;
+export const {setColumnsList, insertTaskInColumn,clearErrors} = ColumnSlice.actions;
 export const selectColumnsList= state => state.columns.list;
 
 export default ColumnSlice.reducer;

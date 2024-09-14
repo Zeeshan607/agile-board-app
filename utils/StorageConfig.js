@@ -35,12 +35,3 @@ export const upload = multer({
   
 
 
-//   // Endpoint to handle image upload
-//   app.post('/upload_image', upload.single('image'), (req, res) => {
-//     if (req.file) {
-//       // Return the URL of the uploaded image
-//       res.json({ link: `/uploads/${req.file.filename}` });
-//     } else {
-//       res.status(400).send('No image uploaded');
-//     }
-//   });

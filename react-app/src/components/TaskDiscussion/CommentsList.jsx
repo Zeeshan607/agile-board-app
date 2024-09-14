@@ -90,10 +90,11 @@ export default function CommentsList({list}) {
                 ):(
                   <div className="comment-wrapper d-flex flex-row">
                   <div className="flex-col">
-                    <img src="/img/avatars/person-placeholder.png" className=' img-fluid rounded-circle comment-profile-img' alt="Commenter-profile" />
+                    <img src={comment.user && comment.user.image?comment.user.image:"/img/avatars/person-placeholder.png"} className=' img-fluid rounded-circle comment-profile-img' alt="Commenter-profile" />
                   </div>
                   <div className=" d-flex flex-column flex-grow-1 align-items-start justify-content-center ps-3">
-                      <h5 className='mb-1' ><b>{comment.user?comment.user.username:"Unknown"}</b></h5>
+                      <h5 className='mb-1' ><b>{comment.user?comment.user.username:"Anonymous"}</b></h5>
+
                       <div className='m-0' dangerouslySetInnerHTML={{ __html: comment.message }}></div>
                     <div className="row mx-0">
                       <div className="col-12 p-0">

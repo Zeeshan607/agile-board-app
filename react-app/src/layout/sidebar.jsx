@@ -69,7 +69,7 @@ return <i className="fa fa-spinner fa-spin"></i>
 
   return (
     <nav id="sidebar" className="sidebar js-sidebar">
-      <div className="sidebar-content js-simplebar">
+      <div className="sidebar-content js-simplebar" style={{height:"100%"}}>
         <a className="sidebar-brand" href="/">
           <span className="align-middle">Agile Board</span>
         </a>
@@ -79,7 +79,7 @@ return <i className="fa fa-spinner fa-spin"></i>
 
           <li className="sidebar-item">
             <Link className="sidebar-link" to={"/"}>
-              <i className="align-middle" data-feather="sliders"></i>
+              <i className="fas fa-home" ></i>
               <span className="align-middle">Dashboard</span>
             </Link>
           </li>
@@ -87,14 +87,20 @@ return <i className="fa fa-spinner fa-spin"></i>
       
           <li className="sidebar-item">
             <Link className="sidebar-link" to={"/boards"}>
-              <i className="align-middle" data-feather="user"></i>
+              <i className="fas fa-columns"></i>
               <span className="align-middle">Boards</span>
             </Link>
           </li>
           <li className="sidebar-item">
             <Link className="sidebar-link" to={"/workspace_members"}>
-              <i className="align-middle" data-feather="user"></i>
+              <i className="fa fa-users" ></i>
               <span className="align-middle">Members</span>
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link className="sidebar-link" to={"/about_project"}>
+              <i className="far fa-map" ></i>
+              <span className="align-middle">About This Project</span>
             </Link>
           </li>
          
@@ -125,7 +131,7 @@ return <i className="fa fa-spinner fa-spin"></i>
                 </ul>
             </div>
         </div> */}
-        <div className="sidebar-bottom">
+        <div className="sidebar-bottom flex-shrink-0">
            <div className="dropup position-relative">
            <a className="nav-icon dropdown-toggle" href="#" id="settingsdropup" data-bs-toggle="dropdown"   >
                     <div className="position-relative">

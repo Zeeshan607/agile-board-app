@@ -22,11 +22,14 @@ const UserAuthSlice = createSlice({
     },
     setUserLastActiveWorkspace:(state, action)=>{
       state.user.last_active_workspace=action.payload.wsId;
+    },
+    updateProfile:(state, action)=>{
+      state.user.image=action.payload.imagePath;
     }
   },
 });
 
-export const { setUserLoginStatus, setAuthenticatedUser, setUserLogoutStatus, setUserLastActiveWorkspace } =UserAuthSlice.actions;
+export const { setUserLoginStatus, setAuthenticatedUser, setUserLogoutStatus, setUserLastActiveWorkspace,updateProfile } =UserAuthSlice.actions;
 
 export const selectAuthenticatedUser = (state) => state.userAuth.user;
 export const selectAuthToken = (state) => state.userAuth.token;

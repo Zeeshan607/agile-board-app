@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, TaskAbortError } from '@reduxjs/toolkit'
 import CustomRequest from '../utils/customRequest.jsx';
-
+import { handleErrors } from '../utils/helpers.js';
 
 export const fetchSubTasksByTaskId=createAsyncThunk('fetch/task/subTasks', async (task_id,{rejectWithValue})=>{
 
@@ -81,6 +81,9 @@ const SubTaskSlice = createSlice({
     },
     deleteAllSubTasks:(state,action)=>{
       state.list=[];
+    },
+    clearErrors: (state) => {
+      state.errors = []; // Clear errors from state
     }
     
     
@@ -101,7 +104,7 @@ const SubTaskSlice = createSlice({
   }
 });
 
-export const {setParentTask, addNewSubTask, updateSubTask,deleteSubTask,deleteAllSubTasks, markSubTaskAsComplete, markSubTaskAsInComplete } = SubTaskSlice.actions
+export const {setParentTask, addNewSubTask, updateSubTask,deleteSubTask,deleteAllSubTasks, markSubTaskAsComplete, markSubTaskAsInComplete,clearErrors } = SubTaskSlice.actions
 export const selectCurrentParentTask=(state)=>state.subTasks.parent_task;
 export const selectSubTaskList=(state)=>state.subTasks.list;
 
@@ -115,7 +118,8 @@ export const subTaskMethods={
             toast.success('Sub Task added successfully');
           }
       }catch(err){
-          toast.error(err) ;
+        handleErrors(err)
+          // toast.error(err) ;
       }
 
   },
@@ -127,7 +131,8 @@ export const subTaskMethods={
           toast.success('Sub Task updated successfully');
         }
     }catch(err){
-        toast.error(err) ;
+      handleErrors(err)
+
     }
   },
   markAsComplete:(id)=>async(dispatch)=>{
@@ -138,7 +143,8 @@ export const subTaskMethods={
           toast.success('Sub Task marked as complete successfully');
         }
     }catch(err){
-        toast.error(err) ;
+      handleErrors(err);
+
     }
 
 
@@ -151,7 +157,8 @@ export const subTaskMethods={
           toast.success('Sub Task marked as in-complete successfully');
         }
     }catch(err){
-        toast.error(err) ;
+      handleErrors(err);
+
     }
   },
   delete:(id)=> async(dispatch)=>{
@@ -162,7 +169,7 @@ export const subTaskMethods={
           toast.success('Sub Task deleted successfully');
         }
     }catch(err){
-        toast.error(err) ;
+      handleErrors(err);
     }
   },
   deleteAllSubTasks:(parent_task_id)=> async (dispatch)=>{
@@ -173,7 +180,7 @@ export const subTaskMethods={
           toast.success('Sub Tasks list deleted successfully');
         }
     }catch(err){
-        toast.error(err) ;
+      handleErrors(err);
     }
   }
 

@@ -104,5 +104,12 @@ class InvitationsHandlingController {
         .json({"error":"Oops! something went wrong. please try again"});
     }
   }
+
+
+  async getBYTokenAndEmail(req, res){
+    const [token, email]=req.params;
+    const invite=Invitation.findOne({where:{'token':token,"invited_user_email":email}});
+    res.status(StatusCodes.OK).json({'invite':invite});
+  }
 }
 export default new InvitationsHandlingController();

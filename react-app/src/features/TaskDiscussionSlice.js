@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import CustomRequest from "../utils/customRequest.jsx";
-import { incrementDiscussionCount,  decrementDiscussionCount} from "./TaskSlice.js";
+import { incrementDiscussionCount, decrementDiscussionCount} from "./ColumnsTasksSlice.js";
+import { handleErrors } from "../utils/helpers.js";
 
 
 export const fetchTaskDiscussions = createAsyncThunk(
@@ -56,6 +57,9 @@ const TaskDiscussionSlice = createSlice({
     },
     resetList:(state,action)=>{
       state.list=[];
+    },
+    clearErrors: (state) => {
+      state.errors = []; // Clear errors from state
     }
   },
   extraReducers(builder) {
@@ -74,7 +78,7 @@ const TaskDiscussionSlice = createSlice({
   },
 });
 
-export const { addNewComment, updateComment, deleteComment, resetList } =
+export const { addNewComment, updateComment, deleteComment, resetList,clearErrors } =
   TaskDiscussionSlice.actions;
 export const selectComments = (state) => state.taskDiscussions.list;
 export default TaskDiscussionSlice.reducer;
@@ -92,9 +96,7 @@ export const taskDiscussionMethods = {
         toast.success("Comment added successfully.");
       }
     } catch (err) {
-      toast.error(
-        "Oops! something went wrong while creating new comment. please try again"
-      );
+      handleErrors(err);
     }
   },
   editComment: (comment, comment_id) => async (dispatch) => {
@@ -107,9 +109,7 @@ export const taskDiscussionMethods = {
         toast.success("Comment udpated successfully.");
       }
     } catch (err) {
-      toast.error(
-        "Oops! something went wrong while updating comment. please try again"
-      );
+      handleErrors(err);
     }
   },
   deleteComment: (comment_id,task_id) => async (dispatch) => {
@@ -121,9 +121,7 @@ export const taskDiscussionMethods = {
         toast.success("Comment deleted successfully.");
       }
     } catch (err) {
-      toast.error(
-        "Oops! something went wrong while deleting comment. please try again"
-      );
+      handleErrors(err);
     }
   },
   deleteCompleteDiscussion:(parent_task_id)=>async(dispatch)=>{
@@ -134,9 +132,7 @@ export const taskDiscussionMethods = {
         toast.success("Discussion deleted successfully.");
       }
     } catch (err) {
-      toast.error(
-        "Oops! something went wrong while deleting discussion. please try again"
-      );
+      handleErrors(err);
     }
   }
 

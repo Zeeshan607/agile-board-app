@@ -15,7 +15,7 @@ import moment from 'moment';
 
 
 
-const TaskList=({task, parent})=>{
+const TaskList=({task, parent, index})=>{
 
 const [isOpenTaskViewModel,setIsOpenTaskViewModel]=useState(false);
 const openTaskViewModel=()=>setIsOpenTaskViewModel(true);
@@ -48,7 +48,7 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
            
                     // <React.Fragment key={task.id}> ///style={style} {...attributes} {...listeners}
                   
-                    <li className="task" draggable="true" ref={setNodeRef} style={style} {...attributes}  {...listeners}   id={task.id}>
+                    <li className="task" draggable="true" ref={setNodeRef} style={style} {...attributes}  {...listeners}   id={task.id} key={index}>
                     <div className="task-link" onClick={handleTaskClick}>
                       <div className="d-flex flex-row task-header">
                         <div className="priority flex-fill">
@@ -69,7 +69,7 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                           }
                          
                         </div>
-                        <div className="menu flex-fill text-end ">
+                        {/* <div className="menu flex-fill text-end ">
                           <div className="dropdown position-relative">
                           <i className="fas fa-arrows-alt mx-3"></i>
                             <a
@@ -96,7 +96,7 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                               </a>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
     
                       </div>
               
@@ -110,12 +110,12 @@ const closeTaskViewModel=()=>setIsOpenTaskViewModel(false);
                           </a>
                         </div>
                         <div className="created_at flex-fill text-end">
-                          <span><b>Due:</b> { !task.due_date?("No time limit"):(moment(task.due_date).format('DD-MM-YYYY'))}</span> 
+                          { !task.due_date?(""): (<small><b>Due Date:</b> {moment(task.due_date).format('DD-MM-YYYY')} </small> )}
                         </div>
                         
                       </div>
                       </div>
-                      <TaskViewModal onClose={closeTaskViewModel} task={task} col_name={parent.name} open={isOpenTaskViewModel}></TaskViewModal>
+                      <TaskViewModal onClose={closeTaskViewModel} task={task} col={parent} open={isOpenTaskViewModel}></TaskViewModal>
                     </li>
     
         

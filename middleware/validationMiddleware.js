@@ -53,11 +53,21 @@ export const ValidateUser = withValidationErrors([
 export const validateUserParam = withValidationErrors([
   param("id")
     .custom(async (val) => {
-      const user = await User.findById({ val });
+      const user = await User.findByPk(val);
       if (!user) throw new NotFoundError(`No User found with id ${val}`);
     })
     .withMessage("invalid User id"),
 ]);
+
+export const validateUserId =withValidationErrors([
+  body("user_id")
+    .custom(async (val) => {
+      const user = await User.findByPk(val);
+      if (!user) throw new NotFoundError(`No User found with id ${val}`);
+    })
+    .withMessage("invalid User id"),
+]);
+
 
 export const ValidateUserCredentials = withValidationErrors([
   body("email")
@@ -74,21 +84,27 @@ export const ValidateUserCredentials = withValidationErrors([
   body("password").notEmpty().withMessage("password is required"),
 ]);
 
-// export const validateProject = withValidationErrors([
-//   body("name").notEmpty().withMessage("Project name required"),
-//   body("description").notEmpty().withMessage("Project description required"),
-// ]);
+export const validateWorkpsaceId=withValidationErrors([
+  param("id")
+    .custom(async (val) => {
+      const ws=await Workspace.findByPk(val);
+      if(!ws) {
+        throw new NotFoundError(`No workspace found with id ${val}`);
+        }
+   
+    }).withMessage('Invalid Workspace ID')
+])
 
-// export const validateProjectIdParam = withValidationErrors([
-//   param("id")
-//     .custom(async (val) => {
-//       const isValidID = mongoose.Types.ObjectId.isValid(val);
-//       if (!isValidID) throw new BadRequestError("invalid MongoDB id");
-//       // const id=ObjectId(val)
-//       const project= await Project.findById(val);
-//       if(!project) throw new NotFoundError(`No Project found with id ${val}`);
-//     }).withMessage("invalid MongoDB id"),
-// ]);
+export const validateWorkpsaceIdForBoards=withValidationErrors([
+  param("ws_id")
+    .custom(async (val) => {
+      const ws=await Workspace.findByPk(val);
+      if(!ws) {
+        throw new NotFoundError(`No workspace found with id ${val}`);
+        }
+   
+    }).withMessage('Invalid Workspace ID')
+])
 
 export const validateBoard = withValidationErrors([
   body("name").notEmpty().withMessage("Board name required"),

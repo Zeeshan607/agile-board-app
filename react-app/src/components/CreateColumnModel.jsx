@@ -8,21 +8,22 @@ import CustomRequest from "../utils/customRequest.jsx";
 import {toast} from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 import { boardMethods, selectBoardsList } from "../features/BoardSlice.js";
-import { modalMethods,selectCreateBoardModal } from "../features/modalSlice.js";
+import { modalMethods,selectCreateBoardModal, selectCreateNewColumnModal } from "../features/modalSlice.js";
+import { columnsTaskMethods } from "../features/ColumnsTasksSlice.js";
 
 
-const CreateBoardModel =({ws_id })=>{
-        const [form, setForm]= useState({name:'', description:'', ws_id:''});
+const CreateColumnModel =({board_id})=>{
+        const [form, setForm]= useState({name:'', description:'', board_id:''});
         const dispatch=useDispatch();
-        const isOpenCreateBoardModal=useSelector(selectCreateBoardModal); 
+        const isOpenCreateColumnModal=useSelector(selectCreateNewColumnModal);
 
-
-      const saveBoard= async (e)=>{  
+      const saveColumn= async (e)=>{  
                 e.target.classList.add('disabled');
-                form.ws_id=ws_id;
-                dispatch(boardMethods.create(form));
+                form.board_id=board_id;
+                dispatch(columnsTaskMethods.createColumn(form));
                 e.target.classList.remove('disabled');
                 setForm({...form});
+                dispatch(modalMethods.closeCreateNewColumnModal());
 
         }
 
@@ -33,44 +34,33 @@ const CreateBoardModel =({ws_id })=>{
             
     return (
 
-        <Modal open={isOpenCreateBoardModal} onClose={()=>dispatch(modalMethods.closeCreateBoardModal())} center classNames={{modal:["container-lg"]}}>
+        <Modal open={isOpenCreateColumnModal} onClose={()=>dispatch(modalMethods.closeCreateNewColumnModal())} center classNames={{modal:["container-lg"]}}>
       
-                    {
-                    !boards.length?(
-                        <div className="">
-                        <h3><b>Wellcome. </b></h3>
-                        <small>It seems that you don't have any boards in this workspace. Please create your first board. </small>
-                        </div>
-
-                    ):(
-                        <div className="">
-                            <h3><b>Create new Board</b></h3>
-                        </div>
-                    )
-                    }
-             
-
+                
+            <div className="">
+                <h3><b>Create new Column</b></h3>
+            </div>
+                
                 <hr/>
 
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row mx-0">
                         <div className="col-12">
                         <Form>
-                
                             <FormRow
                             name="name"
                             type="text"
-                            placeholder="Board name here"
+                            placeholder="Column name here"
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             />
                           
                             <FormTextarea
                             name="description"
-                            placeholder="Board description here"
+                            placeholder="Column description here"
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             />
 
-                            <SubmitBtn text="Create" onClick={(e)=>saveBoard(e)}  />
+                            <SubmitBtn text="Save" onClick={(e)=>saveColumn(e)}  />
                         </Form>
                         </div>
                     </div>
@@ -81,4 +71,4 @@ const CreateBoardModel =({ws_id })=>{
     )
 }
 
-export default CreateBoardModel;
+export default CreateColumnModel;

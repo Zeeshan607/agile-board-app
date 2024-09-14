@@ -25,16 +25,16 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const boards = useSelector(selectBoardsList);
+  const boardSliceStatus=useSelector(state=>state.boards.status);
   const { user } = useAuth();
   const authenticatedUser = user;
 
   useEffect(() => {
-    if (boards.length == 0 && Object.keys(activeWorkspace).length == 0) {
-      console.log("dispatching boards modal");
-      if (boards.length == 0) {
+    const isActiveWorkspace=Object.keys(activeWorkspace).length;
+    if (boards.length == 0 && isActiveWorkspace != 0 && boardSliceStatus=="success") {
+      // console.log('tried to open create board modal')
         dispatch(modalMethods.openCreateBoardModal());
         setIsLoading(false);
-      }
     } else {
       setIsLoading(false);
     }

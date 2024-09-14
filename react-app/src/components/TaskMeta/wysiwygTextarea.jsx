@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-
 import FroalaEditorComponent from "react-froala-wysiwyg";
 import CustomRequest from "../../utils/customRequest";
 import { useDispatch } from "react-redux";
-import { taskMethods } from "../../features/TaskSlice";
 import { EditorConfig } from "../froalaEditorConfig.js";
+import {columnsTaskMethods} from "../../features/ColumnsTasksSlice.js";
+
 
 const WysiwygTextarea = ({ task_id, description }) => {
   const [isEditable, setIsEditable] = useState(false);
@@ -22,8 +22,7 @@ const WysiwygTextarea = ({ task_id, description }) => {
 
     if (data != "") {
       let update = { ["description"]: data };
-      dispatch(taskMethods.editTaskDescription(task_id, update));
-      // setData('');
+      dispatch(columnsTaskMethods.editTaskDescription(task_id, update));
       setIsEditable(false);
       e.target.classList.remove("disabled");
     }

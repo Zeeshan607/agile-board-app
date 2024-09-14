@@ -96,7 +96,7 @@ const initialState = {
     list:{},
     active:{},
     status:"idle",
-    error:[]
+    errors:[],
 
 }
 
@@ -125,6 +125,9 @@ const workspace = createSlice({
           const newSharedWsList=state.list.workspace.shared.filter(ws=>ws.id!==action.payload.workspace_id);
           const newObj={workspace:{...state.list.workspace, shared:newSharedWsList}}
           state.list=newObj;
+        },
+        clearErrors: (state) => {
+          state.errors = []; // Clear errors from state
         }
   },
   extraReducers(builder){
@@ -139,6 +142,7 @@ const workspace = createSlice({
         })
         .addCase(fetchWorkspaces.rejected, (state, action)=>{
             state.status="failed";
+            state.errors.push(action.error.message)
         })
 
 
@@ -146,11 +150,11 @@ const workspace = createSlice({
   }
 });
 
-export const {setActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace,        removeWorkspaceFromSharedWsList} = workspace.actions
+export const {setActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace, removeWorkspaceFromSharedWsList,clearErrors} = workspace.actions
 
 export const selectActiveWorkspace=state=>state.workspace.active;
 export const selectWorkspaceList=state=>state.workspace.list;
-export const selectWorkspaceErrors=state=>state.workspace.error;
+export const selectWorkspaceErrors=state=>state.workspace.errors;
 export const selectWsStatus=state=>state.workspace.status;
 
 export default workspace.reducer
@@ -169,7 +173,8 @@ export const wsMethods={
         }
     }catch(err){
       // console.log(err);
-      toast.error('Oops! something went wrong. Please try again');
+      // toast.error('Oops! something went wrong. Please try again');
+      handleErrors(err);
     }
   },
   create:(title)=>async(dispatch)=>{
@@ -186,11 +191,12 @@ export const wsMethods={
     }catch(err){
       // console.log(err);
       // let err_resp=JSON.parse(err.response);
-      if(err.response.status==400){
-        toast.error("Workspace title already exists."+err.response.data.message[0]);
-      }else{
-        toast.error('Oops! something went wrong. Please try again');
-      }
+      // if(err.response.status==400){
+      //   toast.error("Workspace title already exists."+err.response.data.message[0]);
+      // }else{
+      //   toast.error('Oops! something went wrong. Please try again');
+      // }
+      handleErrors(err);
 
     }
   },
@@ -206,7 +212,8 @@ export const wsMethods={
           toast.success('Workspace switched successfully');
         }
       }catch(err){
-        toast.error("Error while switching workspace:"+err);
+        handleErrors(err);
+        // toast.error("Error while switching workspace:"+err);
       }
     }
     if(dispatch_source=="FROM_WORKSPACE_LEAVE"){
@@ -219,10 +226,30 @@ export const wsMethods={
           toast.success('Workspace switched successfully');
         }
       }catch(err){
-        toast.error("Error while switching workspace:"+err);
+        handleErrors(err);
+        // toast.error("Error while switching workspace:"+err);
       }
     }
     
+  },
+  setActiveWorkspace:(ws_Id)=>async(dispatch)=>{
+    try {
+      const resp = await CustomRequest.post(
+        "/dashboard/set_last_active_workspace",
+        { wsId:ws_Id }
+      );
+      const status = resp.status;
+      if (status == 200) {
+        dispatch(setActiveWorkspace({ wsId: ws_Id }));
+        dispatch(setUserLastActiveWorkspace({ wsId: ws_Id }));
+        toast.success("Workspace loaded successfully");
+      }
+    } catch (err) {
+      // toast.error("Workspace data loading error:" + err);
+      handleErrors(err);
+    }
+
   }
+
 
 }

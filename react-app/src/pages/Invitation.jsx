@@ -2,6 +2,7 @@ import React, { useEffect,useState } from 'react';
 import { useNavigate,useParams, useLocation } from "react-router-dom";
 import CustomRequest from './../utils/customRequest.jsx';
 import { toast } from "react-toastify";
+import { handleErrors } from '../utils/helpers.js';
 
 function Invitation() {
   const { workspace_id } = useParams();
@@ -12,7 +13,7 @@ function Invitation() {
   const token = searchParams.get('token');
     const navigate=useNavigate();
     const [invitedWorkspace, setInvitedWorkspace]=useState(null);
-
+  const [invite, setInvite]=useState(null);
  
 
    const getWorkspaceById=async (ws_id)=>{
@@ -74,6 +75,18 @@ function Invitation() {
           toast.error('Oops! Something when wrong. please try again or contact administrator');
       }
     }
+    const getInvite=async (token, invitedEmail)=>{
+
+        try{
+          const resp=await CustomRequest.get(`/invite/get_by_email_and_token/${token}/${invitedEmail}`);
+          if(resp.status==200){
+            setInvite(resp.data.invite);
+          }
+        }catch(err){
+            handleErrors(err);
+        }
+
+    }
 
 
     useEffect(()=>{
@@ -81,6 +94,7 @@ function Invitation() {
       if(!token || !workspace_id){
           navigate('/page_not_found')
       }
+      getInvite(token, invitedEmail);
 
      getWorkspaceById(workspace_id);
 

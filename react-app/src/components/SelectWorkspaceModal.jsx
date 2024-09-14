@@ -3,6 +3,7 @@ import {
   selectActiveWorkspace,
   selectWorkspaceList,
   setActiveWorkspace,
+  wsMethods,
 } from "../features/workspaceSlice.js";
 import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,10 +17,39 @@ import { modalMethods } from "../features/modalSlice.js";
 const WorkspaceSelectModal = ({ open, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [optionsList,setOptionsList]=useState([]);
-  let ws_list = useSelector(selectWorkspaceList);
+  const ws_list = useSelector(selectWorkspaceList);
   const activeWs = useSelector(selectActiveWorkspace);
 
   const dispatch = useDispatch();
+
+
+
+
+
+    const defaultValue = activeWs
+    ? { value: activeWs.id, label: activeWs.title }
+    : null;
+
+  const handleSelect = async (e) => {
+
+    dispatch(wsMethods.setActiveWorkspace(e.value));
+    dispatch(modalMethods.closeSelectWorkspaceModal())
+    // try {
+    //   const resp = await CustomRequest.post(
+    //     "/dashboard/set_last_active_workspace",
+    //     { wsId: e.value }
+    //   );
+    //   const status = resp.status;
+    //   if (status == 200) {
+    //     dispatch(setActiveWorkspace({ wsId: e.value }));
+    //     dispatch(setUserLastActiveWorkspace({ wsId: e.value }));
+    //     toast.success("Workspace loaded successfully");
+    //     dispatch(modalMethods.closeSelectWorkspaceModal())
+    //   }
+    // } catch (err) {
+    //   toast.error("Workspace data loading error:" + err);
+    // }
+  };
 
   useEffect(() => {
     let list=[]
@@ -27,9 +57,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
       const shared= ws_list.workspace?.shared;
       const owned=ws_list.workspace?.owned;
       shared.forEach(ws => {
-
          const newObj={...ws,title: ws.title+' (shared)'}
-
         list.push({ value: newObj.id, label: newObj.title });
       });
       owned.forEach(ws => {
@@ -39,42 +67,19 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
       setOptionsList(list);
       setIsLoading(false);
     }
-
+ 
 
   }, [ws_list]);
 
 
-  // let options =
-  //   ws_list.workspace?.owned?.map((w) => {
-  //     return { value: w.id, label: w.title };
-  //   }) ??
-  //   ws_list.workspace?.shared?.map((w) => {
-  //     return { value: w.id, label: w.title };
-  //   });
+  
+  // useEffect(()=>{
+  //   if(Object.keys(activeWs).length==0 && Object.keys(ws_list).length !== 0){
+  //     handleDefaultWorkspaceSelection(ws_list);
+  //   }
+  // },[ws_list,activeWs])
 
 
-    const defaultValue = activeWs
-    ? { value: activeWs.id, label: activeWs.title }
-    : null;
-
-  const handleSelect = async (e) => {
-    try {
-      const resp = await CustomRequest.post(
-        "/dashboard/set_last_active_workspace",
-        { wsId: e.value }
-      );
-      const status = resp.status;
-      // console.log(resp)
-      if (status == 200) {
-        dispatch(setActiveWorkspace({ wsId: e.value }));
-        dispatch(setUserLastActiveWorkspace({ wsId: e.value }));
-        toast.success("Workspace loaded successfully");
-        dispatch(modalMethods.closeSelectWorkspaceModal())
-      }
-    } catch (err) {
-      toast.error("Workspace data loading error:" + err);
-    }
-  };
 
   const selectedWorkspace = defaultValue ?? {
     value: "null",
@@ -84,7 +89,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
     height: "300px",
   };
 
-  // console.log(ws_list)
+
   return (
     <Modal
       open={open}

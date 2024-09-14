@@ -12,23 +12,24 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import modalReducer from '../features/modalSlice.js';
 import taskDiscussionReducer from "../features/TaskDiscussionSlice.js";
 import subTaskReducer from "../features/SubTaskSlice.js"
+import errorMiddleware from "./middlewares/ErrorsMiddleware.js";
+import columnsTasksReducer from '../features/ColumnsTasksSlice.js'
 
-
-const preventDuplicateWorkspaceFetch = store => next => action => {
-  const { getState } = store;
+// const preventDuplicateWorkspaceFetch = store => next => action => {
+//   const { getState } = store;
   
-  // Check if `fetchWorkspaces` thunk is being dispatched
-  if (action.type === 'dashboard/workspaces/pending') {
-    const fetchStatus = getState().workspaceSlice.status;
+//   // Check if `fetchWorkspaces` thunk is being dispatched
+//   if (action.type === 'dashboard/workspaces/pending') {
+//     const fetchStatus = getState().workspaceSlice.status;
     
-    // If it's already pending, prevent dispatch
-    if (fetchStatus === 'pending') {
-      return;
-    }
-  }
+//     // If it's already pending, prevent dispatch
+//     if (fetchStatus === 'pending') {
+//       return;
+//     }
+//   }
   
-  return next(action);
-};
+//   return next(action);
+// };
 
 
 
@@ -45,12 +46,13 @@ const appReducer = combineReducers({
   modals: modalReducer,
   taskDiscussions:taskDiscussionReducer,
   subTasks:subTaskReducer,
+  columnsTasks:columnsTasksReducer,
 
 });
 
 
 const rootReducer= (state, action )=>{
-  console.log(action.type)
+  // console.log(action.type)
   if (action.type === 'userAuth/setUserLogoutStatus') {
     return appReducer(undefined, action)
   }
@@ -70,7 +72,7 @@ const Store = configureStore({
   reducer: pr,
   // middleware: () => new Tuple(thunk),
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }),
+    getDefaultMiddleware({ serializableCheck: false }).concat(errorMiddleware),
 
 });
 export default Store;

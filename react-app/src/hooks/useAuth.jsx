@@ -14,30 +14,27 @@ export const AuthProvider = ({ children }) => {
   const user = useSelector((state) => state.userAuth.user);
 
   // call this function when you want to authenticate the user
-//   const login = async (data) => {
+  const CheckIFDatabaseHasUser = async (data) => {
  
-//   try {
-//     const resp = await CustomRequest.post("/auth/login", data);
-//     const token = await resp.data?.token;
-//     const user = jwtDecode(token);
-//     dispatch(setUserLoginStatus({ token, user }));
-//     toast.success(resp.data?.msg);
-//     navigate("/");
-//     // <Navigate to={'/'} replace/>
-//   } catch (err) {
-//     console.log(err);
-//     toast.error(err.response?.data?.msg);
-  
-    
-//   }
-//   // navigate("/profile");
-// };
+  try {
+    const resp = await CustomRequest.post("/auth/login", data);
+    // const token = await resp.data?.token;
+
+    // toast.success(resp.data?.msg);
+    navigate("/");
+    // <Navigate to={'/'} replace/>
+  } catch (err) {
+    console.log(err);
+    toast.error(err.response?.data?.msg);
+  }
+  // navigate("/profile");
+};
 
   // call this function to sign out logged in user
   const logout = async() => {
 
     try {
-      const resp = await CustomRequest.get("/auth/logout");
+      const resp = await CustomRequest.post("/dashboard/auth/logout");
       dispatch(setUserLogoutStatus());
       // <Navigate to={'/login'} replace/>
       navigate("/login");
@@ -57,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   // );
   const value={user, logout};
 
-  console.log('AuthProvider value:', value);
+  // console.log('AuthProvider value:', value);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

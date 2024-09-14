@@ -34,10 +34,13 @@ const Workspace =sequelize.define('Workspace',{
         key:'id'
       }
     },
- 
     visibility:{
       type:DataTypes.ENUM('private', 'public'),
       defaultValue:"private",
+    },
+    is_default:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false,
     }
 
   });

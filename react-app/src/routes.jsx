@@ -15,7 +15,7 @@ import { AuthProvider } from './hooks/useAuth.jsx';
 import Invitation from "./pages/Invitation.jsx";
 import PageNotFound from "./pages/404.jsx";
 import Profile from "./pages/profile.jsx";
-
+import AboutProject from "./pages/aboutProject.jsx"
 
 
 const router = createBrowserRouter([
@@ -68,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProtectedRoute ><Profile /></ProtectedRoute>,
+      },
+      {
+        path: "/about_project",
+        element: <ProtectedRoute ><AboutProject /></ProtectedRoute>,
       },
   
     ],

@@ -8,6 +8,7 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = dirname(__filename);
 
 class editorUploadService {
+  
   async imageUpload(req, res) {
     if (req.file) {
       const filePath = `/api/v1/dashboard/uploads/${req.file.filename}`;

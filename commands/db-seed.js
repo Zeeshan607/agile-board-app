@@ -1,22 +1,19 @@
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
-// var path=require('path')
-// import { fileURLToPath } from 'url';
+// Get the current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+import { v4 as uuidv4 } from "uuid";
+// Convert paths to URLs for dynamic import
+const helpersPath = pathToFileURL(path.resolve(__dirname, '../utils/helpers.js')).href;
+
+// const sequelize = await import(sequelizePath);
+const helpers = await import(helpersPath);
 
 
-// import process from "node:process";
 import sequelize from "../db.js";
-import { v1 as uuidv1, v4 as uuidv4 } from "uuid";
-// const currentDir=process.cwd();
-// // Resolve the path to helpers.js
-// const helpersPath = import.meta.resolve("../utils/helpers.js");
-
-// 
-// import { hashMake } from"../utils/helpers.js" ;
-const helpers = await import("../utils/helpers.js");
-
 import User from "../models/UserModel.js";
 import Workspace from "../models/Workspace.js";
 import Board from "../models/BoardModel.js";
@@ -25,11 +22,7 @@ import BoardColumn from "../models/BoardColumnModel.js";
 import Task from "../models/TaskModel.js";
 import SubTask from "../models/SubTask.js";
 import TaskDiscussion from "../models/TaskDiscussion.js";
-import {
-  trunOffForeignKeyCheckAndTruncateTable,
-  checkIfTableExists,
-} from "../../utils/helpers.js";
-import { dirname } from 'node:path';
+
 // import config from "../config/default.js";
 // import Invitation from './Invitation.js';
 
@@ -50,7 +43,7 @@ const seedModels = async () => {
     // queries for default data insertion
 
     // USER
-    if (await checkIfTableExists("users")) {
+    if (await helpers.checkIfTableExists("users")) {
       const userCount = await User.count();
       if (userCount === 0) {
         try {
@@ -82,7 +75,7 @@ const seedModels = async () => {
     }
 
     // workspace
-    if (await checkIfTableExists("workspaces")) {
+    if (await  helpers.checkIfTableExists("workspaces")) {
       const workspace = await Workspace.count();
       if (workspace == 0) {
         try {
@@ -119,9 +112,9 @@ const seedModels = async () => {
 
     // add users shared workspace link via usersworkspaces table
     if (
-      (await checkIfTableExists("users")) &&
-      (await checkIfTableExists("workspaces")) &&
-      (await checkIfTableExists("userworkspaces"))
+      (await  helpers.checkIfTableExists("users")) &&
+      (await  helpers.checkIfTableExists("workspaces")) &&
+      (await  helpers.checkIfTableExists("userworkspaces"))
     ) {
       const userCount = await User.count();
       const workspaceCount = await Workspace.count();
@@ -147,7 +140,7 @@ const seedModels = async () => {
       }
     }
 
-    if (await checkIfTableExists("boards")) {
+    if (await  helpers.checkIfTableExists("boards")) {
       const bCount = await Board.count();
       if (bCount === 0) {
         try {
@@ -186,7 +179,7 @@ const seedModels = async () => {
     }
 
     // boardColumn
-    if (await checkIfTableExists("boardcolumns")) {
+    if (await  helpers.checkIfTableExists("boardcolumns")) {
       const bcCount = await BoardColumn.count();
       if (bcCount === 0) {
         try {
@@ -256,7 +249,7 @@ const seedModels = async () => {
     }
 
     // Taskmodel.js
-    if (await checkIfTableExists("tasks")) {
+    if (await  helpers.checkIfTableExists("tasks")) {
       const TaskCount = await Task.count();
       if (TaskCount === 0) {
         //  await trunOffForeignKeyCheckAndTruncateTable("tasks");

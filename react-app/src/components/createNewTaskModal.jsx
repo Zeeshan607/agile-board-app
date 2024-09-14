@@ -9,16 +9,16 @@ import { selectColumnsList} from '../features/ColumnSlice.js';
 import { selectActiveBoard } from '../features/BoardSlice.js';
 import WsMembersSelect from "./WsMembersSelect.jsx";
 import CustomRequest from '../utils/customRequest.jsx';
-import {insertTaskInTasksList} from "../features/TaskSlice.js";
+import {insertTaskInTasksList} from "../features/ColumnsTasksSlice.js";
+import { modalMethods, selectCreateNewTaskModal } from '../features/modalSlice.js';
 
 const CreateNewTask=({open, onClose,column_id})=>{
     const [isLoading, setIsLoading]=useState(false);
     const activeBoard= useSelector(selectActiveBoard);
     const [tasksForm, setTasksForm]= useState({title:'',description:'', column_id:column_id, board_id:activeBoard.id, assigned_to:''});
-    // const wsStatus= useSelector(state=>state.workspace.status);
     const activeWsId=useSelector(state=>state.workspace.active.id);
     const dispatch= useDispatch();
-
+    const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal);
 
                     
     const createTask=async (e)=>{
@@ -27,23 +27,22 @@ const CreateNewTask=({open, onClose,column_id})=>{
                 const resp= await CustomRequest.post('/dashboard/task/store',tasksForm);
                     if(resp.status==200){
                         const task= await resp.data?.task;
-                        console.log(task)
                     //insert task in column's task list
-                    dispatch(insertTaskInTasksList({"task":task}))
+                    dispatch(insertTaskInTasksList({"column_id":column_id,"task":task}))
                     toast.success("Task created successfully");
                     e.target.classList.remove('disabled');
-                    onClose();
+                    dispatch(modalMethods.closeCreateNewTaskModal())
                     }
             
             }catch(err){
                 toast.error(err.response?.data?.msg);
                 e.target.classList.remove('disabled');
-                onClose();
+                dispatch(modalMethods.closeCreateNewTaskModal())
             }
     }
 
         return (
-            <Modal open={open} onClose={onClose} center  classNames={{modal:['container-lg']}}>
+            <Modal open={isOpenCreateNewTaskModal} onClose={()=>dispatch(modalMethods.closeCreateNewTaskModal())} center  classNames={{modal:['container-lg']}}>
                     
                     <h1>Create New Task</h1><hr/>
                     <div className="row mx-0">

@@ -10,7 +10,6 @@ import { StatusCodes } from "http-status-codes";
 import config from "../config/default.js";
 import Board from "../models/BoardModel.js";
 import { hashMake } from "../utils/helpers.js";
-// import Role from "../app/__old/__Role.js";
 import Workspace from "../models/Workspace.js";
 import Invitation from "../models/Invitation.js";
 import UserWorkspace from "../models/UserWorkspace.js";
@@ -36,7 +35,7 @@ class AuthController {
       throw new BadRequestError("OOPs! something went wrong. please try again");
       }
 
-     const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id});
+     const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id,'is_default':1});
 
       const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});
 
@@ -82,6 +81,7 @@ class AuthController {
       userId: user.id,
       email: user.email,
       name: user.username,
+      image:user.image,
       last_active_workspace:user.last_active_workspace,
       last_active_board:user.last_active_board,
     });
@@ -101,10 +101,19 @@ class AuthController {
   logout(req, res) {
     res.cookie("token", "logout", {
       httpOnly: true,
-      expires: new Date(Date.now()),
+      // expires: new Date(Date.now()),
+      secure: process.env.NODE_ENV === 'production', // Set to true in production to use Secure flag
+      sameSite: 'strict', // Prevents the cookie from being sent with cross-site requests
+      expires: new Date(0),
     });
     res.status(StatusCodes.OK).json({ msg: "user logged out" });
+    
   }
+
+
+  
+
+
 }
 
 export default new AuthController();

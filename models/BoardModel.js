@@ -1,9 +1,7 @@
 
 import {DataTypes} from 'sequelize';
 import sequelize from '../db.js'; // Assuming you have a Sequelize instance set up
-// import User from './UserModel.js';
-// import Workspace from './workspace.js';
-// import Task from './TaskModel.js';
+
 
 const Board = sequelize.define('Board', {
     // Define model attributes

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import CustomRequest from '../utils/customRequest';
 import {setActiveWorkspace,  removeWorkspaceFromSharedWsList, wsMethods} from './workspaceSlice.js'
 import { Navigate } from 'react-router-dom';
-
+import { handleErrors } from '../utils/helpers.js';
 
 export const fetchMembers=createAsyncThunk( "workspace/members" , async (wsId, { rejectWithValue})=>{
 
@@ -29,7 +29,7 @@ export const fetchMembers=createAsyncThunk( "workspace/members" , async (wsId, {
 const initialState = {
     workspaceWithUserAccess:{},
     status:"idle",
-    error:[]
+    errors:[]
 }
 
 const WorkspaceMembers = createSlice({
@@ -42,6 +42,9 @@ const WorkspaceMembers = createSlice({
     state.workspaceWithUserAccess=newObj;
 
     },
+    clearErrors: (state) => {
+      state.errors = []; // Clear errors from state
+    }
   
     
   },
@@ -57,7 +60,7 @@ const WorkspaceMembers = createSlice({
         })
         .addCase(fetchMembers.rejected, (state, action)=>{
             state.status="failed";
-            state.error.push(action.error.message);
+            state.errors.push(action.error.message);
                 // console.log(action.error)
       })
 
@@ -65,7 +68,7 @@ const WorkspaceMembers = createSlice({
 }
 });
 
-export const {removeUserFromUsersWithAcess} = WorkspaceMembers.actions;
+export const {removeUserFromUsersWithAcess,clearErrors} = WorkspaceMembers.actions;
 export const selectWorkspaceMembers= state=>state.workspaceMembers.workspaceWithUserAccess;
 
 export default WorkspaceMembers.reducer
@@ -75,14 +78,11 @@ export default WorkspaceMembers.reducer
 export const wsWithMemberMethods={
   userLeavingWorkspace:(user_id, ws_id)=> async(dispatch, getState)=>{
 
-    // const currentSlice=getState().workspaceMembers;
-
     try{
 
       const resp =await CustomRequest.post('/dashboard/user_leaving_workspace', {"user_id":user_id,"workspace_id":ws_id});
       if(resp.status===200){
         dispatch(removeUserFromUsersWithAcess({"user_id":user_id,"workspace_id":ws_id}));
-        // dispatch(setActiveWorkspace(resp.data.user_created_latest_workspace.id));
         dispatch(wsMethods.switchWorkspace("FROM_WORKSPACE_LEAVE",resp.data.user_created_latest_workspace.id));
         dispatch(removeWorkspaceFromSharedWsList({'workspace_id':ws_id}));
 
@@ -90,8 +90,9 @@ export const wsWithMemberMethods={
       }
 
     }catch(err){
-      console.log(err);
-      toast.error(err);
+      // console.log(err);
+      // toast.error(err);
+      handleErrors(err);
     }
 
 

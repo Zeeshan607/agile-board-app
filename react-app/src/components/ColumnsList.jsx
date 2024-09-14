@@ -7,13 +7,13 @@ import { fetchMembers } from "../features/WorkspaceMembersSlice.js";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./ColumnsList.css";
+import { modalMethods, selectCreateNewTaskModal } from "../features/modalSlice.js";
 
-const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask }) => {
+const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided }) => {
   const dispatch = useDispatch();
-  const [openNewTaskModal, setOpenNewTaskModal] = useState(false);
-
+  const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal)
   const openTaskModal = useCallback(() => {
-    setOpenNewTaskModal(true);
+      dispatch(modalMethods.openCreateNewTaskModal());
     dispatch(fetchMembers(wsId));
   }, []);
   const closeTaskModal = useCallback(() => setOpenNewTaskModal(false), []);
@@ -37,9 +37,7 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask }) => {
     padding: grid,
     width: 250,
   });
-
-  const tasks = useSelector(selectTasks);
-  // console.log(tasks);
+  // console.log(column.Tasks);
   return (
     <div className="card column" id={column.id}>
       <i className="fas fa-arrows-alt mx-3 column-drag-icon"></i>
@@ -49,12 +47,12 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask }) => {
       </div>
       <div className="card-body">
         <ul className="list-unstyled tasks-list">
-          {tasks.map((task, index) =>
-            column.id == task.column_id ? (
+          {column.Tasks.length?column.Tasks.map((task, index) =>
+            // column.id == task.column_id ? (
               <Draggable
                 key={task.id.toString()}
                 draggableId={task.id.toString()}
-                index={index + 1}
+                index={index}
               >
                 {(provided, snapshot) => (
                   <div
@@ -62,14 +60,15 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    <React.Fragment key={task.id}>
-                      <TaskList task={task} parent={column} />
-                    </React.Fragment>
+                  
+                    <TaskList task={task} parent={column} index={task.id} />
+                    
                   </div>
                 )}
               </Draggable>
-            ) : null
-          )}
+            // ) : null
+          ):('')}
+       {provided.placeholder}
         </ul>
       </div>
       <div className="card-footer bg-transparent">
@@ -80,10 +79,8 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask }) => {
         >
           <i className="fa fa-plus"></i> Add New Task
         </button>
-        {openNewTaskModal && (
+        {isOpenCreateNewTaskModal && (
           <CreateNewTask
-            open={openNewTaskModal}
-            onClose={closeTaskModal}
             column_id={column.id}
           />
         )}

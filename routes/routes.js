@@ -15,13 +15,13 @@ import workspaceController from "../controllers/workspaceController.js";
 Route.post("/auth/register", ValidateUser, AuthController.register);
 Route.post("/auth/login", ValidateUserCredentials, AuthController.login);
 Route.use("/dashboard", AuthenticateUser, AuthRoutes);
-Route.get("/auth/logout", AuthController.logout);
+
 
 Route.get('/workspace/:id', workspaceController.getById);
 
 Route.post('/accept_invite', InvitationsHandlingController.accept);
 Route.post('/decline_invite', InvitationsHandlingController.decline);
-
+Route.get("/invite/get_by_email_and_token/:token/:email",InvitationsHandlingController.getBYTokenAndEmail);
 // Route.get(`/join-workspace/:workspace_id?token=:token`,In );
 
 

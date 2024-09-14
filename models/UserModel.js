@@ -20,7 +20,10 @@ const User = sequelize.define("User", {
     allowNull: false,
     unique: true,
   },
-
+  image:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -32,7 +35,8 @@ const User = sequelize.define("User", {
   last_active_board:{
     type:DataTypes.INTEGER,
     allowNull:true,
-  }
+  },
+  
 });
 
 
