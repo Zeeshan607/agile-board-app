@@ -3,6 +3,7 @@ import Invitation from "../../models/Invitation.js";
 import moment from "moment";
 import InvitationEmailService from "../../services/InvitationEmailService.js";
 import Workspace from "../../models/Workspace.js";
+import { Op } from "sequelize";
 
 class InvitationsHandlingController {
 
@@ -56,7 +57,7 @@ class InvitationsHandlingController {
   }
 
   async decline(req, res) {
-    console.log('got request')
+    // console.log('got request')
     const { token, invitedEmail, workspace_id } = req.body;
 
     try {
@@ -107,8 +108,8 @@ class InvitationsHandlingController {
 
 
   async getBYTokenAndEmail(req, res){
-    const [token, email]=req.params;
-    const invite=Invitation.findOne({where:{'token':token,"invited_user_email":email}});
+    const {token, email}=req.params;
+    const invite=await Invitation.findOne({where:{'token':token,"invited_user_email":email, status:{[Op.ne]:"declined"}}});
     res.status(StatusCodes.OK).json({'invite':invite});
   }
 }

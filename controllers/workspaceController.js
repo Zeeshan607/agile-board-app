@@ -154,7 +154,7 @@ class workspaceController {
     res.status(StatusCodes.OK).json({ workspace:updated_ws});
   }
 
-  async removeUserAccessToWorkspace(req, res){
+  async userLeavingWorkspaceAccess(req, res){
     const {user_id, workspace_id}=req.body;
     if(req.user.userId!==user_id){
       return res.status(StatusCodes.BAD_REQUEST).json({'error':"Action forbiden: you are not autherize to perform this action"});
@@ -174,6 +174,18 @@ class workspaceController {
 
    
 
+  }
+  async removeUserAccessToWorkspace(req, res){
+    const {user_id, workspace_id}=req.body;
+
+    try{
+      await UserWorkspace.destroy({where:{"user_id":user_id,"workspace_id":workspace_id}});
+      const user=await User.findByPk(user_id);
+      await Invitation.destroy({where:{"invited_user_email":user.email, 'workspace_id':workspace_id}});
+      return res.status(StatusCodes.OK).json({'msg':"Access removed succusfully"})
+     }catch(err){
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'error':'Oops! something went wrong.'})
+     }
   }
 
 

@@ -12,17 +12,18 @@ import CustomRequest from '../utils/customRequest.jsx';
 import {insertTaskInTasksList} from "../features/ColumnsTasksSlice.js";
 import { modalMethods, selectCreateNewTaskModal } from '../features/modalSlice.js';
 
-const CreateNewTask=({open, onClose,column_id})=>{
+const CreateNewTask=({column_id,onClose})=>{
     const [isLoading, setIsLoading]=useState(false);
     const activeBoard= useSelector(selectActiveBoard);
     const [tasksForm, setTasksForm]= useState({title:'',description:'', column_id:column_id, board_id:activeBoard.id, assigned_to:''});
     const activeWsId=useSelector(state=>state.workspace.active.id);
     const dispatch= useDispatch();
     const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal);
-
+// console.log(column_id);
                     
     const createTask=async (e)=>{
             e.target.classList.add('disabled');
+// console.log(tasksForm)
             try{
                 const resp= await CustomRequest.post('/dashboard/task/store',tasksForm);
                     if(resp.status==200){
@@ -42,7 +43,7 @@ const CreateNewTask=({open, onClose,column_id})=>{
     }
 
         return (
-            <Modal open={isOpenCreateNewTaskModal} onClose={()=>dispatch(modalMethods.closeCreateNewTaskModal())} center  classNames={{modal:['container-lg']}}>
+            <Modal open={isOpenCreateNewTaskModal} onClose={onClose} center  classNames={{modal:['container-lg']}}>
                     
                     <h1>Create New Task</h1><hr/>
                     <div className="row mx-0">

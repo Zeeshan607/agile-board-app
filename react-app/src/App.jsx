@@ -68,7 +68,28 @@ const App = () => {
   const auth = useAuth();
   const currentUser = auth.user;
   const modalOpenedRef = useRef(false);
-  // console.log(ws_status);
+  const [{ run, steps }, setState] = useSetState<State>({
+    run: false,
+    steps: [
+      {
+        content: <h2>Let's begin our journey!</h2>,
+        locale: { skip: <strong aria-label="skip">S-K-I-P</strong> },
+        placement: 'center',
+        target: 'body',
+      },
+      {
+        content: <h2>Let's all folks</h2>,
+        placement: 'center',
+        target: 'body',
+      },
+    ],
+  });
+
+
+
+
+
+
 
   const checkActiveWorkspace = () => {
     const activeWs=Object.keys(activeWorkspace).length;
@@ -92,7 +113,7 @@ const App = () => {
           dispatch(modalMethods.closeSelectWorkspaceModal());
           return true;
         }catch(err){
-          console.log(err);
+          // console.log(err);
           return false;
         }
 
@@ -124,7 +145,7 @@ const App = () => {
     //   toast.error("Workspace Error: " + wsSliceErr);
     // }
     const { inDb, inStore } = checkActiveWorkspace();
-    console.log("checkActiveWorkspace result:", { inDb, inStore });
+    // console.log("checkActiveWorkspace result:", { inDb, inStore });
 
     if (ws_status !== "idle" && !modalOpenedRef.current) {
       if (ws_status === "success" && Object.keys(workspaceList).length > 0) {
@@ -154,7 +175,11 @@ const App = () => {
 
   useEffect(() => {//useEffect for fetching boards if workspaces are fetched correctly and there is an active workspace loaded;
     if (activeWorkspace && ws_status === "success") {
-      dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
+      let wsId=currentUser.last_active_workspace??activeWorkspace?.id;
+      if(wsId){
+        dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
+      }
+    
       setIsLoading(false);
     }
   }, [activeWorkspace, ws_status, currentUser, dispatch]);

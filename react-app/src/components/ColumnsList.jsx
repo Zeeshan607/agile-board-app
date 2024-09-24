@@ -9,14 +9,20 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./ColumnsList.css";
 import { modalMethods, selectCreateNewTaskModal } from "../features/modalSlice.js";
 
-const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided }) => {
+const ColumnsList = ({ column, wsId, provided }) => {
   const dispatch = useDispatch();
-  const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal)
+  const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal);
+  const [openColumnId, setOpenColumnId] = useState(null);
+
   const openTaskModal = useCallback(() => {
-      dispatch(modalMethods.openCreateNewTaskModal());
+    setOpenColumnId(column.id);
+    dispatch(modalMethods.openCreateNewTaskModal());
     dispatch(fetchMembers(wsId));
   }, []);
-  const closeTaskModal = useCallback(() => setOpenNewTaskModal(false), []);
+  const closeTaskModal = useCallback(() => { 
+    setOpenColumnId(null);
+    dispatch(modalMethods.closeCreateNewTaskModal());
+  }, []);
 
   const grid = 8;
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -37,7 +43,12 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided 
     padding: grid,
     width: 250,
   });
-  // console.log(column.Tasks);
+  
+  // useEffect(()=>{
+
+  // },[column]);
+  // console.log(column);
+
   return (
     <div className="card column" id={column.id}>
       <i className="fas fa-arrows-alt mx-3 column-drag-icon"></i>
@@ -48,7 +59,7 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided 
       <div className="card-body">
         <ul className="list-unstyled tasks-list">
           {column.Tasks.length?column.Tasks.map((task, index) =>
-            // column.id == task.column_id ? (
+
               <Draggable
                 key={task.id.toString()}
                 draggableId={task.id.toString()}
@@ -66,7 +77,7 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided 
                   </div>
                 )}
               </Draggable>
-            // ) : null
+        
           ):('')}
        {provided.placeholder}
         </ul>
@@ -79,9 +90,10 @@ const ColumnsList = ({ column, wsId, draggingActiveId, activeDragTask, provided 
         >
           <i className="fa fa-plus"></i> Add New Task
         </button>
-        {isOpenCreateNewTaskModal && (
+        {openColumnId==column.id && (
           <CreateNewTask
             column_id={column.id}
+            onClose={()=>closeTaskModal()}
           />
         )}
       </div>

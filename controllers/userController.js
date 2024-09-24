@@ -45,7 +45,7 @@ async set_last_active_workspace(req, res){
 async set_last_active_board(req, res){
     const {boardSlug}=req.body;
     try{
-        const board=await Board.findOne({where:{slug:boardSlug}})
+        const board=await Board.findOne({where:{slug:boardSlug}});
         await User.update({last_active_board:board.id},{where:{id:req.user.userId}});
     }catch(err){
         throw new BadRequestError(err) ;

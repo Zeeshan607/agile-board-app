@@ -7,6 +7,7 @@ import { modalMethods } from "../features/modalSlice.js";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import errorHandlerMiddleware from './../../../middleware/errorHandlerMiddleware';
 
 const WorkspaceMembers=()=>{
 
@@ -52,9 +53,23 @@ const handleUserLeavingWorkspace=(user_id, ws_id)=>{
 
       });
 }
+const handleRemoveUserWorkspaceAccess=(user_id, ws_id)=>{
 
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You want to Remove access of this user from this workspace!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Remove!",
+      }).then( (result) => {
+            if(result.isConfirmed){
+                dispatch(wsWithMemberMethods.removeUserWorkspaceAccess(user_id, ws_id));
+            }
 
-
+      });
+}
     return (
         <div className="container-fluid bg-white p-3">
             <div className="row mx-0">
@@ -81,15 +96,18 @@ const handleUserLeavingWorkspace=(user_id, ws_id)=>{
                         <td><b>{workspaceWithMembers.creator?"Owner":''}</b></td>
                             <td>{workspaceWithMembers.creator?.username}</td>
                             <td>{workspaceWithMembers.creator?.email}</td>
-                         
-                            <td><Link className={"btn btn-outline-primary" + (workspaceWithMembers.createdBy!==authenticatedUser.userId?" disabled d-none":"" ) } to={`/`}>View Boards</Link></td>
+                            <td>
+                                <Link className={"btn btn-outline-primary" + (workspaceWithMembers.createdBy!==authenticatedUser.userId?" disabled d-none":"" ) } to={`/`}>View Boards</Link>
+                               
+                                </td>
                         </tr>
                         {
                             
                            workspaceWithMembers?.usersWithAccess?.length?workspaceWithMembers.usersWithAccess.map(user=>(
                             // printing invited users [this is workspace is share with these users]
+                            <>
                             <tr key={user.id}>
-                                <td><b>{user.id !==workspaceWithMembers.createdBy?"Shared With":''}</b></td>
+                                <td><b>{user.id !==workspaceWithMembers.createdBy?"Shared Access":''}</b></td>
                                 <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>
@@ -97,22 +115,31 @@ const handleUserLeavingWorkspace=(user_id, ws_id)=>{
                                         //if current active workspace is not created by current authenticated user
                                     authenticatedUser.userId!==workspaceWithMembers.createdBy?(
                                         <div className="actions-wrap">
-                                                <button className="btn btn-warning me-2" onClick={()=>handleUserLeavingWorkspace(authenticatedUser.userId, workspaceWithMembers.id)}>leave action</button>
+                                                <button className="btn btn-warning me-2" onClick={()=>handleUserLeavingWorkspace(authenticatedUser.userId, workspaceWithMembers.id)}>leave workspace</button>
                                                 <Link className="btn btn-outline-primary" to={`/`}>View Boards</Link>
                                         </div>
                                        
-                                        ):('' )
+                                        ):(
+                                            <button className="btn btn-danger me-2" onClick={()=>handleRemoveUserWorkspaceAccess(user.id, workspaceWithMembers.id)}>Remove access</button>
+                                        )
                                     }
 
                                 </td>
                             </tr>
+                              <tr>
+                                <td colSpan={3}></td>
+                                    <td><button className="btn btn-primary" onClick={()=>dispatch(modalMethods.openSendInvitationModal())}><i className="fa fa-user-plus me-1"></i>Send Invite</button></td>
+                              </tr>
+                              </>
                             )):(
-                                    //if current active workspace is not created by current authenticated user
+                                    //if current active workspace is created by current authenticated user
                                 authenticatedUser.userId==workspaceWithMembers.createdBy?(
+                              
                                     <tr>
                                       <td colSpan="3">Not Shared with anyone yet</td>
                                       <td><button className="btn btn-primary" onClick={()=>dispatch(modalMethods.openSendInvitationModal())}><i className="fa fa-user-plus me-1"></i>Send Invite</button></td>
-                                   </tr>
+                                      </tr>
+                                 
                                 ):(
                                     <tr>
                                     <td colSpan="4">Not Shared with anyone yet</td>

@@ -91,11 +91,24 @@ export const wsWithMemberMethods={
 
     }catch(err){
       // console.log(err);
-      // toast.error(err);
       handleErrors(err);
     }
 
 
+  },
+  removeUserWorkspaceAccess:(user_id, ws_id)=>async(dispatch)=>{
+    try{
+
+      const resp =await CustomRequest.post('/dashboard/remove_user_workspace_access', {"user_id":user_id,"workspace_id":ws_id});
+      if(resp.status===200){
+        dispatch(removeUserFromUsersWithAcess({"user_id":user_id,"workspace_id":ws_id}));
+        toast.success('Workspace Access removed sucessfully');
+      }
+
+    }catch(err){
+      // console.log(err);
+      handleErrors(err);
+    }
   }
 
 }

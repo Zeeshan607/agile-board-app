@@ -25,6 +25,9 @@ const WysiwygTextarea = ({ task_id, description }) => {
       dispatch(columnsTaskMethods.editTaskDescription(task_id, update));
       setIsEditable(false);
       e.target.classList.remove("disabled");
+    }else{
+      toast.error('Description can not be Empty please fill some text');
+      e.target.classList.remove("disabled");
     }
   };
   // console.log(data)

@@ -28,12 +28,12 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    // :workspace_id?token=:token
+
     path:'/join-workspace/:workspace_id',
     element:<Invitation/>
   },
   {
-    // :workspace_id?token=:token
+
     path:'*',
     element:<PageNotFound/>
   },

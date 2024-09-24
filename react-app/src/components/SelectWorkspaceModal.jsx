@@ -22,13 +22,9 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
 
   const dispatch = useDispatch();
 
-
-
-
-
     const defaultValue = activeWs
     ? { value: activeWs.id, label: activeWs.title }
-    : null;
+    : { value: null, label: "--Select-Workspace" };
 
   const handleSelect = async (e) => {
 

@@ -56,18 +56,13 @@ const BoardView = React.memo(() => {
   }, [boardSlug, dispatch, boardStatus]);
 
   const handleDragStart = (event) => {
-    // console.log(event)
     const { active } = event;
     const { id } = active;
     setActiveId(id);
     setActiveDragTask(active.data.current.task);
   };
 
-  // const handleDragOver = (event) => {
-  //   console.log("drag-Over event");
-  //   console.log(event);
-
-  // };
+ 
 
   const handleDragEnd = (event) => {
     const {
@@ -76,8 +71,8 @@ const BoardView = React.memo(() => {
       destination,
       type: eventType,
     } = event;
-    console.log("on drag end triggering: ");
-    console.log(event);
+    // console.log("on drag end triggering: ");
+    // console.log(event);
 
     if (!destination) {
       return;
@@ -85,8 +80,7 @@ const BoardView = React.memo(() => {
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
-    )
-      return;
+    ){return;}
 
     if (eventType == "TASK") {
       const sInd = source.droppableId; //sInd = source Index
@@ -99,14 +93,23 @@ const BoardView = React.memo(() => {
         let newTaskOrder = Array.from(sourceColumn.Tasks);
         const [movedTask] = newTaskOrder.splice(source.index, 1);
         newTaskOrder.splice(destination.index, 0, movedTask);
-
+          
         newTaskOrder = newTaskOrder.map((task, index) => {
           return {
             ...task,
             order: index + 1, // Set new order (starting from 1 or 0, depending on your logic)
           };
         });
-        console.log(newTaskOrder);
+        // console.log(newTaskOrder);
+
+            newTaskOrder.map((t, i)=>{
+              if (i < newTaskOrder.length - 1) {
+              if(Object.keys(newTaskOrder[i]).length !== Object.keys(newTaskOrder[i+1]).length  ){
+                return z
+              }
+            }
+            })
+
         dispatch(
           columnsTaskMethods.updateTaskOrder(newTaskOrder, source.droppableId)
         );
@@ -131,6 +134,23 @@ const BoardView = React.memo(() => {
             ...task,
             order: index + 1, // Update order in the source column if needed
           }));
+
+          destinationTaskOrder.map((t, i)=>{
+            if (i < destinationTaskOrder.length - 1) {
+            if(Object.keys(destinationTaskOrder[i]).length !== Object.keys(destinationTaskOrder[i+1]).length  ){
+              return;
+            }
+          }
+          })
+          sourceTaskOrder.map((t, i)=>{
+            if (i < sourceTaskOrder.length - 1) {
+              if(Object.keys(sourceTaskOrder[i]).length !== Object.keys(sourceTaskOrder[i+1]).length  ){
+                return;
+              }
+           }
+          })
+
+
 
           let data = {
             sourceColumnId: source.droppableId,
@@ -282,7 +302,8 @@ const BoardView = React.memo(() => {
                           style={{
                             ...provided.draggableProps.style,
                             margin: "0 5px", // Add margin between columns
-                            minWidth: "250px", // Ensure columns have a fixed width
+                            minWidth: "250px",
+                            height:"fit-content" // Ensure columns have a fixed width
                           }}
                         >
                           <Droppable

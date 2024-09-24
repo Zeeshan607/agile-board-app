@@ -42,9 +42,23 @@ class TaskDiscussionController {
     let { message } = req.body;
     const td = await TaskDiscussion.findByPk(id);
     const td_updated = await td.update({ message });
+
+    // Fetch the updated comment along with the associated user
+    const updatedComment = await TaskDiscussion.findOne({
+      where: { 'id': id },
+      include: [
+        {
+          model: User, // Assuming the model name for the user is 'User'
+          as: 'user', // Adjust 'user' if you use a different alias
+          // attributes: ['id', 'name', 'email'], // Specify the user attributes you want to include
+        },
+      ]
+      ,
+    });
+
     res
       .status(StatusCodes.OK)
-      .json({ "comment": td_updated, msg: "Comment updated successfully" });
+      .json({ "comment": updatedComment, msg: "Comment updated successfully" });
   }
 
 

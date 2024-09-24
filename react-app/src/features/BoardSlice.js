@@ -7,12 +7,12 @@ import { handleErrors } from "../utils/helpers.js";
 
 export const fetchBoardsByWsId=createAsyncThunk( "workspace/boards" , async (wsId, { rejectWithValue})=>{
 
+    
   try{
       const resp= await CustomRequest.get(`dashboard/workspace/${wsId}/boards`);
       return await resp.data.boards;
 
   }catch(err){
-
 
     if (err.response) {
       const statusCode = err.response.status;
@@ -32,6 +32,8 @@ export const fetchBoardsByWsId=createAsyncThunk( "workspace/boards" , async (wsI
     } else {
       return rejectWithValue(`Error: ${err.message}`);
     }
+  }
+
 
 
 
@@ -50,7 +52,6 @@ export const fetchBoardsByWsId=createAsyncThunk( "workspace/boards" , async (wsI
     //   console.log(err.message)
     //   return rejectWithValue('Request error:'+err.message);
     // }
-  }
 
 
 });

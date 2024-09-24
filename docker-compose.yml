@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  # Backend service (Node.js)
+  backend:
+    build: .
+    container_name: mern-backend
+    ports:
+      - '5000:5000'
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm start
+    depends_on:
+      - db
+
+  # Frontend service (React)
+  frontend:
+    build: ./react-app
+    container_name: mern-frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./react-app:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm run start
+    depends_on:
+      - backend
+
+  # Database service (MySQL)
+  db:
+    image: mysql:5.7
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_DATABASE: your_db_name
+      MYSQL_USER: your_user
+      MYSQL_PASSWORD: your_password
+    ports:
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

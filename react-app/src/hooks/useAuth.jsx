@@ -14,29 +14,16 @@ export const AuthProvider = ({ children }) => {
   const user = useSelector((state) => state.userAuth.user);
 
   // call this function when you want to authenticate the user
-  const CheckIFDatabaseHasUser = async (data) => {
- 
-  try {
-    const resp = await CustomRequest.post("/auth/login", data);
-    // const token = await resp.data?.token;
+  // LOGIN
+  // resp = await CustomRequest.post("/auth/login", data);
+  // const token = await resp.data?.token;
 
-    // toast.success(resp.data?.msg);
-    navigate("/");
-    // <Navigate to={'/'} replace/>
-  } catch (err) {
-    console.log(err);
-    toast.error(err.response?.data?.msg);
-  }
-  // navigate("/profile");
-};
 
   // call this function to sign out logged in user
   const logout = async() => {
-
     try {
       const resp = await CustomRequest.post("/dashboard/auth/logout");
       dispatch(setUserLogoutStatus());
-      // <Navigate to={'/login'} replace/>
       navigate("/login");
     } catch (err) {
       toast.error(err.response?.data?.msg);

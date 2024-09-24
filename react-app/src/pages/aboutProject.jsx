@@ -51,7 +51,7 @@ const AboutProject=()=>{
             <div className="col-12">
                 <h1>Note By Creator <a href="https://muhammadzeeshan.dev" target="_blank">Muhammad Zeeshan</a></h1>
                 <p>I have created this project for my personal learning purpose. It is my First Full stack project in MERN Stack(mySQL as database). This project can be enhanced by various means.
-                    for example we can add functionality to add more status columns in a board and feature to order columns using drag and drop. But with limited time(although this project also took almost 3 months to complete as i had to write alot of react/redux code) i was only able to complete these features
+                   With limited time(although this project also took almost 3 months to complete as i had to write alot of react/redux code) i was only able to complete these features
                     that i think are the core features of <a href="https://trello.com/" target="_blank">Trello</a>. You can find code and project setup details on <a href="https://github.com/Zeeshan607/agile-board-app" target="_blank" rel="noopener noreferrer">github</a> repository of this project.  Thanks for visiting.
                 
                 </p>

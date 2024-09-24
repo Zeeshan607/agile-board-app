@@ -55,7 +55,7 @@ class editorUploadService {
 
   async getUploadsDirectoryToListFiles(req, res) {
     const directoryPath = path.join(__dirname, "/../uploads");
-    console.log(directoryPath);
+    // console.log(directoryPath);
     // Read the files from the uploads directory
     fs.readdir(directoryPath, (err, files) => {
       if (err) {

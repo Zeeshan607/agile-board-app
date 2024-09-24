@@ -14,7 +14,7 @@ const Workspace =sequelize.define('Workspace',{
     title:{
       type:DataTypes.STRING,
       allowNull:false,
-      unique:true,
+   
       set(value){
       const slug = value.split(' ').join('-');
         this.setDataValue('slug',slug.toLowerCase());
@@ -24,7 +24,7 @@ const Workspace =sequelize.define('Workspace',{
     slug:{
       type:DataTypes.STRING,
       allowNull:false,
-      unique:true,
+   
     },
     createdBy:{
       type:DataTypes.INTEGER,

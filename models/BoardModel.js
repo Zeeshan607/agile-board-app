@@ -12,7 +12,13 @@ const Board = sequelize.define('Board', {
     },
     name:{
        type: DataTypes.STRING,
-       allowNull:false
+       allowNull:false,
+    //    unique:true,
+        set(value){
+        const slug = value.split(' ').join('-');
+            this.setDataValue('slug',slug.toLowerCase());
+            this.setDataValue('name',value)
+        }
     },
     slug:{
         type: DataTypes.STRING,

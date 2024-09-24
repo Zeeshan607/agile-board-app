@@ -57,6 +57,11 @@ const ColumnsTasksSlice = createSlice({
     updateTasksColumn: (state, action) => {
       //task being dragged
       const target_task = state.list.flatMap(col => col.Tasks).find(task => task.id == action.payload.task_id);
+      if (!target_task) {
+        // console.error(`Task with id ${action.payload.task_id} not found.`);
+        return;
+      }
+
       // column from which i need to remove target task
       const columnToRemoveTask=state.list.find(col=>col.id==action.payload.sourceColumnId);
 
@@ -337,7 +342,7 @@ export const columnsTaskMethods = {
         // toast.success('Task moved successfully');
       }
     } catch (err) {
-      // console.log(err)
+      console.log(err)
       handleErrors(err);
     }
   },

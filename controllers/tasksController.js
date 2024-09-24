@@ -109,11 +109,27 @@ async updateAttribute(req, res){
         const data= req.body;
         const {id}= req.params;
         
+
+         // Whitelist only the allowed fields to prevent unwanted updates
+    const allowedFields = ['priority', 'due_date', 'title', "description"]; 
+    const updateObject = Object.keys(data)
+      .filter(key => allowedFields.includes(key)) // Only include allowed fields
+      .reduce((obj, key) => {
+        obj[key] = req.body[key];
+        return obj;
+      }, {});
+
+    // Ensure there is something to update
+    if (Object.keys(updateObject).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
+
+        
      const task= await Task.findOne({where:{id:id}});
      if(!task){
         throw new NotFoundError('Task with given task_id not found');
      }
-     task.update(data);
+     task.update(updateObject);
      res.status(StatusCodes.OK).json({task:task,msg:"Task "+Object.keys(data)+" updated successfully"})
 }
 
