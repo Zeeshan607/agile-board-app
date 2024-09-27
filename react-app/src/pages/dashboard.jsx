@@ -61,7 +61,7 @@ const Dashboard = () => {
                   </sup>
                 </b>
               </small>
-              <h1 className="m-0" title="Default Workspace">
+              <h1 className="m-0" title="Default Workspace" id="workspace-title">
                 {
                   <EditableText
                     initialText={activeWorkspace.title}

@@ -7,7 +7,7 @@ import { modalMethods } from "../features/modalSlice.js";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
-import errorHandlerMiddleware from './../../../middleware/errorHandlerMiddleware';
+
 
 const WorkspaceMembers=()=>{
 

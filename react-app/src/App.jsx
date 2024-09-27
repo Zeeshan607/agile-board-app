@@ -17,18 +17,17 @@ import {
   setUserLoginStatus,
   setUserLogoutStatus,
 } from "./features/UserAuthSlice.js";
-import { toast } from "react-toastify";
-import CustomRequest from "./utils/customRequest.jsx";
-import AppResponse from "./components/AppResponse.jsx";
+// import { toast } from "react-toastify";
+// import CustomRequest from "./utils/customRequest.jsx";
+// import AppResponse from "./components/AppResponse.jsx";
 import {
   selectBoardsList,
   setBoardsList,
   fetchBoardsByWsId,
 } from "./features/BoardSlice.js";
-import Select from "react-select";
 import CreateBoardModel from "./components/CreateBoardModel.jsx";
 import WorkspaceSelectModal from "./components/SelectWorkspaceModal.jsx";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import {
   fetchWorkspaces,
   selectActiveWorkspace,
@@ -39,7 +38,7 @@ import {
   wsMethods
 } from "./features/workspaceSlice.js";
 import Loading from "./components/Loading.jsx";
-import { AuthProvider } from "./hooks/useAuth.jsx";
+// import { AuthProvider } from "./hooks/useAuth.jsx";
 import { useAuth } from "./hooks/useAuth.jsx";
 
 import {
@@ -51,6 +50,7 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/css/froala_style.min.css";
 import CreateWorkspaceModal from "./components/createWorkspaceModal.jsx";
 import SendInvitationModal from "./components/SendInvitationModal.jsx";
+import Joyride, { STATUS } from 'react-joyride';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -67,29 +67,51 @@ const App = () => {
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const auth = useAuth();
   const currentUser = auth.user;
-  const modalOpenedRef = useRef(false);
-  const [{ run, steps }, setState] = useSetState<State>({
-    run: false,
-    steps: [
-      {
-        content: <h2>Let's begin our journey!</h2>,
-        locale: { skip: <strong aria-label="skip">S-K-I-P</strong> },
-        placement: 'center',
-        target: 'body',
-      },
-      {
-        content: <h2>Let's all folks</h2>,
-        placement: 'center',
-        target: 'body',
-      },
-    ],
-  });
+  const modalOpenedRef = useRef(true);
+  const [rideSteps, setRideSteps]=useState([
+    {
+      content: <h2>Lets take a small tour</h2>,
+      locale: { skip: <strong aria-label="skip">S-K-I-P</strong> },
+      placement: 'center',
+      target: 'body',
+    },
+    {
+      title:  <h2>Active Workspace</h2>,
+      content: <p>Double Click to Edit workspace name</p>,
+      placement: 'right',
+      target: '#workspace-title',
+    },
+    {
+      title:  <h2>Settings</h2>,
+      content: <p>Contains Options To switch workspace, and other settings</p>,
+      placement: 'top',
+      target: '#settingsdropup',
+      action:()=>{
+        $()
+      }
+    },
+    {
+      title:  <h2>Your accessable workspace's list</h2>,
+      content: <p>Click to switch from one workspace to other</p>,
+      placement: 'right',
+      target: '#workspace-switch-list',
+    },
+  ])
+  const [ rideRun, setRideRun] = useState(true);
 
+  const handleJoyrideCallback = (data) => {
+    const { status, type } = data;
+    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
 
-
-
-
-
+    if (finishedStatuses.includes(status)) {
+      setRideRun(false);
+    }
+    
+  };
+    const handleClickStart = (event) => {
+      event.preventDefault();
+      setRideRun(true);
+    };
 
   const checkActiveWorkspace = () => {
     const activeWs=Object.keys(activeWorkspace).length;
@@ -141,9 +163,7 @@ const App = () => {
 
 
   useEffect(() => {
-    // if (wsSliceErr.length) {
-    //   toast.error("Workspace Error: " + wsSliceErr);
-    // }
+   
     const { inDb, inStore } = checkActiveWorkspace();
     // console.log("checkActiveWorkspace result:", { inDb, inStore });
 
@@ -207,198 +227,7 @@ const App = () => {
             <div className="navbar-collapse collapse">
               <ul className="navbar-nav navbar-align">
                 <li className="nav-item"></li>
-                {/* <li className="nav-item dropdown">
-                  <a
-                    className="nav-icon dropdown-toggle"
-                    href="#"
-                    id="alertsDropdown"
-                    data-bs-toggle="dropdown"
-                  >
-                    <div className="position-relative">
-                      <i className=" fa fa-bell" data-feather="bell"></i>
-                      <span className="indicator">4</span>
-                    </div>
-                  </a>
-                  <div
-                    className="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
-                    aria-labelledby="alertsDropdown"
-                  >
-                    <div className="dropdown-menu-header">
-                      4 New Notifications
-                    </div>
-                    <div className="list-group">
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <i
-                              className="text-danger"
-                              data-feather="alert-circle"
-                            ></i>
-                          </div>
-                          <div className="col-10">
-                            <div className="text-dark">Update completed</div>
-                            <div className="text-muted small mt-1">
-                              Restart server 12 to complete the update.
-                            </div>
-                            <div className="text-muted small mt-1">30m ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <i className="text-warning" data-feather="bell"></i>
-                          </div>
-                          <div className="col-10">
-                            <div className="text-dark">Lorem ipsum</div>
-                            <div className="text-muted small mt-1">
-                              Aliquam ex eros, imperdiet vulputate hendrerit et.
-                            </div>
-                            <div className="text-muted small mt-1">2h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <i className="text-primary" data-feather="home"></i>
-                          </div>
-                          <div className="col-10">
-                            <div className="text-dark">
-                              Login from 192.186.1.8
-                            </div>
-                            <div className="text-muted small mt-1">5h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <i
-                              className="text-success"
-                              data-feather="user-plus"
-                            ></i>
-                          </div>
-                          <div className="col-10">
-                            <div className="text-dark">New connection</div>
-                            <div className="text-muted small mt-1">
-                              Christina accepted your request.
-                            </div>
-                            <div className="text-muted small mt-1">14h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dropdown-menu-footer">
-                      <a href="#" className="text-muted">
-                        Show all notifications
-                      </a>
-                    </div>
-                  </div>
-                </li>
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-icon dropdown-toggle"
-                    href="#"
-                    id="messagesDropdown"
-                    data-bs-toggle="dropdown"
-                  >
-                    <div className="position-relative">
-                      <i
-                        className="align-middle"
-                        data-feather="message-square"
-                      ></i>
-                    </div>
-                  </a>
-                  <div
-                    className="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
-                    aria-labelledby="messagesDropdown"
-                  >
-                    <div className="dropdown-menu-header">
-                      <div className="position-relative">4 New Messages</div>
-                    </div>
-                    <div className="list-group">
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <img
-                              src="public/img/avatars/avatar-5.jpg"
-                              className="avatar img-fluid rounded-circle"
-                              alt="Vanessa Tucker"
-                            />
-                          </div>
-                          <div className="col-10 ps-2">
-                            <div className="text-dark">Vanessa Tucker</div>
-                            <div className="text-muted small mt-1">
-                              Nam pretium turpis et arcu. Duis arcu tortor.
-                            </div>
-                            <div className="text-muted small mt-1">15m ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <img
-                              src="/img/avatars/avatar-2.jpg"
-                              className="avatar img-fluid rounded-circle"
-                              alt="William Harris"
-                            />
-                          </div>
-                          <div className="col-10 ps-2">
-                            <div className="text-dark">William Harris</div>
-                            <div className="text-muted small mt-1">
-                              Curabitur ligula sapien euismod vitae.
-                            </div>
-                            <div className="text-muted small mt-1">2h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <img
-                              src="img/avatars/avatar-4.jpg"
-                              className="avatar img-fluid rounded-circle"
-                              alt="Christina Mason"
-                            />
-                          </div>
-                          <div className="col-10 ps-2">
-                            <div className="text-dark">Christina Mason</div>
-                            <div className="text-muted small mt-1">
-                              Pellentesque auctor neque nec urna.
-                            </div>
-                            <div className="text-muted small mt-1">4h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                      <a href="#" className="list-group-item">
-                        <div className="row g-0 align-items-center">
-                          <div className="col-2">
-                            <img
-                              src="/img/avatars/avatar-3.jpg"
-                              className="avatar img-fluid rounded-circle"
-                              alt="Sharon Lessman"
-                            />
-                          </div>
-                          <div className="col-10 ps-2">
-                            <div className="text-dark">Sharon Lessman</div>
-                            <div className="text-muted small mt-1">
-                              Aenean tellus metus, bibendum sed, posuere ac,
-                              mattis non.
-                            </div>
-                            <div className="text-muted small mt-1">5h ago</div>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dropdown-menu-footer">
-                      <a href="#" className="text-muted">
-                        Show all messages
-                      </a>
-                    </div>
-                  </div>
-                </li> */}
+            
                 <li className="nav-item dropdown">
                   <a
                     className="nav-icon dropdown-toggle d-inline-block d-sm-none"
@@ -443,13 +272,6 @@ const App = () => {
                       Create Workspace
                     </a>
                     <div className="dropdown-divider"></div>
-                    {/* <a className="dropdown-item" href="index.html">
-                      <i
-                        className="align-middle me-1"
-                        data-feather="settings"
-                      ></i>{" "}
-                      Settings & Privacy
-                    </a> */}
                     <a className="dropdown-item" href="#" onClick={(e)=>
                     {if (window.confirm('Click Ok to go to our contact page, Cancel to Stay here')){
                       window.open('https://www.muhammadzeeshan.dev/#contact-section', '_blank');
@@ -483,6 +305,21 @@ const App = () => {
             <CreateWorkspaceModal />
             <SendInvitationModal />
             <CreateBoardModel ws_id={activeWorkspace?.id} />
+            <Joyride
+                callback={handleJoyrideCallback}
+                continuous={true}
+                // run={rideRun}
+                // scrollToFirstStep
+                showProgress
+                showSkipButton
+                steps={rideSteps}
+                styles={{
+                  options: {
+                   primaryColor:'#3b7ddd'
+                  },
+                }}
+              />
+
 
             {isLoading ? <Loading /> : <Outlet></Outlet>}
           </main>
