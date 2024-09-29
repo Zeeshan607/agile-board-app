@@ -27,7 +27,7 @@ import { columnsTaskMethods } from "../features/ColumnsTasksSlice.js";
 import { selectCreateNewColumnModal } from "../features/modalSlice.js";
 import CreateColumnModel from "../components/CreateColumnModel.jsx";
 
-const BoardView = React.memo(() => {
+const BoardView = () => {
   const param = useParams();
   const boardSlug = param.slug;
   const dispatch = useDispatch();
@@ -357,6 +357,6 @@ const BoardView = React.memo(() => {
       </div>
     </div>
   );
-});
+};
 
 export default BoardView;
