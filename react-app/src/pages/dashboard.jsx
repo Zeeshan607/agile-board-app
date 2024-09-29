@@ -38,6 +38,16 @@ const Dashboard = () => {
     } else {
       setIsLoading(false);
     }
+
+
+    // initializing tooltip
+    const tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map((tooltipTriggerEl) => {
+      return new window.bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
   }, [boards, activeWorkspace]);
 
   const handleWorkspaceNameEdit = (input) => {
@@ -52,7 +62,7 @@ const Dashboard = () => {
       <div className="row mx-0 pt-5">
         <div className="col-6 p-5 d-flex flex-column align-items-center">
           {activeWorkspace ? (
-            <div className="ws-wrapper text-start">
+            <div className="ws-wrapper text-start" id="workspace-title">
               <small>
                 <b className="text-success">
                   Workspace{" "}
@@ -61,7 +71,7 @@ const Dashboard = () => {
                   </sup>
                 </b>
               </small>
-              <h1 className="m-0" title="Default Workspace" id="workspace-title">
+              <h1 className="m-0"  data-bs-toggle="tooltip" data-bs-placement="top" title="Double click to Edit workspace name" >
                 {
                   <EditableText
                     initialText={activeWorkspace.title}

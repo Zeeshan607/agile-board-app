@@ -14,15 +14,14 @@ const WorkspaceMembers=()=>{
 const dispatch=useDispatch();
 const activeWs=useSelector(selectActiveWorkspace);
 const workspaceWithMembers=useSelector(selectWorkspaceMembers);
-const navigate=useNavigate()
-;const {user}=useAuth();
+const navigate=useNavigate();
+const {user}=useAuth();
 const authenticatedUser=user;
-// console.log(authenticatedUser.userId);
+
 useEffect(()=>{
 
     if(activeWs){
         dispatch(fetchMembers(activeWs.id));
-      
     }else{
         if(authenticatedUser.last_active_workspace){
             dispatch(setActiveWorkspace({"ws_id":authenticatedUser.last_active_workspace}));

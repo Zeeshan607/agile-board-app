@@ -84,6 +84,7 @@ class AuthController {
       image:user.image,
       last_active_workspace:user.last_active_workspace,
       last_active_board:user.last_active_board,
+      // is_tour_done:user.is_tour_done
     });
 
     const oneDay = 1000 * 60 * 60 * 24; //converting one Day into milliseconds

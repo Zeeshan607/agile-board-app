@@ -12,14 +12,9 @@ import Sidebar from "./layout/sidebar.jsx";
 import Footer from "./layout/footer.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  selectAuthenticatedUser,
   selectAuthToken,
-  setUserLoginStatus,
-  setUserLogoutStatus,
 } from "./features/UserAuthSlice.js";
-// import { toast } from "react-toastify";
-// import CustomRequest from "./utils/customRequest.jsx";
-// import AppResponse from "./components/AppResponse.jsx";
+
 import {
   selectBoardsList,
   setBoardsList,
@@ -50,7 +45,8 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/css/froala_style.min.css";
 import CreateWorkspaceModal from "./components/createWorkspaceModal.jsx";
 import SendInvitationModal from "./components/SendInvitationModal.jsx";
-import Joyride, { STATUS } from 'react-joyride';
+import Joyride, {ACTIONS, EVENTS, STATUS } from 'react-joyride';
+
 
 const App = () => {
   const dispatch = useDispatch();
@@ -67,51 +63,68 @@ const App = () => {
   const activeWorkspace = useSelector(selectActiveWorkspace);
   const auth = useAuth();
   const currentUser = auth.user;
-  const modalOpenedRef = useRef(true);
-  const [rideSteps, setRideSteps]=useState([
-    {
-      content: <h2>Lets take a small tour</h2>,
-      locale: { skip: <strong aria-label="skip">S-K-I-P</strong> },
-      placement: 'center',
-      target: 'body',
-    },
-    {
-      title:  <h2>Active Workspace</h2>,
-      content: <p>Double Click to Edit workspace name</p>,
-      placement: 'right',
-      target: '#workspace-title',
-    },
-    {
-      title:  <h2>Settings</h2>,
-      content: <p>Contains Options To switch workspace, and other settings</p>,
-      placement: 'top',
-      target: '#settingsdropup',
-      action:()=>{
-        $()
-      }
-    },
-    {
-      title:  <h2>Your accessable workspace's list</h2>,
-      content: <p>Click to switch from one workspace to other</p>,
-      placement: 'right',
-      target: '#workspace-switch-list',
-    },
-  ])
-  const [ rideRun, setRideRun] = useState(true);
+  const modalOpenedRef = useRef(false);
+  // const [rideSteps, setRideSteps]=useState([
+  //   {
+  //     content: <h2>Lets take a small tour</h2>,
+  //     locale: { skip: <strong aria-label="skip">S-K-I-P</strong> },
+  //     placement: 'center',
+  //     target: 'body',
+  //   },
+  //   {
+  //     title:  <h2>Active Workspace</h2>,
+  //     content: <p>Double Click to Edit workspace name</p>,
+  //     placement: 'right',
+  //     target: '#workspace-title',
+  //   },
+  //   {
+  //     title:  <h2>Settings</h2>,
+  //     content: <p>Contains Options To switch workspace, and other settings</p>,
+  //     placement: 'top',
+  //     target: '#settingsdropup',
+  //   },
+  //   {
+  //     title:  <h2>Your accessable workspace's list</h2>,
+  //     content: <p>Click to switch from one workspace to other</p>,
+  //     placement: 'right',
+  //     target: '#workspace-switch-list',
+  //   },
+  //   {
+  //     title:  <h2>Boards</h2>,
+  //     content: <p>Board Manager module, where you create, edit and delete your boards</p>,
+  //     placement: 'right',
+  //     target: '#board-menu',
+  //   },
+  // ])
+  // const [ rideRun, setRideRun] = useState(false);
 
-  const handleJoyrideCallback = (data) => {
-    const { status, type } = data;
-    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+//   const handleJoyrideCallback = (data) => {
+//     const {action, index, status, type } = data;
+//     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+// console.log(index)
+//     // Check if it's the second step (where dropdown is needed)
+//     if (index == 2 && type === EVENTS.STEP_AFTER) {
+//       // Trigger click on the dropdown button
+//       console.log('step 4 before code')
+//         document.querySelector('#settingsdropup').click();
+//         // $('#settingsdropup').addClass('show');
+//         // $('.settingsdropup-menu').addClass('show');
+//         // document.querySelector()
+//     }
 
-    if (finishedStatuses.includes(status)) {
-      setRideRun(false);
-    }
     
-  };
-    const handleClickStart = (event) => {
-      event.preventDefault();
-      setRideRun(true);
-    };
+//     if (finishedStatuses.includes(status)) {
+//       setRideRun(false);
+//       dispatch(authUserMethod.setTourStatus(true));
+//     }
+  
+    
+//   };
+
+//   const handleTourStart = () => {
+//     // event.preventDefault();
+//     setRideRun(true);
+//   };
 
   const checkActiveWorkspace = () => {
     const activeWs=Object.keys(activeWorkspace).length;
@@ -125,6 +138,7 @@ const App = () => {
       return { inDb: false, inStore: false };
     }
   };
+
   const handleDefaultWorkspaceSelection=(list)=>{
     const shared= list.workspace?.shared;
     const owned=list.workspace?.owned;
@@ -135,7 +149,7 @@ const App = () => {
           dispatch(modalMethods.closeSelectWorkspaceModal());
           return true;
         }catch(err){
-          // console.log(err);
+          console.log(err);
           return false;
         }
 
@@ -150,6 +164,9 @@ const App = () => {
       navigate("/login");
       return;
     }
+    // if(!currentUser.is_tour_done){
+    //   handleTourStart();
+    // }
     if (authToken) {
       if (Object.keys(workspaceList).length == 0) {
         if (ws_status === "idle" || ws_status === "failed") {
@@ -168,16 +185,19 @@ const App = () => {
     // console.log("checkActiveWorkspace result:", { inDb, inStore });
 
     if (ws_status !== "idle" && !modalOpenedRef.current) {
+
       if (ws_status === "success" && Object.keys(workspaceList).length > 0) {
-        
+ 
             if (!inDb) {
-              // console.log("No active workspace in DB, opening modal");
+            
               if(!handleDefaultWorkspaceSelection(workspaceList)){
+      
                   dispatch(modalMethods.openSelectWorkspaceModal());
                   modalOpenedRef.current = true; // Prevent multiple modal openings
                 }
 
             } else if (!inStore) {
+              console.log('trying to set from user last active feild')
               dispatch(
                 setActiveWorkspace({ wsId: currentUser.last_active_workspace })
               );
@@ -305,20 +325,21 @@ const App = () => {
             <CreateWorkspaceModal />
             <SendInvitationModal />
             <CreateBoardModel ws_id={activeWorkspace?.id} />
-            <Joyride
+            {/* <Joyride
                 callback={handleJoyrideCallback}
                 continuous={true}
-                // run={rideRun}
+                run={rideRun}
                 // scrollToFirstStep
                 showProgress
                 showSkipButton
                 steps={rideSteps}
                 styles={{
                   options: {
-                   primaryColor:'#3b7ddd'
+                   primaryColor:'#3b7ddd',
                   },
+             
                 }}
-              />
+              /> */}
 
 
             {isLoading ? <Loading /> : <Outlet></Outlet>}

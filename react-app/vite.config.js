@@ -14,4 +14,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Split each dependency into its own chunk
+            return id.split('node_modules/')[1].split('/')[0];
+          }
+          if (id.includes('froala-editor')) {
+            return 'froala-editor';
+          }
+        },
+      },
+    },
+  },
 })

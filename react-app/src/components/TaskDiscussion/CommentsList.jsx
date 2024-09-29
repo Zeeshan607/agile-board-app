@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { taskDiscussionMethods } from '../../features/TaskDiscussionSlice.js';
 import { EditorConfig } from '../froalaEditorConfig.js';
 import FroalaEditorComponent from 'react-froala-wysiwyg';
+// const FroalaEditorComponent=React.lazy(() => import("react-froala-wysiwyg"));
 
 export default function CommentsList({list}) {
     const dispatch=useDispatch();

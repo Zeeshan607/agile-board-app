@@ -18,3 +18,23 @@
     text-decoration: none;
     cursor: pointer;
 }
+/* Change the background color of the tooltip */
+.tooltip-inner {
+    background-color: #000000a4; /* Example: orange color */
+    color: #fff; /* Optional: Change text color */
+    padding:5px;
+    border-radius: 5px;
+  }
+  
+  /* Optional: Change the arrow (caret) color */
+  .tooltip.bs-tooltip-top .tooltip-arrow::before,
+  .tooltip.bs-tooltip-bottom .tooltip-arrow::before,
+  .tooltip.bs-tooltip-left .tooltip-arrow::before,
+  .tooltip.bs-tooltip-right .tooltip-arrow::before {
+    background-color: #000000a4; /* Same as tooltip background color */
+  }
+  .tooltip .tooltip-arrow::before {
+    width: 0.8rem;
+    height: 0.8rem;
+
+  }

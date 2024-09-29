@@ -357,3 +357,7 @@ export const validateCommentId=withValidationErrors([
   }).withMessage('Invalid Comment id'),
 
 ]);
+
+// export const validateUserTourStatus=withValidationErrors([
+// body('status').notEmpty().isBoolean().withMessage('invalid Tour status value.'),
+// ])

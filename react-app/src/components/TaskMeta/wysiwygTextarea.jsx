@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import FroalaEditorComponent from "react-froala-wysiwyg";
+// const FroalaEditorComponent=React.lazy(() => import("react-froala-wysiwyg"));
 import CustomRequest from "../../utils/customRequest";
 import { useDispatch } from "react-redux";
 import { EditorConfig } from "../froalaEditorConfig.js";

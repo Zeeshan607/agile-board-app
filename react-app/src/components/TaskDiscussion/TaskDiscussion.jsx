@@ -3,9 +3,9 @@ import CommentsList from "./CommentsList.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTaskDiscussions, selectComments , taskDiscussionMethods} from "../../features/TaskDiscussionSlice.js";
 
-import 'froala-editor/js/plugins/image.min.js';
-import 'froala-editor/js/plugins.pkgd.min.js';
+
 import FroalaEditorComponent from "react-froala-wysiwyg";
+// const FroalaEditorComponent=React.lazy(() => import("react-froala-wysiwyg"));
 import { EditorConfig } from "../froalaEditorConfig.js";
 import CustomRequest from "../../utils/customRequest.jsx";
 

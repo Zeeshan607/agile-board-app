@@ -86,13 +86,13 @@ return <i className="fa fa-spinner fa-spin"></i>
 
       
           <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/boards"}>
+            <Link className="sidebar-link" id="board-menu" to={"/boards"}>
               <i className="fas fa-columns"></i>
               <span className="align-middle">Boards</span>
             </Link>
           </li>
           <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/workspace_members"}>
+            <Link className="sidebar-link" id="workspaceMembers-menu" to={"/workspace_members"}>
               <i className="fa fa-users" ></i>
               <span className="align-middle">Members</span>
             </Link>
@@ -117,7 +117,7 @@ return <i className="fa fa-spinner fa-spin"></i>
                     </div>
                 </a>
 
-              <div className="dropdown-menu dropdown-menu-sm dropdown-menu-dark py-3 " aria-labelledby="settingsdropup">
+              <div className="dropdown-menu dropdown-menu-sm dropdown-menu-dark py-3 settingsdropup-menu " aria-labelledby="settingsdropup">
                 
                       <li className="dropend hoverable-dropdown">
                       <a className="dropdown-item  "  id="subdropend" data-bs-toggle="dropdown" aria-expanded="false" href="#">Switch

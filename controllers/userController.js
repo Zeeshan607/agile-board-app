@@ -118,6 +118,14 @@ async deleteAccount(req, res){
 
 }
 
+// async updateTourStatus(req,res){
+//         const {status}=req.body;
+//         const user=await User.findByPk(req.user.userId);
+//         await user.update({'is_tour_done':status});
+//         res.status(StatusCodes.OK).json({'msg':"tour status Updated successfully"});
+
+// }
+
 
 }
 export default new UserController(); 

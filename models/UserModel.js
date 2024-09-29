@@ -36,10 +36,10 @@ const User = sequelize.define("User", {
     type:DataTypes.INTEGER,
     allowNull:true,
   },
-  is_tour_done:{
-    type:DataTypes.BOOLEAN,
-    defaultValue:false,
-  }
+  // is_tour_done:{
+  //   type:DataTypes.BOOLEAN,
+  //   defaultValue:false,
+  // }
   
 });
 

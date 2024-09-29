@@ -27,7 +27,8 @@ import {
   validateBoardSlug,
   validateComment,
   validateCommentUpdate,
-  validateCommentId
+  validateCommentId,
+  // validateUserTourStatus,
 } from "../middleware/validationMiddleware.js";
 import userController from "../controllers/userController.js";
 import boardController from "../controllers/boardController.js";
@@ -47,7 +48,7 @@ AuthRoutes.get("/get_current_user", userController.getCurrectUser);
 AuthRoutes.post("/auth/logout", AuthController.logout);
 AuthRoutes.post('/update_profile_picture',upload.single("image"),validateUserId, userController.updateProfilePicture)
 AuthRoutes.post('/delete_account', userController.deleteAccount);
-
+// AuthRoutes.post('/update_user_tour_status', validateUserTourStatus, userController.updateTourStatus);
 // board module Routs
 AuthRoutes.get(
   "/boards/:ws_id",
