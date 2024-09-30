@@ -43,9 +43,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.get('/*', function (req, res) {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
+app.get('/api/v1/api-testing', (req, res) => {
+  res.json({ message: 'API working' });
+});
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
