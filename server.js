@@ -26,6 +26,11 @@ if(config.node_env ==="development"){
 }
 // Define your routes here
 import Route  from './routes/routes.js';
+
+app.use('/',(req, res)=>{
+  return res.status(200).json('Backend runing..')
+})
+
 app.use('/api/v1/', Route);
 
 
