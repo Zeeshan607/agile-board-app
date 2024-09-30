@@ -156,7 +156,7 @@ const uid8=uuidv4();
 
 
 const initModels = async () => {
-console.log('db-refresh status'+config.db_refresh)
+// console.log('db-refresh status'+config.db_refresh)
   try {
 
     await syncModels();
