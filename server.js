@@ -29,7 +29,7 @@ if(config.node_env ==="development"){
 import Route  from './routes/routes.js';
 app.use('/api/v1/', Route);
 
-app.use(express.static(__dirname + '/build'));
+// app.use(express.static(__dirname + '/build'));
 
 //  middleware to check for invalid request errors
 app.use('*',(req, res)=>{
@@ -43,10 +43,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('/*', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 
