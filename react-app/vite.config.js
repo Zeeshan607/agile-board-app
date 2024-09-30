@@ -8,7 +8,7 @@ export default defineConfig({
     port:parseInt(process.env.VITE_PORT) || 4173,
     proxy: {
       '/api': {
-        target: 'https://localhost:5000/api',
+        target: 'http://localhost:5000/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         // rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1'),

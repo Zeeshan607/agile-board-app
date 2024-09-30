@@ -30,7 +30,7 @@ import CreateColumnModel from "../components/CreateColumnModel.jsx";
 const BoardView = () => {
   const param = useParams();
   const boardSlug = param.slug;
-  const dispatch = useDispatch();git
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useAuth();
   const authenticatedUser = user;
