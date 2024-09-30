@@ -3,17 +3,18 @@ import express from "express";
 import cors from 'cors';
 import  config  from './config/default.js';
 import morgan from 'morgan';
-// import mongoos from "mongoose";
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import cookieParser from 'cookie-parser';
-// import  sequelize from "./db.js"
 import { initModels } from './models/index.js';
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
+// Get the current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 const app = express();
-// const mongo_uri = config.mongodb_uri;
-
 
 // Middleware
 app.use(cors());
@@ -26,13 +27,9 @@ if(config.node_env ==="development"){
 }
 // Define your routes here
 import Route  from './routes/routes.js';
-
-// app.use('/',(req, res)=>{
-//   return res.status(200).json('Backend runing..')
-// })
-
 app.use('/api/v1/', Route);
 
+app.use(express.static(__dirname + '/build'));
 
 //  middleware to check for invalid request errors
 app.use('*',(req, res)=>{
@@ -46,6 +43,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
