@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import { initModels } from './models/index.js';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-
+import os from 'os';
 // Get the current directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,10 +65,14 @@ app.get('/*', function (req, res) {
 
 try{
 
-  app.listen(config.port, async () => {
+  const server = app.listen(config.port, async () => {
     await initModels();
+
+    const { address, port } = server.address();
+    const host = address === '::' ? 'localhost' : address
     console.log('Database synchronized successfully');
-    console.log(`Server is running on port ${config.port} `);
+    // console.log(`Server is running on host ${hostname}: port ${config.port} `);
+    console.log(`Server running at http://${host}:${port}`);
   });
 
 }catch(err){
