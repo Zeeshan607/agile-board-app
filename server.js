@@ -72,7 +72,7 @@ try{
     const host = address === '::' ? 'localhost' : address
     console.log('Database synchronized successfully');
     // console.log(`Server is running on host ${hostname}: port ${config.port} `);
-    console.log(`Server running at http://${host}:${port}`);
+    console.log(`Server running at http:// ${host} : ${port} `);
   });
 
 }catch(err){
