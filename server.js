@@ -29,7 +29,7 @@ if(config.node_env ==="development"){
 import Route  from './routes/routes.js';
 app.use('/api/v1/', Route);
 
-// app.use(express.static(__dirname + '/build'));
+
 
 //  middleware to check for invalid request errors
 app.use('*',(req, res)=>{
@@ -51,8 +51,6 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-
 
 // await sequelize.sync({ force:true })// Set force to true to drop existing tables and recreate them
 //     .then(() => {
