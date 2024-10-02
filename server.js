@@ -30,11 +30,6 @@ import Route  from './routes/routes.js';
 app.use('/api/v1/', Route);
 
 
-
-//  middleware to check for invalid request errors
-app.use('*',(req, res)=>{
-  return res.status(404).json({message:"404 Resource not found"})
-});
 // middleware to check for errors by controllers, this itself will be valid request
 app.use(errorHandlerMiddleware);
 
@@ -43,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/api/v1/api-testing', (req, res) => {
+app.get('/api/v1/api_testing', (req, res) => {
   res.json({ message: 'API working' });
 });
 
@@ -64,6 +59,14 @@ app.use((req, res, next) => {
 //         console.error('Error: '+ err);
 //         process.exit(1);
 //     });
+
+
+
+
+//  middleware to check for invalid request errors
+app.use('*',(req, res)=>{
+  return res.status(404).json({message:"404 Resource not found"})
+});
 
 try{
 
