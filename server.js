@@ -82,7 +82,7 @@ try{
 
 }catch(err){
   console.error('Error: '+ err);
-        process.exit(1);
+  process.exit(1);
 }
 
 

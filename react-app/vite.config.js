@@ -35,7 +35,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command }) => {
   if (command === 'serve' || command === 'preview' || command === 'dev' ) {
-           // development config
+   // development config
     return {
       plugins: [react()],
       server: {
@@ -43,7 +43,7 @@ export default defineConfig(({ command }) => {
           '/api': {
             target: 'http://localhost:5000/api',
             changeOrigin: true,
-            rewrite: (path) => path.replace(/^\/api/, ''),
+            // rewrite: (path) => path.replace(/^\/api/, ''),
           },
         },
       },
