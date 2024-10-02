@@ -43,7 +43,7 @@ export default defineConfig(({ command }) => {
           '/api': {
             target: 'http://localhost:5000/api',
             changeOrigin: true,
-            // rewrite: (path) => path.replace(/^\/api/, ''),
+            rewrite: (path) => path.replace(/^\/api/, ''),
           },
         },
       },
@@ -70,8 +70,16 @@ export default defineConfig(({ command }) => {
 
        // Production config
     return {
- 
       plugins: [react()],
+      server: {
+        proxy: {
+          '/api': {
+            target: 'http://localhost:5000/api',
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ''),
+          },
+        },
+      },
       build: {
           rollupOptions: {
             output: {
