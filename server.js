@@ -47,21 +47,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// await sequelize.sync({ force:true })// Set force to true to drop existing tables and recreate them
-//     .then(() => {
-//         console.log('Database synchronized successfully');
-//         app.listen(config.port, async () => {
-//           // await mongoos.connect(config.mongodb_uri);
-//           console.log(`Server is running on port ${config.port} `);
-//         });
-//     }).catch((err) => {
-//         // console.error('Error synchronizing database:', error);
-//         console.error('Error: '+ err);
-//         process.exit(1);
-//     });
-
-
-
 
 //  middleware to check for invalid request errors
 app.use('*',(req, res)=>{
@@ -87,3 +72,18 @@ try{
 
 
 
+
+//******Notes********
+
+// await sequelize.sync({ force:true })// Set force to true to drop existing tables and recreate them
+//     .then(() => {
+//         console.log('Database synchronized successfully');
+//         app.listen(config.port, async () => {
+//           // await mongoos.connect(config.mongodb_uri);
+//           console.log(`Server is running on port ${config.port} `);
+//         });
+//     }).catch((err) => {
+//         // console.error('Error synchronizing database:', error);
+//         console.error('Error: '+ err);
+//         process.exit(1);
+//     });
