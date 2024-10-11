@@ -27,9 +27,9 @@ class AuthController {
     const hashedPass = await hashMake(req.body.password);
     req.body.password = hashedPass;
 
-    // req.body.workspace = { title: "Agile-Workspace", admin: 1 };
+      const {username, email, password}=req.body;
 
-    const user = await User.create(req.body);
+    const user = await User.create({'username':username, 'email':email, 'password':password});
 
     if (!user){
       throw new BadRequestError("OOPs! something went wrong. please try again");
