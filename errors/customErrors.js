@@ -28,5 +28,12 @@ export class BadRequestError extends Error {
       this.name = 'UnauthorizedError';
       this.statusCode = StatusCodes.FORBIDDEN;
     }
-  }
 
+  }
+  export class InternalServerError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = 'InternalServerError';
+      this.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+    }
+  }

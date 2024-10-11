@@ -4,6 +4,7 @@ import {
   BadRequestError,
   NotFoundError,
   UnauthenticatedError,
+  InternalServerError,
 } from "../errors/customErrors.js";
 import { createJwt } from "../utils/Jwt.js";
 import { StatusCodes } from "http-status-codes";
@@ -27,14 +28,17 @@ class AuthController {
     const hashedPass = await hashMake(req.body.password);
     req.body.password = hashedPass;
 
-      const {username, email, password}=req.body;
-
-    const user = await User.create({'username':username, 'email':email, 'password':password});
-
-    if (!user){
-      throw new BadRequestError("OOPs! something went wrong. please try again");
-      }
-
+    const {username, email, password}=req.body;
+// create new user
+    const newlyCreatedUser=await User.create({'username':username, 'email':email, 'password':password});
+//get newly created user 
+    const user =await User.findByPk(newlyCreatedUser.id);
+    // if system is unable to find the newly created user means there is somthing wrong with user creation of terminate the registration process.
+    if(!user){
+      // throw new InternalServerError('Oops! something went wrong');
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR('Oops! something went wrong'));
+    }
+    console.log(user);
      const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id,'is_default':1});
 
       const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});
