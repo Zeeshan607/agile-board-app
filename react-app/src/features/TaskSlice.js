@@ -287,7 +287,7 @@ export const taskMethods = {
         toast.success("Task ReOrdered successfully");
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       handleErrors(err);
     }
   },

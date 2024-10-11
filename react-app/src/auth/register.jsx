@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import  {SelectErrors, SelectMessages, resetResp} from '../features/ResponseSlice.js';
 import CustomRequest from '../utils/customRequest.jsx';
 import { toast}  from 'react-toastify';
+import { handleErrors } from '../utils/helpers.js';
 function Register(){
 
 const [form, setForm]=useState({name:'',email:'',password:''});
@@ -39,8 +40,8 @@ const onRegister= async (e)=>{
 			// console.log(err);
 			setIsSubmitting(false);
 		formReset();
-			toast.error("Error: "+err?.response?.data?.msg)
-		
+			// toast.error("Error: "+err?.response?.data?.msg)
+		handleErrors(err);
 			
 		}
 }

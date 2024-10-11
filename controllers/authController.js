@@ -38,7 +38,7 @@ class AuthController {
       // throw new InternalServerError('Oops! something went wrong');
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR('Oops! something went wrong'));
     }
-    console.log(user);
+    // console.log(user);
      const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id,'is_default':1});
 
       const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});

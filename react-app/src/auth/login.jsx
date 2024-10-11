@@ -50,7 +50,7 @@ function Login() {
       toast.success(resp.data?.msg);
       navigate("/");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       toast.error(err.response?.data?.msg);
     }
   };

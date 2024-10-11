@@ -156,7 +156,7 @@ export const EditorConfig = {
           return false;
         })
         .catch((err) => {
-          console.log(err)
+          // console.log(err)
           toast.error("Oops! Error while uploading image in Editor");
 
         });
@@ -207,7 +207,7 @@ export const EditorConfig = {
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
           toast.error("Oops! Error while deleting image in Editor");
         });
       return false;

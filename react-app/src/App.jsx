@@ -197,7 +197,7 @@ const App = () => {
                 }
 
             } else if (!inStore) {
-              console.log('trying to set from user last active feild')
+              // console.log('trying to set from user last active feild')
               dispatch(
                 setActiveWorkspace({ wsId: currentUser.last_active_workspace })
               );

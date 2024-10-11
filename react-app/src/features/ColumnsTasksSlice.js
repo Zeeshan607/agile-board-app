@@ -342,7 +342,7 @@ export const columnsTaskMethods = {
         // toast.success('Task moved successfully');
       }
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       handleErrors(err);
     }
   },
@@ -390,7 +390,7 @@ export const columnsTaskMethods = {
         toast.success('New Column Created Successfully');
       }
     }catch(err){
-      console.log(err);
+      // console.log(err);
       handleErrors(err);
     }
   }

@@ -28,7 +28,7 @@ const Profile=()=>{
             toast.success('Profile updated successfully');
         }
         }catch(err){
-            console.log(err)
+            // console.log(err)
             handleErrors(err);
         }
     }
@@ -54,7 +54,7 @@ const Profile=()=>{
                         await logout();
                     }
                 }catch(err){
-                    console.log(err);
+                    // console.log(err);
                     handleErrors(err);
                 }
         

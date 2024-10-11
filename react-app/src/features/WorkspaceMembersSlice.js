@@ -19,7 +19,7 @@ export const fetchMembers=createAsyncThunk( "workspace/members" , async (wsId, {
         return rejectWithValue('No response from server');
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.log(err.message)
+        // console.log(err.message)
         return rejectWithValue('Request error:'+err.message);
       }
     }
