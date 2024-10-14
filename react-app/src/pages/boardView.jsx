@@ -55,7 +55,7 @@ const BoardView = () => {
 
 
   useEffect(() => {
-console.log(activeWsId);
+
     dispatch(boardMethods.setActiveBoardData(activeWsId, boardSlug));
     if (boardStatus == "success") {
       if (columnsTasksStatus == "idle" || columnsTasksStatus == "success") {
