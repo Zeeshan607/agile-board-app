@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import CustomRequest from "../utils/customRequest.jsx";
-import { toast } from "react-toastify";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectBoardsList,
   setBoardsList,
   boardMethods,
 } from "../features/BoardSlice.js";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-
+import { Link, useNavigate,   } from "react-router-dom";
+import useBoard from '../hooks/useBoard.jsx';
 import {
   selectActiveWorkspace,
   wsMethods,
@@ -28,6 +27,11 @@ const Dashboard = () => {
   const boardSliceStatus=useSelector(state=>state.boards.status);
   const { user } = useAuth();
   const authenticatedUser = user;
+
+
+
+
+
 
   useEffect(() => {
     const isActiveWorkspace=Object.keys(activeWorkspace).length;
@@ -105,8 +109,7 @@ const Dashboard = () => {
           <div className="board-list d-flex flex-row flex-wrap mt-5">
             {boards.length ? (
               boards.map((board) => (
-                <Link
-                  to={`/board-view/${board.slug}`}
+                <Link to={`/board-view/${board.slug}`}
                   key={board.id}
                   className="card p-4 board-view-card"
                 >

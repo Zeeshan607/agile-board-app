@@ -7,10 +7,10 @@ import { handleErrors } from "../utils/helpers.js";
 
 export const fetchColumnsTasks = createAsyncThunk(
   "fetch/board/columns_tasks",
-  async (boardSlug, { rejectWithValue }) => {
+  async ({wsId, boardSlug}, {rejectWithValue}) => {
     try {
       const resp = await CustomRequest.get(
-        `/dashboard/board/${boardSlug}/columns_tasks`
+        `/dashboard/workspace/${wsId}/board/${boardSlug}/columns_tasks`
       );
       return await resp.data.columnstasks;
     } catch (err) {

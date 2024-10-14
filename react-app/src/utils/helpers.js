@@ -18,6 +18,7 @@ export const handleErrors=(err)=>{
         } else if (statusCode === 401) {
           toast.error('Unauthorized! Please login again.');
         } else if (statusCode === 404) {
+        
           toast.error('Resource not found.');
         } else {
           // toast.error(errorMessage);

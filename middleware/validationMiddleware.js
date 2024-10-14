@@ -127,6 +127,12 @@ export const validateBoardIdParam = withValidationErrors([
       if(!board) throw new NotFoundError(`No Board found with id ${val}`);
     }).isInt().withMessage("invalid record id"),
 ]);
+export const validateBoardId= withValidationErrors([
+  body("boardId").custom(async (val) => {
+      const board= await Board.findByPk(val);
+      if(!board) throw new NotFoundError(`No Board found with id ${val}`);
+    }).isInt().withMessage("invalid record id"),
+]);
 
 
 export const validateTask= withValidationErrors([
@@ -320,6 +326,14 @@ export const validateWsId=withValidationErrors([
 
 export const validateBoardSlug=withValidationErrors([
   body('boardSlug').isString().notEmpty().custom(async(val)=>{
+      const b=await Board.findOne({where:{'slug':val}});
+      if(!b){
+        throw new NotFoundError(`Board with slug ${val} does not exist`);
+      }
+  }).withMessage('board with given slug does not exist'),
+]);
+export const validateBoardSlugParam=withValidationErrors([
+  param('boardSlug').isString().notEmpty().custom(async(val)=>{
       const b=await Board.findOne({where:{'slug':val}});
       if(!b){
         throw new NotFoundError(`Board with slug ${val} does not exist`);

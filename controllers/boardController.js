@@ -22,6 +22,17 @@ constructor(){}
    return res.json(board);
  }
 
+async getByWsIdAndSlug(req, res){
+  const {wsId, boardSlug}=req.params;
+  const board= await Board.findOne({where:{'workspace_id':wsId, 'slug':boardSlug}});
+  if(!board){
+    return res.status(StatusCodes.NOT_FOUND).json({'msg':"board not found"});
+  }
+   return res.json({"board":board});
+ }
+
+
+
 // create
  async store (req, res) {
     const { name, description, ws_id } = req.body;

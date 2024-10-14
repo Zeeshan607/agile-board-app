@@ -1,6 +1,7 @@
 import {
   Link,
   Navigate,
+  redirect,
   useNavigate,
   useParams,
   useSearchParams,
@@ -26,6 +27,10 @@ import {
 import { columnsTaskMethods } from "../features/ColumnsTasksSlice.js";
 import { selectCreateNewColumnModal } from "../features/modalSlice.js";
 import CreateColumnModel from "../components/CreateColumnModel.jsx";
+import useBoard from '../hooks/useBoard.jsx';
+import CustomRequest from "../utils/customRequest.jsx";
+import { handleErrors } from "../utils/helpers.js";
+
 
 const BoardView = () => {
   const param = useParams();
@@ -36,24 +41,29 @@ const BoardView = () => {
   const authenticatedUser = user;
   const [isLoading, setIsLoading] = useState(false);
   const activeWorkspace = useSelector(selectActiveWorkspace);
+  const activeWsId = activeWorkspace.id;
   const columnsTasksStatus = useSelector((state) => state.columnsTasks.status);
   const wsStatus = useSelector((state) => state.workspace.status);
   const boardStatus = useSelector((state) => state.boards.status);
-  const activeWsId = useSelector((state) => state.workspace.active.id);
-  const [activeId, setActiveId] = useState(null);
+  const [activeId, setActiveId] = useState(null);//active draging element id
   const [activeDragTask, setActiveDragTask] = useState({});
   const columnsTasks = useSelector(selectColumnsTasks);
   const isOpenCreateColumnModal = useSelector(selectCreateNewColumnModal);
   const activeBoard=useSelector(selectActiveBoard);
 
+
+
+
   useEffect(() => {
-    dispatch(boardMethods.setActiveBoardData(boardSlug));
+console.log(activeWsId);
+    dispatch(boardMethods.setActiveBoardData(activeWsId, boardSlug));
     if (boardStatus == "success") {
       if (columnsTasksStatus == "idle" || columnsTasksStatus == "success") {
-        dispatch(fetchColumnsTasks(boardSlug));
+        dispatch(fetchColumnsTasks({"wsId":activeWsId, "boardSlug":boardSlug}));
       }
     }
-  }, [boardSlug, dispatch, boardStatus]);
+
+  }, [boardSlug, dispatch, boardStatus, activeWsId]);
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -150,8 +160,6 @@ const BoardView = () => {
            }
           })
 
-
-
           let data = {
             sourceColumnId: source.droppableId,
             destinationColumnId: destination.droppableId,
@@ -205,7 +213,7 @@ const BoardView = () => {
     navigate(`/board-view/${op.value}`);
   };
 
-  const selectedBoard = boardSlug
+  const defaultSelectedBoard =boardSlug
     ? { value: boardSlug, label: boardSlug }
     : { value: "null", label: "--select Board--" };
 
@@ -232,8 +240,8 @@ const BoardView = () => {
           <label className="text-success ">Board:</label>
             <Select
               defaultValue={
-                selectedBoard
-                  ? selectedBoard
+                defaultSelectedBoard
+                  ? defaultSelectedBoard
                   : { value: "null", label: "--select Board--" }
               }
               onChange={(op) => handleSelect(op)}

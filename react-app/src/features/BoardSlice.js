@@ -88,13 +88,14 @@ const BoardSlice = createSlice({
         }
       })
     },
+    
     removeBoard:(state, action)=>{
       const newBoards= state.list.filter(b=> b.id != action.payload.id)
       state.list= newBoards;
     },
     setActiveBoard: (state, action) => {
         state.list.map(board=>{
-          if(board.slug==action.payload.slug){
+          if(board.slug == action.payload.boardSlug && board.workspace_id == action.payload.wsId){
             state.activeBoard = board;
             return;
           }
@@ -129,12 +130,12 @@ export default BoardSlice.reducer;
 
 
 export const boardMethods={
-   setActiveBoardData:(slug)=> async(dispatch)=>{
+   setActiveBoardData:(activeWsId, boardSlug)=> async(dispatch)=>{
 
     try{
-      const resp=await CustomRequest.post('/dashboard/user/setLastActiveboard/',{boardSlug:slug});
+      const resp=await CustomRequest.post('/dashboard/user/setLastActiveboard/',{"wsId":activeWsId,'boardSlug':boardSlug});
           if(resp.status==200){
-            dispatch(setActiveBoard({slug:slug}))
+            dispatch(setActiveBoard({"wsId":activeWsId,'boardSlug':boardSlug}))
           }
     }catch(err){
       handleErrors(err);

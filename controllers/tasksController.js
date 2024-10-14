@@ -12,10 +12,10 @@ constructor(){}
 
 
 async index(req, res){
-    const {slug}=req.params;
-    const board=await Board.findOne({where:{'slug':slug}});
+    const {ws_id, boardSlug}=req.params;
+    const board=await Board.findOne({where:{'workspace_id':ws_id, 'slug':boardSlug}});
     if(!board){
-        throw new NotFoundError(`board with given slug: ${slug} not found`);
+        throw new NotFoundError(`board with given slug: ${boardSlug} and workspace id: ${ws_id} not found`);
     }
   //   const tasks= await Task.findAll({where:{board_id:board.id}, attributes: {
   //       include: [

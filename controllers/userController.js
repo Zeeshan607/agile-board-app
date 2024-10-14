@@ -43,9 +43,9 @@ async set_last_active_workspace(req, res){
 }
 
 async set_last_active_board(req, res){
-    const {boardSlug}=req.body;
+    const {wsId,boardSlug}=req.body;
     try{
-        const board=await Board.findOne({where:{slug:boardSlug}});
+        const board=await Board.findOne({where:{'workspace_id':wsId, 'slug':boardSlug}});
         await User.update({last_active_board:board.id},{where:{id:req.user.userId}});
     }catch(err){
         throw new BadRequestError(err) ;
@@ -59,7 +59,7 @@ async updateProfilePicture(req, res){
     if (req.file) {
         const user=await User.findByPk(user_id);
       
-           if(user.image){
+           if(user.image !== null ){
                 const baseName = user.image.replace(/^\/api\/v1\/dashboard\/uploads\//, "");
                 const filePath = path.join(__dirname, "/../uploads/", baseName);
 

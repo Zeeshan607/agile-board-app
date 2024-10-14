@@ -68,11 +68,11 @@ class workspaceController {
             attributes: ['is_shared']
           }
         },
-        {
-          model: Board,
-          as: 'boards',
-          include: [{ model: Task, as: 'tasks' }]
-        }
+        // {
+        //   model: Board,
+        //   as: 'boards',
+        //   include: [{ model: Task, as: 'tasks' }]
+        // }
       ]
     });
     

@@ -28,6 +28,7 @@ import {
   validateComment,
   validateCommentUpdate,
   validateCommentId,
+  validateBoardSlugParam
   // validateUserTourStatus,
 } from "../middleware/validationMiddleware.js";
 import userController from "../controllers/userController.js";
@@ -70,8 +71,8 @@ AuthRoutes.post("/columns/order/update",boardColumnController.updateOrder);
 AuthRoutes.post('/column/store',validateColumn, boardColumnController.store);
 
 
-// AuthRoutes.get("/board/:slug/tasks", tasksController.index); // get all tasks of specific board; 
-AuthRoutes.get("/board/:slug/columns_tasks", tasksController.index); // get all Columns with tasks of specific board; slug validation is being done in index methods of controller
+// AuthRoutes.get('/board/getByWsIdAndSlug/:wsId/:boardSlug', boardController.getByWsIdAndSlug);
+AuthRoutes.get("/workspace/:ws_id/board/:boardSlug/columns_tasks",validateWorkpsaceIdForBoards, validateBoardSlugParam, tasksController.index); // get all Columns with tasks of specific board; slug validation is being done in index methods of controller
 AuthRoutes.post("/task/store", validateTask, tasksController.store);
 AuthRoutes.post("/task_column/update", validateTaskAndColumnId, tasksController.updateColumnOfTask);
 AuthRoutes.post("/:column_id/task_order/update", validateTaskArrayAndColumnId, tasksController.updateOrderOfTasks);
@@ -122,7 +123,7 @@ AuthRoutes.post(
   userController.set_last_active_workspace
 );
 AuthRoutes.post(
-  "/user/setLastActiveboard",validateBoardSlug,
+  "/user/setLastActiveboard",validateWsId,validateBoardSlug,
   userController.set_last_active_board
 );
 
