@@ -48,22 +48,23 @@ const seedModels = async () => {
       if (userCount === 0) {
         try {
           User.bulkCreate([
-            {
+              {
               id: 1,
-              username: "Zeeshan",
-              email: "zeeshanawan1998@gmail.com",
-              password: await helpers.hashMake("Shani-1998"),
+              username: "Admin001",
+              email: "admin@admin.com",
+              password: await helpers.hashMake("Admin@786"),
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
               id: 2,
-              username: "M-Zeeshan",
-              email: "muhammadzeeshan5420@gmail.com",
-              password: await helpers.hashMake("Shani-1998"),
+              username: "Zeeshan",
+              email: "zeeshanawan1998@gmail.com",
+              password: await helpers.hashMake("Admin@786"),
               createdAt: new Date(),
               updatedAt: new Date(),
             },
+          
           ]);
         } catch (err) {
           // console.log("failed to insert default users into db error: " + err);

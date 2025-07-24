@@ -13,7 +13,7 @@ import {jwtDecode} from 'jwt-decode'
 
 
 function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "admin@admin.com", password: "Admin@786" });
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -142,6 +142,7 @@ function Login() {
                         </NavLink>
                       </div>
                     </form>
+                    <p class="text-center">Default Admin crendetials are already populated for your convenience please click sign-in t Test the project</p>
                   </div>
                 </div>
               </div>
