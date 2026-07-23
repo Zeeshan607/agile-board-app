@@ -67,6 +67,7 @@ function Login() {
           <div className="col-sm-10 col-md-8 col-lg-6 mx-auto d-table h-100">
             <div className="d-table-cell align-middle">
               <div className="text-center mt-4">
+                <div className="auth-brand-mark mx-auto mb-3"></div>
                 <h1 className="h2">Welcome back</h1>
                 <p className="lead">Sign in to your account to continue</p>
               </div>

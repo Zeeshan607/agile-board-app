@@ -5,15 +5,10 @@ import FormRow from "./FormRow.jsx";
 import FormTextarea from "./FormTextarea.jsx";
 import SubmitBtn from "./SubmitBtn.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectColumnsList,
-  insertTaskInColumn,
-} from "../features/ColumnSlice.js";
 import Select from "react-select";
 import moment from "moment";
 import WysiwygTextarea from "./TaskMeta/wysiwygTextarea.jsx";
 import CustomRequest from "../utils/customRequest.jsx";
-import { taskMethods } from "../features/TaskSlice.js";
 import SubTasks from "./SubTasks.jsx";
 import TaskDiscussion from "./TaskDiscussion/TaskDiscussion.jsx";
 import { selectSubTaskList, subTaskMethods } from "../features/SubTaskSlice.js";
@@ -21,6 +16,7 @@ import Swal from "sweetalert2";
 import "./taskViewModal.css";
 import { taskDiscussionMethods } from "../features/TaskDiscussionSlice.js";
 import {columnsTaskMethods} from "../features/ColumnsTasksSlice.js"
+import { selectTheme } from "../utils/reactSelectTheme.js";
 
 
 const TaskViewModal = ({ open, onClose, task, col }) => {
@@ -191,6 +187,7 @@ const TaskViewModal = ({ open, onClose, task, col }) => {
               onChange={handleSelect}
               options={priorityOptions}
               placeholder="--select Priority--"
+              styles={selectTheme}
             />
           </div>
 

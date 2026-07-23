@@ -37,3 +37,6 @@ react-app/lerna-debug.log*
 *.sln
 *.sw?
 .env
+
+.claude
+CLAUDE.md

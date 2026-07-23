@@ -2,6 +2,7 @@ import {selectWorkspaceMembers} from "../features/WorkspaceMembersSlice.js";
 import Select from "react-select";
 import { useSelector } from "react-redux";
 import Loading from "./Loading.jsx";
+import { selectTheme } from "../utils/reactSelectTheme.js";
 
 const WsMemebersSelect= ({state, defaultValue})=>{
 
@@ -37,8 +38,9 @@ return (
               options={options}
               placeholder="0 member found"
               id="memebers-select"
-              isLoading={members.length} >
-              
+              isLoading={members.length}
+              styles={selectTheme} >
+
         </Select>
     </div>
 )

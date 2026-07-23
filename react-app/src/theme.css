@@ -1,0 +1,623 @@
+/*!
+ * Agile Board — theme layer
+ * ---------------------------------------------------------------------------
+ * Loaded LAST (imported at the very end of main.jsx, after every other CSS
+ * side-effect import: app.css/style.css via <link>, then react-toastify,
+ * react-responsive-modal and Froala's CSS pulled in via the routes -> App.jsx
+ * import chain) so it always wins the cascade for any class name they also
+ * define. It re-themes Bootstrap 5 in place via its own CSS custom property
+ * system rather than touching the vendor files — structure/markup and JS
+ * behavior (jQuery dropdowns, tooltips, sidebar toggle, drag & drop) are
+ * untouched; only color, type, radius, shadow and elevation change.
+ *
+ * Palette: indigo/violet primary on a slate neutral scale ("modern SaaS" —
+ * Linear/Notion/Vercel dashboard family), with a permanently dark sidebar
+ * that anchors the brand across both the light and dark content themes.
+ * Toggle dark mode by setting document.documentElement[data-theme="dark"]
+ * (see src/hooks/useTheme.jsx).
+ *
+ * IMPORTANT convention used throughout this file: when a Bootstrap component
+ * already reads its own color from a `--bs-*` custom property (buttons,
+ * badges via `.btn-*`/`--bs-btn-*`, dropdowns via `--bs-dropdown-*`, list
+ * groups via `--bs-list-group-*`), we re-declare THAT variable rather than
+ * setting `background-color`/`color` directly. Setting the literal property
+ * instead of the variable "shadows" every other variant that relies on the
+ * same variable (this is exactly what broke `.dropdown-menu-dark`: an
+ * earlier version of this file set `.dropdown-menu { background-color: ... }`
+ * directly, which silently defeated `.dropdown-menu-dark`'s own
+ * `--bs-dropdown-bg` override since nothing was reading it anymore).
+ * ---------------------------------------------------------------------------
+ */
+
+:root {
+  /* ---- Brand palette --------------------------------------------------- */
+  --brand-indigo-50: #eef2ff;
+  --brand-indigo-100: #e0e7ff;
+  --brand-indigo-200: #c7d2fe;
+  --brand-indigo-300: #a5b4fc;
+  --brand-indigo-400: #818cf8;
+  --brand-indigo-500: #6366f1;
+  --brand-indigo-600: #4f46e5;
+  --brand-indigo-700: #4338ca;
+  --brand-indigo-800: #3730a3;
+  --brand-indigo-900: #312e81;
+
+  --brand-violet-400: #a78bfa;
+  --brand-violet-500: #8b5cf6;
+  --brand-violet-600: #7c3aed;
+
+  --brand-pink-500: #ec4899;
+
+  --brand-slate-50: #f8fafc;
+  --brand-slate-100: #f1f5f9;
+  --brand-slate-200: #e2e8f0;
+  --brand-slate-300: #cbd5e1;
+  --brand-slate-400: #94a3b8;
+  --brand-slate-500: #64748b;
+  --brand-slate-600: #475569;
+  --brand-slate-700: #334155;
+  --brand-slate-800: #1e293b;
+  --brand-slate-900: #0f172a;
+  --brand-slate-950: #090e1c;
+
+  --brand-emerald-500: #10b981;
+  --brand-emerald-600: #059669;
+  --brand-amber-500: #f59e0b;
+  --brand-amber-600: #d97706;
+  --brand-red-500: #ef4444;
+  --brand-red-600: #dc2626;
+  --brand-blue-500: #3b82f6;
+  --brand-blue-600: #2563eb;
+
+  /* ---- Semantic surface tokens — light mode (default) ------------------ */
+  --surface-canvas: var(--brand-slate-50);
+  --surface-card: #ffffff;
+  --surface-sunken: var(--brand-slate-100);
+  --surface-border: var(--brand-slate-200);
+  --text-primary: var(--brand-slate-800);
+  --text-secondary: var(--brand-slate-500);
+  --text-muted: var(--brand-slate-400);
+  --scrollbar-thumb: var(--brand-slate-300);
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+  --shadow-md: 0 6px 16px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .06);
+  --shadow-lg: 0 16px 36px rgba(15, 23, 42, .14), 0 2px 8px rgba(15, 23, 42, .06);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --font-display: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme="dark"] {
+  --surface-canvas: var(--brand-slate-900);
+  --surface-card: #172037;
+  --surface-sunken: #101a30;
+  --surface-border: #2a3a5c;
+  --text-primary: var(--brand-slate-100);
+  --text-secondary: #93a2c2;
+  --text-muted: #64729a;
+  --scrollbar-thumb: #33456b;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, .4);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, .55);
+}
+
+/* =========================================================================
+   Foundations — typography, background, scrollbars, remap Bootstrap tokens
+   ========================================================================= */
+
+html { scrollbar-color: var(--scrollbar-thumb) transparent; }
+body {
+  font-family: var(--font-body);
+  background:
+    radial-gradient(1200px 500px at 100% -10%, rgba(99, 102, 241, .06), transparent 60%),
+    var(--surface-canvas);
+  color: var(--text-primary);
+}
+
+/* AdminKit's compiled CSS hardcodes `.main { background: #f5f7fb }` (the
+   navbar+content+footer wrapper) and `h1..h6 { color: #000 }` with no
+   variable indirection at all — so every heading stayed black regardless of
+   theme, and `.main`'s fixed light-gray background showed through wherever a
+   page has padding around a component (e.g. the board view). Overriding both
+   here is what actually fixes "dark text in dark mode" / "white showing
+   through" everywhere at once, rather than patching it page by page. */
+.main { background: var(--surface-canvas) !important; }
+
+h1, h2, h3, h4, h5, h6,
+.card-title, .navbar-brand, .sidebar-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--text-primary);
+}
+
+/* Themed scrollbars everywhere (kanban's horizontal scroll, modals, sidebar,
+   dropdowns) instead of the OS default, which stayed light-colored and stood
+   out badly against the dark canvas. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--brand-indigo-400); }
+.sidebar-content { scrollbar-color: rgba(255, 255, 255, .18) transparent; }
+.sidebar-content::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, .18); background-clip: content-box; }
+
+:root {
+  --bs-primary: var(--brand-indigo-500);
+  --bs-primary-rgb: 99, 102, 241;
+  --bs-secondary: var(--brand-slate-500);
+  --bs-secondary-rgb: 100, 116, 139;
+  --bs-success: var(--brand-emerald-500);
+  --bs-success-rgb: 16, 185, 129;
+  --bs-warning: var(--brand-amber-500);
+  --bs-warning-rgb: 245, 158, 11;
+  --bs-danger: var(--brand-red-500);
+  --bs-danger-rgb: 239, 68, 68;
+  --bs-info: var(--brand-blue-500);
+  --bs-info-rgb: 59, 130, 246;
+  --bs-body-bg: var(--surface-canvas);
+  --bs-body-bg-rgb: 248, 250, 252;
+  --bs-body-color: var(--text-primary);
+  --bs-border-color: var(--surface-border);
+  --bs-link-color: var(--brand-indigo-600);
+  --bs-link-hover-color: var(--brand-indigo-700);
+  --bs-font-sans-serif: var(--font-body);
+}
+
+a { color: var(--brand-indigo-600); }
+a:hover { color: var(--brand-indigo-700); }
+
+/* =========================================================================
+   Buttons
+   ========================================================================= */
+
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand-indigo-500);
+  --bs-btn-border-color: var(--brand-indigo-500);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-indigo-600);
+  --bs-btn-hover-border-color: var(--brand-indigo-600);
+  --bs-btn-active-bg: var(--brand-indigo-700);
+  --bs-btn-active-border-color: var(--brand-indigo-700);
+  --bs-btn-disabled-bg: var(--brand-indigo-300);
+  --bs-btn-disabled-border-color: var(--brand-indigo-300);
+  --bs-btn-focus-shadow-rgb: 99, 102, 241;
+  box-shadow: 0 1px 2px rgba(99, 102, 241, .3);
+}
+.btn-primary:hover { box-shadow: 0 6px 16px rgba(99, 102, 241, .35); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  --bs-btn-bg: var(--brand-slate-500);
+  --bs-btn-border-color: var(--brand-slate-500);
+  --bs-btn-hover-bg: var(--brand-slate-600);
+  --bs-btn-hover-border-color: var(--brand-slate-600);
+  --bs-btn-active-bg: var(--brand-slate-700);
+  --bs-btn-active-border-color: var(--brand-slate-700);
+}
+
+.btn-danger {
+  --bs-btn-bg: var(--brand-red-500);
+  --bs-btn-border-color: var(--brand-red-500);
+  --bs-btn-hover-bg: var(--brand-red-600);
+  --bs-btn-hover-border-color: var(--brand-red-600);
+  --bs-btn-active-bg: var(--brand-red-600);
+  --bs-btn-active-border-color: var(--brand-red-600);
+}
+
+.btn-warning {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand-amber-500);
+  --bs-btn-border-color: var(--brand-amber-500);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-amber-600);
+  --bs-btn-hover-border-color: var(--brand-amber-600);
+}
+
+.btn-success {
+  --bs-btn-bg: var(--brand-emerald-500);
+  --bs-btn-border-color: var(--brand-emerald-500);
+  --bs-btn-hover-bg: var(--brand-emerald-600);
+  --bs-btn-hover-border-color: var(--brand-emerald-600);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--brand-indigo-600);
+  --bs-btn-border-color: var(--brand-indigo-300);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-indigo-500);
+  --bs-btn-hover-border-color: var(--brand-indigo-500);
+  --bs-btn-active-bg: var(--brand-indigo-600);
+  --bs-btn-active-border-color: var(--brand-indigo-600);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--text-secondary);
+  --bs-btn-border-color: var(--surface-border);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-slate-500);
+  --bs-btn-hover-border-color: var(--brand-slate-500);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--brand-red-500);
+  --bs-btn-border-color: #fca5a5;
+  --bs-btn-hover-bg: var(--brand-red-500);
+  --bs-btn-hover-border-color: var(--brand-red-500);
+}
+
+.btn-transparent { color: var(--text-secondary); }
+.btn-transparent:hover { color: var(--brand-indigo-600); }
+
+/* A dashed "add new" affordance for Add Board / Add Column-style actions —
+   reads immediately as "create new" rather than a generic outline button. */
+.btn-dashed {
+  border: 2px dashed var(--surface-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all .15s ease;
+}
+.btn-dashed:hover {
+  border-color: var(--brand-indigo-400);
+  color: var(--brand-indigo-600);
+  background: var(--surface-sunken);
+}
+
+/* =========================================================================
+   Badges — soft "pill" tints instead of solid fills (priority labels etc.)
+   ========================================================================= */
+
+.badge {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: .4em .85em;
+}
+.badge.bg-danger { background-color: #fee2e2 !important; color: var(--brand-red-600) !important; }
+.badge.bg-warning { background-color: #fef3c7 !important; color: var(--brand-amber-600) !important; }
+.badge.bg-secondary { background-color: var(--surface-sunken) !important; color: var(--text-secondary) !important; }
+.badge.bg-primary { background-color: var(--brand-indigo-50) !important; color: var(--brand-indigo-600) !important; }
+
+[data-theme="dark"] .badge.bg-danger { background-color: rgba(239, 68, 68, .18) !important; color: #fca5a5 !important; }
+[data-theme="dark"] .badge.bg-warning { background-color: rgba(245, 158, 11, .18) !important; color: #fcd34d !important; }
+[data-theme="dark"] .badge.bg-secondary { background-color: rgba(148, 163, 184, .15) !important; color: var(--brand-slate-300) !important; }
+[data-theme="dark"] .badge.bg-primary { background-color: rgba(99, 102, 241, .18) !important; color: var(--brand-indigo-300) !important; }
+
+/* =========================================================================
+   Cards, surfaces, list groups
+   ========================================================================= */
+
+.card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+.card-header, .card-footer {
+  background-color: transparent;
+  border-color: var(--surface-border);
+}
+.card-title { font-size: 1.05rem; }
+.card-subtitle { color: var(--text-secondary) !important; }
+
+[data-theme="dark"] .bg-white { background-color: var(--surface-card) !important; color: var(--text-primary); }
+[data-theme="dark"] .bg-body { background-color: var(--surface-canvas) !important; }
+.text-dark { color: var(--text-primary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+
+.list-group-item {
+  --bs-list-group-bg: var(--surface-card);
+  --bs-list-group-color: var(--text-primary);
+  --bs-list-group-border-color: var(--surface-border);
+}
+
+/* =========================================================================
+   Forms
+   ========================================================================= */
+
+.form-control, .form-select {
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  border-color: var(--brand-indigo-400);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
+}
+.form-control::placeholder { color: var(--text-muted); }
+.form-control:disabled, .form-control[readonly] { background-color: var(--surface-sunken); }
+.form-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.form-check-input:checked {
+  background-color: var(--brand-indigo-500);
+  border-color: var(--brand-indigo-500);
+}
+.form-check-input:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, .15); }
+
+/* =========================================================================
+   Dropdowns, tables, alerts, tooltips
+   ========================================================================= */
+
+/* Re-declare the SAME --bs-dropdown-* tokens Bootstrap's compiled .dropdown-menu
+   / .dropdown-item rules already consume (confirmed in app.css) rather than
+   setting background-color/color directly — that's what let a plain
+   .dropdown-menu override silently defeat .dropdown-menu-dark before. */
+.dropdown-menu {
+  --bs-dropdown-bg: var(--surface-card);
+  --bs-dropdown-color: var(--text-primary);
+  --bs-dropdown-link-color: var(--text-primary);
+  --bs-dropdown-link-hover-color: var(--text-primary);
+  --bs-dropdown-link-hover-bg: var(--surface-sunken);
+  --bs-dropdown-link-active-color: #fff;
+  --bs-dropdown-link-active-bg: var(--brand-indigo-500);
+  --bs-dropdown-border-color: var(--surface-border);
+  --bs-dropdown-divider-bg: var(--surface-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+/* Always dark, matching the permanently-dark sidebar — used for the sidebar's
+   settings menu and its nested workspace-switch submenu regardless of the
+   page's light/dark theme. */
+.dropdown-menu-dark {
+  --bs-dropdown-bg: var(--brand-slate-800);
+  --bs-dropdown-color: rgba(226, 232, 240, .85);
+  --bs-dropdown-link-color: rgba(226, 232, 240, .85);
+  --bs-dropdown-link-hover-color: #fff;
+  --bs-dropdown-link-hover-bg: rgba(99, 102, 241, .18);
+  --bs-dropdown-link-active-color: #fff;
+  --bs-dropdown-link-active-bg: rgba(99, 102, 241, .28);
+  --bs-dropdown-border-color: rgba(255, 255, 255, .08);
+  --bs-dropdown-divider-bg: rgba(255, 255, 255, .1);
+}
+
+.table { --bs-table-striped-bg: var(--surface-sunken); }
+.table-bordered { border-color: var(--surface-border); }
+
+.alert-success { background-color: rgba(16, 185, 129, .12); border-color: rgba(16, 185, 129, .3); color: var(--brand-emerald-600); }
+.alert-danger { background-color: rgba(239, 68, 68, .12); border-color: rgba(239, 68, 68, .3); color: var(--brand-red-600); }
+[data-theme="dark"] .alert-success { color: #6ee7b7; }
+[data-theme="dark"] .alert-danger { color: #fca5a5; }
+
+.tooltip-inner { background-color: var(--brand-slate-800); }
+.tooltip .tooltip-arrow::before { background-color: var(--brand-slate-800); }
+
+/* =========================================================================
+   Navbar, sidebar, footer — the sidebar stays permanently dark/ink in both
+   themes; it's the app's constant orientation point (see design notes).
+   ========================================================================= */
+
+.navbar-bg { background: var(--surface-card) !important; border-bottom: 1px solid var(--surface-border); }
+.navbar .nav-icon, .navbar .nav-link { color: var(--text-secondary); }
+.navbar-collapse .nav-link:hover { color: var(--brand-indigo-600); }
+
+.footer { background: var(--surface-canvas) !important; border-top: 1px solid var(--surface-border); }
+.footer .text-muted, .footer a.text-muted { color: var(--text-muted) !important; }
+
+.sidebar, .sidebar-content {
+  background: linear-gradient(190deg, var(--brand-slate-900) 0%, var(--brand-slate-950) 100%) !important;
+}
+.sidebar-brand {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.sidebar-brand::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-indigo-400), var(--brand-violet-500));
+  box-shadow: 0 0 10px var(--brand-indigo-400);
+}
+.sidebar-header { color: #5b6a92; font-weight: 700; letter-spacing: .08em; font-size: .7rem; }
+
+.sidebar-link, a.sidebar-link {
+  background: transparent;
+  color: rgba(226, 232, 240, .68);
+  border-left: 3px solid transparent;
+  border-radius: 0 999px 999px 0;
+  margin: 1px 10px 1px 0;
+  transition: background-color .15s ease, color .15s ease;
+}
+.sidebar-link i, .sidebar-link svg, a.sidebar-link i { color: rgba(226, 232, 240, .55); }
+.sidebar-link:hover, a.sidebar-link:hover { background: rgba(99, 102, 241, .14); color: #fff; }
+.sidebar-link:hover i, a.sidebar-link:hover i { color: #fff; }
+.sidebar-link.active, a.sidebar-link.active {
+  background: linear-gradient(90deg, rgba(99, 102, 241, .28), rgba(139, 92, 246, .12));
+  color: #fff;
+  border-left-color: var(--brand-indigo-400);
+}
+.sidebar-link.active i { color: #fff; }
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .05);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.theme-toggle-btn:hover { background: rgba(99, 102, 241, .28); border-color: var(--brand-indigo-400); transform: translateY(-1px); }
+
+/* =========================================================================
+   Toasts — align with the palette, keep success/error semantic
+   ========================================================================= */
+
+.Toastify__toast {
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  box-shadow: var(--shadow-lg);
+}
+.Toastify__toast--success { background: var(--brand-emerald-500); }
+.Toastify__toast--error { background: var(--brand-red-500); }
+.Toastify__toast--info { background: var(--brand-indigo-500); }
+.Toastify__toast--warning { background: var(--brand-amber-500); }
+
+/* =========================================================================
+   Modals (react-responsive-modal)
+   ========================================================================= */
+
+.react-responsive-modal-modal {
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+.react-responsive-modal-overlay { background: rgba(15, 23, 42, .55) !important; }
+.react-responsive-modal-closeButton svg { fill: var(--text-secondary); }
+
+/* =========================================================================
+   Froala editor (task description / comments) — dark-mode pass. Bootstrap
+   variable indirection doesn't apply here since Froala ships its own CSS;
+   we target its stable, documented class names directly.
+   ========================================================================= */
+
+[data-theme="dark"] .fr-box.fr-basic .fr-wrapper,
+[data-theme="dark"] .fr-box.fr-basic .fr-element,
+[data-theme="dark"] .fr-view {
+  background-color: var(--surface-card) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .fr-toolbar,
+[data-theme="dark"] .fr-second-toolbar {
+  background-color: var(--surface-sunken) !important;
+  border-color: var(--surface-border) !important;
+}
+[data-theme="dark"] .fr-box.fr-basic .fr-wrapper { border-color: var(--surface-border) !important; }
+[data-theme="dark"] .fr-toolbar .fr-btn,
+[data-theme="dark"] .fr-toolbar .fr-command,
+[data-theme="dark"] .fr-second-toolbar .fr-btn,
+[data-theme="dark"] .fr-toolbar .fr-dropdown-wrapper .fr-dropdown-icon {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .fr-toolbar .fr-btn:hover,
+[data-theme="dark"] .fr-toolbar .fr-command:hover:not(.fr-disabled) {
+  background-color: var(--surface-border) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .fr-popup,
+[data-theme="dark"] .fr-dropdown-menu {
+  background-color: var(--surface-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--surface-border) !important;
+}
+[data-theme="dark"] .fr-popup .fr-dropdown-content ul li a.fr-command,
+[data-theme="dark"] .fr-popup .fr-input-line input,
+[data-theme="dark"] .fr-popup .fr-input-line textarea {
+  background-color: var(--surface-card) !important;
+  color: var(--text-primary) !important;
+}
+.task-description { color: var(--text-primary); }
+
+/* =========================================================================
+   Kanban board — column status colors. Each column gets an accent (matched
+   by common status names, falling back to a rotating palette for custom
+   column names) that appears as a top accent bar + title dot on the column,
+   and as the left border accent on every task card inside it — this is what
+   actually communicates "what state is this work in" at a glance, so it
+   replaces the earlier priority-based task border (priority still shows via
+   the High/Medium/Normal badge on each card).
+   ========================================================================= */
+
+.column-accent-blue    { --accent: var(--brand-blue-500); }
+.column-accent-amber   { --accent: var(--brand-amber-500); }
+.column-accent-emerald { --accent: var(--brand-emerald-500); }
+.column-accent-violet  { --accent: var(--brand-violet-500); }
+.column-accent-pink    { --accent: var(--brand-pink-500); }
+.column-accent-slate   { --accent: var(--brand-slate-400); }
+
+.kanban-container .column[class*="column-accent-"] {
+  border-top: 3px solid var(--accent);
+}
+.column-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.kanban-container .column .tasks-list .task[class*="column-accent-"] {
+  border-left: 3px solid var(--accent);
+}
+
+/* =========================================================================
+   Board view topbar (workspace name + board switcher)
+   ========================================================================= */
+
+.board-view-topbar {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.topbar-eyebrow {
+  display: block;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.topbar-workspace h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin: 0;
+}
+.topbar-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--surface-border);
+}
+.topbar-board-select { min-width: 220px; }
+
+/* =========================================================================
+   Auth pages (login/register) — small branded touch above the card
+   ========================================================================= */
+
+.auth-brand-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--brand-indigo-500), var(--brand-violet-500));
+  box-shadow: 0 10px 26px rgba(99, 102, 241, .35);
+}

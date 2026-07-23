@@ -28,6 +28,7 @@ import {
   selectActiveWorkspace,
   selectWorkspaceErrors,
   setActiveWorkspace,
+  clearActiveWorkspace,
   selectWorkspaceList,
   selectWsStatus,
   wsMethods
@@ -139,23 +140,27 @@ const App = () => {
     }
   };
 
+  // Picks a sensible workspace to fall back to when nothing is active yet: the user's designated
+  // default, else their first owned workspace, else their first shared one. Previously this only
+  // handled the single-owned-default-workspace case, so the moment a user created a second
+  // workspace it silently stopped working and the workspace-picker modal was forced open on
+  // every single login from then on.
   const handleDefaultWorkspaceSelection=(list)=>{
-    const shared= list.workspace?.shared;
-    const owned=list.workspace?.owned;
-    if (owned.length==1 && shared.length==0){
-      if(owned[0].is_default){
-        try{
-          dispatch(wsMethods.setActiveWorkspace(owned[0].id));
-          dispatch(modalMethods.closeSelectWorkspaceModal());
-          return true;
-        }catch(err){
-          console.log(err);
-          return false;
-        }
-
+    const shared= list.workspace?.shared ?? [];
+    const owned= list.workspace?.owned ?? [];
+    const fallback = owned.find(ws => ws.is_default) ?? owned[0] ?? shared[0];
+    if (fallback){
+      try{
+        dispatch(wsMethods.setActiveWorkspace(fallback.id));
+        dispatch(modalMethods.closeSelectWorkspaceModal());
+        return true;
+      }catch(err){
+        console.log(err);
+        return false;
       }
     }
-  }  
+    return false;
+  }
 
 
 
@@ -180,46 +185,59 @@ const App = () => {
 
 
   useEffect(() => {
-   
-    const { inDb, inStore } = checkActiveWorkspace();
-    // console.log("checkActiveWorkspace result:", { inDb, inStore });
+    if (ws_status !== "success" || Object.keys(workspaceList).length === 0) {
+      return;
+    }
 
-    if (ws_status !== "idle" && !modalOpenedRef.current) {
-
-      if (ws_status === "success" && Object.keys(workspaceList).length > 0) {
- 
-            if (!inDb) {
-            
-              if(!handleDefaultWorkspaceSelection(workspaceList)){
-      
-                  dispatch(modalMethods.openSelectWorkspaceModal());
-                  modalOpenedRef.current = true; // Prevent multiple modal openings
-                }
-
-            } else if (!inStore) {
-              // console.log('trying to set from user last active feild')
-              dispatch(
-                setActiveWorkspace({ wsId: currentUser.last_active_workspace })
-              );
-            }
-    
-
+    // Reconcile: if the persisted "active" workspace no longer appears in the freshly fetched
+    // owned/shared lists (e.g. its access was revoked while this user was offline), clear it
+    // instead of trusting stale state — otherwise the app would keep trying to load boards for a
+    // workspace the user can no longer see.
+    if (activeWorkspace?.id) {
+      const stillAccessible = [
+        ...(workspaceList.workspace?.owned ?? []),
+        ...(workspaceList.workspace?.shared ?? []),
+      ].some((ws) => ws.id === activeWorkspace.id);
+      if (!stillAccessible) {
+        dispatch(clearActiveWorkspace());
+        setIsLoading(false);
+        return;
       }
     }
 
+    if (!modalOpenedRef.current) {
+      const { inDb, inStore } = checkActiveWorkspace();
+
+      if (!inDb && !inStore) {
+        // Nothing active anywhere yet — pick a sensible default or, failing that, ask the user.
+        if(!handleDefaultWorkspaceSelection(workspaceList)){
+            dispatch(modalMethods.openSelectWorkspaceModal());
+            modalOpenedRef.current = true; // Prevent multiple modal openings
+          }
+      } else if (inDb && !inStore) {
+        // We know their last active workspace from their profile, just not loaded into the store yet.
+        dispatch(
+          setActiveWorkspace({ wsId: currentUser.last_active_workspace })
+        );
+      }
+      // else: a workspace is already active in the store and confirmed accessible — nothing to do.
+    }
+
     setIsLoading(false);
-  }, [ws_status, activeWorkspace, dispatch]);
+  }, [ws_status, activeWorkspace, workspaceList, currentUser, dispatch]);
 
 
 
 
   useEffect(() => {//useEffect for fetching boards if workspaces are fetched correctly and there is an active workspace loaded;
     if (activeWorkspace && ws_status === "success") {
-      let wsId=currentUser.last_active_workspace??activeWorkspace?.id;
+      // Prefer the already-reconciled activeWorkspace.id; only fall back to the (possibly stale,
+      // JWT-derived) currentUser.last_active_workspace if no workspace is active yet.
+      let wsId = activeWorkspace?.id ?? currentUser.last_active_workspace;
       if(wsId){
-        dispatch(fetchBoardsByWsId(currentUser.last_active_workspace));
+        dispatch(fetchBoardsByWsId(wsId));
       }
-    
+
       setIsLoading(false);
     }
   }, [activeWorkspace, ws_status, currentUser, dispatch]);

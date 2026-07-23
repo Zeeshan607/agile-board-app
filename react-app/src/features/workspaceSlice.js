@@ -108,8 +108,13 @@ const workspace = createSlice({
             state.list=action.payload.workspace;
         },
         setActiveWorkspace:(state, action)=>{
-            const active=state.list.workspace.owned.find((ws)=> ws.id==action.payload.wsId)??state.list.workspace.shared.find(ws=> ws.id==action.payload.wsId);
+            // Fall back to {} (never undefined) when the id isn't found in either list — App.jsx
+            // and others unconditionally do Object.keys(activeWorkspace), which throws on undefined.
+            const active=state.list.workspace.owned.find((ws)=> ws.id==action.payload.wsId)??state.list.workspace.shared.find(ws=> ws.id==action.payload.wsId)??{};
             state.active=active;
+        },
+        clearActiveWorkspace:(state)=>{
+            state.active={};
         },
         addNewWorkspace:(state, action)=>{
             state.list.workspace.owned.push(action.payload.workspace);
@@ -150,7 +155,7 @@ const workspace = createSlice({
   }
 });
 
-export const {setActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace, removeWorkspaceFromSharedWsList,clearErrors} = workspace.actions
+export const {setActiveWorkspace, clearActiveWorkspace, setWorkspaceList, editWsName,addNewWorkspace, removeWorkspaceFromSharedWsList,clearErrors} = workspace.actions
 
 export const selectActiveWorkspace=state=>state.workspace.active;
 export const selectWorkspaceList=state=>state.workspace.list;
@@ -182,20 +187,19 @@ export const wsMethods={
 
       const resp= await CustomRequest.post('/dashboard/workspace/store',{'title':title});
       if(resp.status==200){
-        dispatch(addNewWorkspace({"workspace":resp.data.workspace}));
-        toast.success('Workspace Created successfully. Please visit settings menu to switch');
+        const newWorkspace = resp.data.workspace;
+        dispatch(addNewWorkspace({"workspace":newWorkspace}));
+        // Immediately activate the workspace the user just created, instead of leaving them on
+        // whatever was active before and requiring a manual switch via the settings menu.
+        await CustomRequest.post('/dashboard/set_last_active_workspace',{wsId:newWorkspace.id});
+        dispatch(setActiveWorkspace({wsId:newWorkspace.id}));
+        dispatch(setUserLastActiveWorkspace({wsId:newWorkspace.id}));
+        toast.success('Workspace created and activated successfully');
         dispatch(modalMethods.closeCreateWorkspaceModal());
         dispatch(fetchWorkspaces());
       }
 
     }catch(err){
-      // console.log(err);
-      // let err_resp=JSON.parse(err.response);
-      // if(err.response.status==400){
-      //   toast.error("Workspace title already exists."+err.response.data.message[0]);
-      // }else{
-      //   toast.error('Oops! something went wrong. Please try again');
-      // }
       handleErrors(err);
 
     }

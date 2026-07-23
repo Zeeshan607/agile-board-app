@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import CustomRequest from "../utils/customRequest";
 import { useDispatch,useSelector } from "react-redux";
 import {jwtDecode} from 'jwt-decode';
+import { toast } from "react-toastify";
 import { setUserLoginStatus,setUserLogoutStatus } from "../features/UserAuthSlice.js";
 
 const AuthContext = createContext();
@@ -26,7 +27,11 @@ export const AuthProvider = ({ children }) => {
       dispatch(setUserLogoutStatus());
       navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.msg);
+      // A failed logout call (e.g. an already-expired session, 401) still means the user should
+      // end up logged out locally instead of stuck on a page that thinks they're authenticated.
+      dispatch(setUserLogoutStatus());
+      navigate("/login");
+      toast.error(err.response?.data?.msg || "Logout request failed, but you've been signed out locally.");
     }
 
   };

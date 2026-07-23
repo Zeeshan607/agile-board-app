@@ -31,31 +31,47 @@ class AuthController {
     const {username, email, password}=req.body;
 // create new user
     const newlyCreatedUser=await User.create({'username':username, 'email':email, 'password':password});
-//get newly created user 
+//get newly created user
     const user =await User.findByPk(newlyCreatedUser.id);
     // if system is unable to find the newly created user means there is somthing wrong with user creation of terminate the registration process.
     if(!user){
-      // throw new InternalServerError('Oops! something went wrong');
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR('Oops! something went wrong'));
+      throw new InternalServerError('Oops! something went wrong');
     }
     // console.log(user);
      const defaultWorkspace= await Workspace.create({'title':"Default Agile Workspace","createdBy":user.id,'is_default':1});
+     // make the auto-created workspace the user's active one so they land somewhere useful right after signup
+     await user.update({'last_active_workspace':defaultWorkspace.id});
 
       const invite=await Invitation.findOne({where:{'invited_user_email':user.email, 'status':'accepted'}});
 
-      if(!invite){
-        return res.status(StatusCodes.OK)
-        .json({ msg: "Account Created successfully" });
-      }else{
+      if(invite){
         const workspace=await Workspace.findByPk(invite.workspace_id);
         if(workspace){
           await UserWorkspace.create({'workspace_id':workspace.id,'user_id':user.id, 'is_shared':1});
         }
       }
 
+    // log the user in immediately, mirroring login(), so registration doesn't dead-end back at the login screen
+    let token = createJwt({
+      userId: user.id,
+      email: user.email,
+      name: user.username,
+      image: user.image,
+      last_active_workspace: user.last_active_workspace,
+      last_active_board: user.last_active_board,
+    });
+
+    const oneDay = 1000 * 60 * 60 * 24;
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + oneDay),
+      secure: config.node_env === "production",
+    });
+
     return res
       .status(StatusCodes.OK)
-      .json({ msg: "Account Created successfully" });
+      .json({ token, msg: "Account Created successfully" });
   }
 
   // login function

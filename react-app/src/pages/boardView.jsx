@@ -30,6 +30,7 @@ import CreateColumnModel from "../components/CreateColumnModel.jsx";
 import useBoard from '../hooks/useBoard.jsx';
 import CustomRequest from "../utils/customRequest.jsx";
 import { handleErrors } from "../utils/helpers.js";
+import { selectTheme } from "../utils/reactSelectTheme.js";
 
 
 const BoardView = () => {
@@ -121,7 +122,7 @@ const BoardView = () => {
             })
 
         dispatch(
-          columnsTaskMethods.updateTaskOrder(newTaskOrder, source.droppableId)
+          columnsTaskMethods.updateTaskOrder(newTaskOrder, source.droppableId, sourceColumn.Tasks)
         );
       } else {
         if (activeDragingElId !== destination.droppableId) {
@@ -166,21 +167,20 @@ const BoardView = () => {
             task_id: activeDragingElId,
           };
 
-          dispatch(columnsTaskMethods.updateTaskColumnId(data));
-
-          // Dispatch to update both source and destination column tasks in the Redux store
-          dispatch(
-            columnsTaskMethods.updateTaskOrder(
-              sourceTaskOrder,
-              source.droppableId
-            )
-          );
-          dispatch(
-            columnsTaskMethods.updateTaskOrder(
-              destinationTaskOrder,
-              destination.droppableId
-            )
-          );
+          // The column-move and reorder calls persist to the backend sequenced (each network
+          // call awaited before the next fires, since the order-update query keys off the task's
+          // *new* column_id server-side) — but the Redux/UI update happens instantly inside each
+          // thunk regardless, so the drop feels immediate rather than waiting on this chain.
+          (async () => {
+            const moved = await dispatch(columnsTaskMethods.updateTaskColumnId(data));
+            if (!moved) return;
+            await dispatch(
+              columnsTaskMethods.updateTaskOrder(sourceTaskOrder, source.droppableId, sourceColumn.Tasks)
+            );
+            await dispatch(
+              columnsTaskMethods.updateTaskOrder(destinationTaskOrder, destination.droppableId, destinationColumn.Tasks)
+            );
+          })();
         }
       }
     }
@@ -222,56 +222,55 @@ const BoardView = () => {
   }
 
   return (
-    <div className="container-fluid bg-white pt-3 h-100 board-view">
-      <div className="row mx-0 bg-white p-3 shadow-md bg-body ">
-        <div className="col-12 col-sm-12 col-md-12 col-lg-6 d-flex flex-row flex-sm-wrap flex-wrap flex-md-nowrap flex-lg-nowrap justify-content-start align-items-center">
+    <div className="container-fluid pt-3 h-100 board-view">
+      <div className="board-view-topbar d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 mb-3">
+        <div className="d-flex flex-wrap align-items-center gap-3">
           {activeWorkspace ? (
-            <h6 className="m-0 d-inline-flex ">
-              {" "}
-              <b className="text-success flex-nowrap">Workspace:</b>{" "}
-              <span title="Default Workspace">{activeWorkspace.title} </span>
-            </h6>
+            <div className="topbar-workspace" title="Active workspace">
+              <span className="topbar-eyebrow">Workspace</span>
+              <h6>{activeWorkspace.title}</h6>
+            </div>
           ) : (
-            "No active workspace"
+            <span className="text-muted">No active workspace</span>
           )}
-          {"        "}
-        
-          <div className="input-group-inline ms-2 d-flex flex-row align-items-center">
-          <label className="text-success ">Board:</label>
-            <Select
-              defaultValue={
-                defaultSelectedBoard
-                  ? defaultSelectedBoard
-                  : { value: "null", label: "--select Board--" }
-              }
-              onChange={(op) => handleSelect(op)}
-              options={options}
-              placeholder="0 board found"
-            />
-            <div className="input-group-append">
+
+          <div className="topbar-divider d-none d-sm-block"></div>
+
+          <div className="d-flex align-items-center gap-2">
+            <div>
+              <span className="topbar-eyebrow">Board</span>
+              <Select
+                defaultValue={
+                  defaultSelectedBoard
+                    ? defaultSelectedBoard
+                    : { value: "null", label: "--select Board--" }
+                }
+                onChange={(op) => handleSelect(op)}
+                options={options}
+                placeholder="0 board found"
+                styles={selectTheme}
+                className="topbar-board-select"
+              />
+            </div>
             <button
-              className="btn btn-transparent"
+              className="btn btn-outline-primary"
+              title="Add new board"
               onClick={() => dispatch(modalMethods.openCreateBoardModal())}
             >
               <i className="fa fa-plus"></i>
             </button>
-            </div>
-         
           </div>
         </div>
-        <div className="col-12 col-sm-12 col-md-12 col-lg-6  text-center text-md-end text-lg-end text-sm-end">
+
         {activeWorkspace.createdBy == authenticatedUser.userId ? (
-            <button
-              className="btn btn-primary mt-2 mt-sm-0"
-              title="Give access of this workspace to someone you know."
-              onClick={() => dispatch(modalMethods.openSendInvitationModal())}
-            >
-              <i className="fa fa-user-plus mx-1"></i>Share
-            </button>
-          ) : (
-            ""
-          )}
-        </div>
+          <button
+            className="btn btn-primary"
+            title="Give access of this workspace to someone you know."
+            onClick={() => dispatch(modalMethods.openSendInvitationModal())}
+          >
+            <i className="fa fa-user-plus mx-1"></i>Share
+          </button>
+        ) : null}
       </div>
 
       <div className="kanban-container">
@@ -327,6 +326,7 @@ const BoardView = () => {
                               >
                                 <ColumnsList
                                   column={column}
+                                  columnIndex={index}
                                   key={index}
                                   wsId={activeWsId}
                                   draggingActiveId={activeId}
@@ -354,7 +354,7 @@ const BoardView = () => {
           <button
             role="button"
             onClick={()=>dispatch(modalMethods.openCreateNewColumnModal())}
-            className=" btn btn-outline-primary mt-2 text-nowrap"
+            className="btn btn-dashed mt-2 text-nowrap"
           >
             <i className="fa fa-plus"></i> Add New Column
           </button>

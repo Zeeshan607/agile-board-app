@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import CustomRequest from '../utils/customRequest';
-import {setActiveWorkspace,  removeWorkspaceFromSharedWsList, wsMethods} from './workspaceSlice.js'
+import {setActiveWorkspace, clearActiveWorkspace, removeWorkspaceFromSharedWsList, wsMethods} from './workspaceSlice.js'
 import { Navigate } from 'react-router-dom';
 import { handleErrors } from '../utils/helpers.js';
 
@@ -83,10 +83,19 @@ export const wsWithMemberMethods={
       const resp =await CustomRequest.post('/dashboard/user_leaving_workspace', {"user_id":user_id,"workspace_id":ws_id});
       if(resp.status===200){
         dispatch(removeUserFromUsersWithAcess({"user_id":user_id,"workspace_id":ws_id}));
-        dispatch(wsMethods.switchWorkspace("FROM_WORKSPACE_LEAVE",resp.data.user_created_latest_workspace.id));
         dispatch(removeWorkspaceFromSharedWsList({'workspace_id':ws_id}));
 
-        toast.success('Workspace Access removed sucessfully');
+        // The user leaving may own no other workspace at all (e.g. they only ever had shared
+        // access) — the backend now returns null in that case instead of crashing, so fall back
+        // to clearing the active workspace rather than assuming there's always somewhere to switch to.
+        const nextWorkspace = resp.data.user_created_latest_workspace;
+        if(nextWorkspace){
+          dispatch(wsMethods.switchWorkspace("FROM_WORKSPACE_LEAVE", nextWorkspace.id));
+        }else{
+          dispatch(clearActiveWorkspace());
+        }
+
+        toast.success('Left workspace successfully');
       }
 
     }catch(err){

@@ -25,10 +25,10 @@ function Invitation() {
             }else{
               toast.error('Invalid Invite URL');
             }
-                
+
           }
       }catch(err){
-              toast.error(err);
+              toast.error(err.response?.data?.msg || 'Failed to load the invited workspace details.');
       }
 
     }
@@ -42,17 +42,13 @@ function Invitation() {
         try{
             const resp= await CustomRequest.post('/accept_invite',data);
             if(resp.status===200){
-                toast.success('Invite accepted successfully, Please register with your invited Email or Login with your account');
+                toast.success(resp.data?.msg || 'Invite accepted successfully, Please register with your invited Email or Login with your account');
                 navigate('/login');
             }
-            if(resp.data.error){
-                toast.error(resp.data.error);
-            }
-
         }catch(err){
-            toast.error('Oops! Something went wrong while trying to accept invitation. please try again or contact administrater');
+            toast.error(err.response?.data?.msg || 'Oops! Something went wrong while trying to accept invitation. please try again or contact administrater');
         }
-       
+
     }
 
     const declineInvite=async ()=>{
@@ -63,16 +59,12 @@ function Invitation() {
       }
       try{
           const resp= await CustomRequest.post('/decline_invite',data);
-          if(resp.status===200 && !resp.data.error){
-              toast.success('Invite declined successfully');
+          if(resp.status===200){
+              toast.success(resp.data?.msg || 'Invite declined successfully');
               navigate('/login');
           }
-          if(resp.data.error){
-              toast.error(resp.data.error);
-          }
-
       }catch(err){
-          toast.error('Oops! Something when wrong. please try again or contact administrator');
+          toast.error(err.response?.data?.msg || 'Oops! Something when wrong. please try again or contact administrator');
       }
     }
     const getInvite=async (token, invitedEmail)=>{

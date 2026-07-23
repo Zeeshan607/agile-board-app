@@ -20,18 +20,21 @@ const authenticatedUser=user;
 
 useEffect(()=>{
 
-    if(activeWs){
+    // activeWs defaults to {} (not falsy) in the store, so a plain `if(activeWs)` check always
+    // passed and skipped this fallback entirely — check for actual content instead.
+    const hasActiveWorkspace = activeWs && Object.keys(activeWs).length > 0;
+    if(hasActiveWorkspace){
         dispatch(fetchMembers(activeWs.id));
     }else{
         if(authenticatedUser.last_active_workspace){
-            dispatch(setActiveWorkspace({"ws_id":authenticatedUser.last_active_workspace}));
+            dispatch(setActiveWorkspace({"wsId":authenticatedUser.last_active_workspace}));
         }else{
             dispatch(modalMethods.openSelectWorkspaceModal());
         }
-    
+
     }
 
-   
+
 },[activeWs])
 
 const handleUserLeavingWorkspace=(user_id, ws_id)=>{

@@ -20,15 +20,17 @@ class InvitationsHandlingController {
       if (!invite) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ error: "Invitation not found." });
+          .json({ msg: "Invitation not found." });
       }
 
       const now = moment();
 
-      // Check if the token is expired
+      // Check if the token is expired. Must be a non-2xx status: the frontend only treats a
+      // 200 response as success, so returning 200 here previously made an expired invite show
+      // an "accepted successfully" toast and redirect to login anyway.
       if (now.isAfter(moment(invite.expires_at))) {
-        return res.status(StatusCodes.OK).json({
-          error:
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          msg:
             "Token Expired. Please ask the workspace admin to resend the invitation.",
         });
       }
@@ -46,13 +48,13 @@ class InvitationsHandlingController {
       } else {
         return res
           .status(StatusCodes.BAD_REQUEST)
-          .json({ error: "Invalid invitation details." });
+          .json({ msg: "Invalid invitation details." });
       }
     } catch (error) {
       // Handle any unexpected errors
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error +"Oops! Something went wrong." });
+        .json({ msg: "Oops! Something went wrong." });
     }
   }
 
@@ -70,15 +72,15 @@ class InvitationsHandlingController {
       if (!invite) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ error: "Invitation not found." });
+          .json({ msg: "Invitation not found." });
       }
 
       const now = moment();
 
-    //   // Check if the token is expired
+    //   // Check if the token is expired (see accept() above for why this must not be a 200)
       if (now.isAfter(moment(invite.expires_at))) {
-        return res.status(StatusCodes.OK).json({
-          error:
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          msg:
             "Token Expired. Please ask the workspace admin to resend the invitation.",
         });
       }
@@ -96,13 +98,13 @@ class InvitationsHandlingController {
         } else {
             return res
             .status(StatusCodes.BAD_REQUEST)
-            .json({ error: "Invalid invitation details." });
+            .json({ msg: "Invalid invitation details." });
         }
     } catch (error) {
     //   // Handle any unexpected errors
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({"error":"Oops! something went wrong. please try again"});
+        .json({"msg":"Oops! something went wrong. please try again"});
     }
   }
 

@@ -11,7 +11,7 @@ export const handleErrors=(err)=>{
   // console.log('getting in error handler')
     if (err.response) {
         const statusCode = err.response.status;
-        const errorMessage = err.response.data?.msg || 'Oops! Something went wrong';
+        const errorMessage = err.response.data?.msg || err.response.data?.error || 'Oops! Something went wrong';
   
         if (statusCode === 400) {
           toast.error(`Validation Error: ${errorMessage}`);

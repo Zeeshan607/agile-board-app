@@ -12,6 +12,7 @@ import { setUserLastActiveWorkspace } from "../features/UserAuthSlice.js";
 import { Modal } from "react-responsive-modal";
 import CustomRequest from "../utils/customRequest.jsx";
 import { modalMethods } from "../features/modalSlice.js";
+import { selectTheme } from "../utils/reactSelectTheme.js";
 
 
 const WorkspaceSelectModal = ({ open, onClose }) => {
@@ -116,6 +117,7 @@ const WorkspaceSelectModal = ({ open, onClose }) => {
                 placeholder="0 Workspace found"
                 id="workspace-select"
                 isLoading={isLoading}
+                styles={selectTheme}
               ></Select>
             </div>
           </div>

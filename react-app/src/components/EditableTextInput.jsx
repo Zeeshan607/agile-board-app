@@ -25,18 +25,22 @@ const EditableTextInput = ({ initialText, saveMethod  }) => {
 
   const handleInputBlur = async () => {
     setIsEditing(false);
-    if (inputValue !== text) {
+    if (inputValue.trim() && inputValue !== text) {
       setText(inputValue);
       await saveMethod(inputValue); // Replace with your actual API call
+    } else if (!inputValue.trim()) {
+      setInputValue(text); // discard an empty edit instead of silently saving it
     }
   };
 
   const handleInputKeyDown = async (e) => {
     if (e.key === 'Enter') {
       setIsEditing(false);
-      if (inputValue !== text) {
+      if (inputValue.trim() && inputValue !== text) {
         setText(inputValue);
         await saveMethod(inputValue); // Replace with your actual API call
+      } else if (!inputValue.trim()) {
+        setInputValue(text); // discard an empty edit instead of silently saving it
       }
     }
   };

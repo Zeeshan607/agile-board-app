@@ -42,13 +42,12 @@ const Task = sequelize.define('Task', {
     },
     column_id:{
         type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
         allowNull:true,
         references:{
             model:'BoardColumns',
             key:'id',
         },
-    
+
     },
     board_id:{
         type:DataTypes.INTEGER,

@@ -1,23 +1,68 @@
 .kanban-container .column {
-  width: 360px;
-  margin: 10px;
-  background-color: rgb(236, 242, 247);
-  border: 1px solid lightgray;
+  width: 300px;
+  margin: 8px;
+  background-color: var(--surface-canvas);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.kanban-container .column .card-header {
+  padding: 14px 16px 6px;
+  border-bottom: none;
+}
+.kanban-container .column .card-title {
+  font-family: var(--font-display);
+  font-size: .85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+.kanban-container .column .card-subtitle {
+  font-size: .78rem;
+  color: var(--text-muted) !important;
+}
+.kanban-container .column .card-footer {
+  border-top: none;
+  padding: 4px 12px 14px;
+  background: transparent;
 }
 .kanban-container .column .tasks-list .task {
-  padding: 10px;
-  margin: 5px 0px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: var(white, 0px 1px 1px rgba(9, 30, 66, 0.2509803922), 0px 0px 1px rgba(9, 30, 66, 0.3098039216));
+  padding: 12px 14px;
+  margin: 0 0 8px 0;
+  background-color: var(--surface-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-border);
+  border-left: 3px solid var(--surface-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .15s ease, transform .15s ease;
 }
+.kanban-container .column .tasks-list .task:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+/* Left-border accent color comes from the task's column (see theme.css's
+   .column-accent-* / .task[class*="column-accent-"] rules) — the column
+   itself owns the color, not the task's priority. */
 .kanban-container .column .tasks-list .task .task-link {
   text-decoration: none;
   cursor: pointer;
+  color: var(--text-primary);
 }
 .kanban-container .column .tasks-list .task .task-link h4 {
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 6px 0;
+  color: var(--text-primary);
 }
 .kanban-container .column .tasks-list .task .task-header {
-  margin-bottom: 10px;
-}/*# sourceMappingURL=style.css.map */
+  margin-bottom: 6px;
+}
+.kanban-container .column .tasks-list .task .task-footer {
+  color: var(--text-muted);
+  font-size: .8rem;
+}
+.kanban-container .column .tasks-list .task .comments {
+  color: var(--text-muted) !important;
+}

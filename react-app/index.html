@@ -16,11 +16,22 @@
 
 <title>Agile Board</title>
 
+<script>
+  // Applied before first paint (and before any CSS needs it) so switching
+  // themes never causes a flash of the wrong one on load.
+  (function () {
+    try {
+      var stored = localStorage.getItem('agileboard-theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 
 <link rel="stylesheet" href="/plugins/font-awesome-icons/css/all.css">
 <link href="/css/app.css" rel="stylesheet">
 <link href="/css/style.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body>
 

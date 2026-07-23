@@ -16,11 +16,11 @@ class InvitationController{
             const invitationLink=InvitationEmailService.generateInvitationLink(workspace_id,email,token);
             const workspace=await Workspace.findByPk(workspace_id);
             if(!workspace){
-                return res.status(StatusCodes.NOT_FOUND).json({'error':"workspace with given Id Not found"});
+                return res.status(StatusCodes.NOT_FOUND).json({'msg':"workspace with given Id Not found"});
             }
             if(workspace.createdBy !==req.user.userId){
-                return res.status(StatusCodes.FORBIDDEN).json({"error":"You are not allowd to send invitations. Only admin of workspace can send Invites"})
-                }            
+                return res.status(StatusCodes.FORBIDDEN).json({"msg":"You are not allowd to send invitations. Only admin of workspace can send Invites"})
+                }
             const now = moment();
             // Add one day to the current time
             const nextDay = now.add(1, 'days');
@@ -32,7 +32,7 @@ class InvitationController{
 
         }catch(err){
             // "Oops! something went wrong"
-            return res.status(StatusCodes.BAD_REQUEST).json({'error': "Oops! something went wrong"});
+            return res.status(StatusCodes.BAD_REQUEST).json({'msg': "Oops! something went wrong"});
         }
  
 

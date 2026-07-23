@@ -329,41 +329,45 @@ export const columnsTaskMethods = {
     }
   },
   updateTaskColumnId: (data) => async (dispatch) => {
+    // Apply the move to Redux immediately. Waiting for the network round-trip
+    // before updating state (the previous behavior) is what made a dropped
+    // card visibly snap back to its old column for an instant before jumping
+    // to its real destination once the request resolved — react-beautiful-dnd
+    // expects the underlying list to already reflect the new order the moment
+    // the drag ends.
+    dispatch(updateTasksColumn(data));
 
-    let requestData={'column_id':data.destinationColumnId,"task_id":data.task_id}
-
+    const requestData = { column_id: data.destinationColumnId, task_id: data.task_id };
     try {
-      const resp = await CustomRequest.post(
-        "/dashboard/task_column/update",
-       requestData
-      );
+      const resp = await CustomRequest.post("/dashboard/task_column/update", requestData);
       if (resp.status == 200) {
-        dispatch(updateTasksColumn(data));
-        // toast.success('Task moved successfully');
+        return true;
       }
+      throw new Error('Unexpected response updating task column');
     } catch (err) {
-      // console.log(err)
       handleErrors(err);
+      // Roll back: the server never actually recorded the move.
+      dispatch(updateTasksColumn({
+        task_id: data.task_id,
+        sourceColumnId: data.destinationColumnId,
+        destinationColumnId: data.sourceColumnId,
+      }));
+      return false;
     }
   },
-  updateTaskOrder: (reOrderedTasks, column_id) => async (dispatch) => {
+  updateTaskOrder: (reOrderedTasks, column_id, previousTasks) => async (dispatch) => {
+    // Same optimistic-first approach as updateTaskColumnId above.
+    dispatch(updateTasksOrder({ tasksWithNewOrder: reOrderedTasks, column_id }));
     try {
-      const resp = await CustomRequest.post(
+      await CustomRequest.post(
         `/dashboard/${column_id}/task_order/update`,
         { tasks: reOrderedTasks }
       );
-      if (resp.status == 200) {
-        dispatch(
-          updateTasksOrder({
-            "tasksWithNewOrder": reOrderedTasks,
-            "column_id": column_id,
-          })
-        );
-        // toast.success("Task ReOrdered successfully");
-      }
     } catch (err) {
-      // console.log(err);
       handleErrors(err);
+      if (previousTasks) {
+        dispatch(updateTasksOrder({ tasksWithNewOrder: previousTasks, column_id }));
+      }
     }
   },
   updateColumnsOrder:(columnsWithNewOrder)=>async(dispatch)=>{

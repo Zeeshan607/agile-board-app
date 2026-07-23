@@ -15,7 +15,7 @@ const withValidationErrors = (validateValues) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         const errorMessages = errors.array().map((error) => error.msg);
-        throw new BadRequestError(errorMessages);
+        throw new BadRequestError(errorMessages.join(', '));
       }
       next();
     },
@@ -109,13 +109,12 @@ export const validateWorkpsaceIdForBoards=withValidationErrors([
 export const validateBoard = withValidationErrors([
   body("name").notEmpty().escape().trim().withMessage("Board name required"),
   body("description").notEmpty().escape().trim().withMessage("Board description required"),
-  body('ws_id').custom(async (val,{req})=>{
-    if (req.method === "POST") {   
+  // ws_id is only required/validated when creating a board (POST); board edits (PATCH) never send it.
+  body('ws_id').if((value, {req}) => req.method === "POST").custom(async (val)=>{
        const ws=await Workspace.findByPk(val);
         if(!ws) {
           throw new NotFoundError(`No workspace found with id ${val}`);
           }
-        }
   }).isUUID().withMessage("invalid ws_id"),
 ]);
 
@@ -280,6 +279,15 @@ export const validateSubTaskIdParamAsId=withValidationErrors([
 ]);
 export const validateWorkspaceTitle=withValidationErrors([
 body('title').notEmpty().escape().trim().withMessage('Title feild required'),
+]);
+export const validateColumnsArrayForOrderUpdate=withValidationErrors([
+  body('updatedColumns').isArray({min:1}).withMessage('Invalid columns array'),
+  body('updatedColumns.*.id').notEmpty().isUUID().withMessage('Invalid column id in columns array').custom(async (val)=>{
+    const column = await BoardColumn.findByPk(val);
+    if(!column){
+      throw new NotFoundError(`Column with id ${val} does not exist`);
+    }
+  }),
 ]);
 export const validateUserWorkspaceAccessRemoval=withValidationErrors([
   body("workspace_id")

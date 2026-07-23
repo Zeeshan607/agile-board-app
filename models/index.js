@@ -94,8 +94,11 @@ Board.belongsTo(Workspace,{
 
 
 // TaskModel.js
+// Both sides of this association must agree on onDelete — they previously declared CASCADE vs
+// RESTRICT for the same column_id foreign key, an undocumented contradiction that made board/column
+// deletion's cascade behavior depend on Sequelize's association merge order instead of explicit intent.
 BoardColumn.hasMany(Task,{foreignKey:{ allowNull: false,name:"column_id"},onDelete: 'CASCADE',as:"Tasks"});
-Task.belongsTo(BoardColumn,{as:'columns',onDelete: 'RESTRICT',foreignKey:{ allowNull: false,name:"column_id"}});
+Task.belongsTo(BoardColumn,{as:'columns',onDelete: 'CASCADE',foreignKey:{ allowNull: false,name:"column_id"}});
 Task.belongsTo(Board,{as:'boards',onDelete: 'RESTRICT',constraints:false,foreignKey:{ allowNull: false,name:"board_id"}});
 Board.hasMany(Task,{
     onDelete:"CASCADE",

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import CreateNewTask from "./createNewTaskModal.jsx";
 import TaskList from "./TaskList.jsx";
-import { selectTasks } from "../features/TaskSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMembers } from "../features/WorkspaceMembersSlice.js";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./ColumnsList.css";
 import { modalMethods, selectCreateNewTaskModal } from "../features/modalSlice.js";
+import { getColumnAccentClass } from "../utils/columnColors.js";
 
-const ColumnsList = ({ column, wsId, provided }) => {
+const ColumnsList = ({ column, wsId, provided, columnIndex }) => {
+  const accentClass = getColumnAccentClass(column, columnIndex);
   const dispatch = useDispatch();
   const isOpenCreateNewTaskModal=useSelector(selectCreateNewTaskModal);
   const [openColumnId, setOpenColumnId] = useState(null);
@@ -50,10 +51,10 @@ const ColumnsList = ({ column, wsId, provided }) => {
   // console.log(column);
 
   return (
-    <div className="card column" id={column.id}>
+    <div className={"card column " + accentClass} id={column.id}>
       <i className="fas fa-arrows-alt mx-3 column-drag-icon"></i>
       <div className="card-header bg-transparent">
-        <h1 className="card-title">{column.name}</h1>
+        <h1 className="card-title"><span className="column-dot"></span>{column.name}</h1>
         <p className="card-subtitle">{column.description}</p>
       </div>
       <div className="card-body">
@@ -71,13 +72,13 @@ const ColumnsList = ({ column, wsId, provided }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                  
-                    <TaskList task={task} parent={column} index={task.id} />
-                    
+
+                    <TaskList task={task} parent={column} index={task.id} accentClass={accentClass} />
+
                   </div>
                 )}
               </Draggable>
-        
+
           ):('')}
        {provided.placeholder}
         </ul>
@@ -86,7 +87,7 @@ const ColumnsList = ({ column, wsId, provided }) => {
         <button
           role="button"
           onClick={openTaskModal}
-          className=" board-column-btn"
+          className="btn btn-dashed btn-sm w-100"
         >
           <i className="fa fa-plus"></i> Add New Task
         </button>

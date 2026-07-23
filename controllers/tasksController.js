@@ -85,7 +85,9 @@ async updateColumnOfTask(req, res){
      if(!task){
         throw new NotFoundError('Task with given task_id not found');
      }
-     task.update({column_id:column_id});
+     // Must be awaited: the response was previously sent before the DB write was guaranteed to
+     // commit, which is exactly what let the follow-up "reorder tasks" request race ahead of it.
+     await task.update({column_id:column_id});
      res.status(StatusCodes.OK).json({task:task,msg:"Task status updated successfully"})
 }
 
@@ -121,7 +123,7 @@ async updateAttribute(req, res){
 
     // Ensure there is something to update
     if (Object.keys(updateObject).length === 0) {
-      return res.status(400).json({ error: 'No valid fields to update' });
+      return res.status(400).json({ msg: 'No valid fields to update' });
     }
 
         

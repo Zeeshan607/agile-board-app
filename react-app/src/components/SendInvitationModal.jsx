@@ -47,9 +47,9 @@ if(activeWs){
     
             }catch(err){
                 if(err.response.status==403){
-                    toast.error(err.response.data.error);
+                    toast.error(err.response.data.msg);
                 }else{
-                    toast.error("Oops! something went Wrong while trying to send Invitation.");
+                    toast.error(err.response?.data?.msg || "Oops! something went Wrong while trying to send Invitation.");
                 }
             
                 e.target.classList.remove('disabled');

@@ -6,6 +6,8 @@ import Task from "../models/TaskModel.js";
 import { Op } from "sequelize";
 import UserWorkspace from "../models/UserWorkspace.js";
 import Invitation from "../models/Invitation.js";
+import sequelize from "../db.js";
+import { UnauthorizedError } from "../errors/customErrors.js";
 
 
 
@@ -150,6 +152,9 @@ class workspaceController {
     const {id}=req.params;
     const {title}=req.body;
     const ws = await Workspace.findByPk(id);
+    if(ws.createdBy !== req.user.userId){
+      throw new UnauthorizedError("You are not allowed to rename this workspace. Only the owner can rename it.");
+    }
     const updated_ws=await ws.update({'title':title});
     res.status(StatusCodes.OK).json({ workspace:updated_ws});
   }
@@ -157,22 +162,28 @@ class workspaceController {
   async userLeavingWorkspaceAccess(req, res){
     const {user_id, workspace_id}=req.body;
     if(req.user.userId!==user_id){
-      return res.status(StatusCodes.BAD_REQUEST).json({'error':"Action forbiden: you are not autherize to perform this action"});
+      return res.status(StatusCodes.BAD_REQUEST).json({'msg':"Action forbidden: you are not authorized to perform this action"});
     }
    try{
-    const userWs=await UserWorkspace.destroy({where:{"user_id":user_id,"workspace_id":workspace_id}});
-    const user=await User.findByPk(user_id);
-    const removeInvite=await Invitation.destroy({where:{"invited_user_email":user.email, 'workspace_id':workspace_id}});
-     const workspace=await Workspace.findOne({where:{createdBy:user.id}, order: [['createdAt', 'DESC']]});
+    // Wrapped in a transaction so a user's access is never removed unless we can also
+    // land them on a valid last_active_workspace (previously this could partially commit
+    // then crash if the user owned no other workspace, leaving DB/UI out of sync).
+    const nextWorkspace = await sequelize.transaction(async (t) => {
+      await UserWorkspace.destroy({where:{"user_id":user_id,"workspace_id":workspace_id}, transaction:t});
+      const user=await User.findByPk(user_id, {transaction:t});
+      await Invitation.destroy({where:{"invited_user_email":user.email, 'workspace_id':workspace_id}, transaction:t});
+      const workspace=await Workspace.findOne({where:{createdBy:user.id}, order: [['createdAt', 'DESC']], transaction:t});
 
-      await user.update({'last_active_workspace':workspace.id});
+      await user.update({'last_active_workspace': workspace ? workspace.id : null}, {transaction:t});
+      return workspace;
+    });
 
-    return res.status(StatusCodes.OK).json({'user_created_latest_workspace':workspace});
+    return res.status(StatusCodes.OK).json({'user_created_latest_workspace':nextWorkspace});
    }catch(err){
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'error':'Oops! something went wrong.'})
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'msg':'Oops! something went wrong.'})
    }
 
-   
+
 
   }
   async removeUserAccessToWorkspace(req, res){
@@ -184,7 +195,7 @@ class workspaceController {
       await Invitation.destroy({where:{"invited_user_email":user.email, 'workspace_id':workspace_id}});
       return res.status(StatusCodes.OK).json({'msg':"Access removed succusfully"})
      }catch(err){
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'error':'Oops! something went wrong.'})
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({'msg':'Oops! something went wrong.'})
      }
   }
 

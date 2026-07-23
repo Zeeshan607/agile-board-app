@@ -28,7 +28,8 @@ import {
   validateComment,
   validateCommentUpdate,
   validateCommentId,
-  validateBoardSlugParam
+  validateBoardSlugParam,
+  validateColumnsArrayForOrderUpdate
   // validateUserTourStatus,
 } from "../middleware/validationMiddleware.js";
 import userController from "../controllers/userController.js";
@@ -67,7 +68,7 @@ AuthRoutes.patch(
 AuthRoutes.delete("/board/:id", validateBoardIdParam, boardController.delete); // delete by id
 
 AuthRoutes.get("/board/:slug/columns", boardColumnController.index); // get all columns of specific board
-AuthRoutes.post("/columns/order/update",boardColumnController.updateOrder);
+AuthRoutes.post("/columns/order/update",validateColumnsArrayForOrderUpdate,boardColumnController.updateOrder);
 AuthRoutes.post('/column/store',validateColumn, boardColumnController.store);
 
 
@@ -105,7 +106,7 @@ AuthRoutes.get("/task/:id/discussions",validateTaskIdParamAsId, taskDiscussionCo
 
 AuthRoutes.get("/users", userController.index);
 AuthRoutes.get("/workspaces", workspaceController.index);
-AuthRoutes.post("/workspace/:id/update",validateWorkpsaceId, workspaceController.update);
+AuthRoutes.post("/workspace/:id/update",validateWorkpsaceId,validateWorkspaceTitle, workspaceController.update);
 AuthRoutes.post("/workspace/store",validateWorkspaceTitle, workspaceController.store);
 AuthRoutes.post(
   "/user_leaving_workspace",validateUserWorkspaceAccessRemoval,

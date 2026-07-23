@@ -25,7 +25,7 @@ top:5px;
 }
 .settings-workspace-list .dropdown-item::after{
     content:"";
-    border:2px solid gainsboro;
+    border:2px solid rgba(226,232,240,.35);
     border-radius: 50%;
     width:10px;
     height: 10px;
@@ -36,13 +36,13 @@ top:5px;
 
 }
 .settings-workspace-list .dropdown-item:active, .settings-workspace-list .dropdown-item.active{
-  background-color: rgba(0,0,0,0)!important;
-  color:rgb(4, 207, 4);
+  background-color: rgba(99,102,241,.16)!important;
+  color:#fff;
 }
 .settings-workspace-list .dropdown-item:active:hover, .settings-workspace-list .dropdown-item.active:hover{
-  background-color: rgba(255, 255, 255, 0.267)!important;
+  background-color: rgba(99,102,241,.24)!important;
 }
 .settings-workspace-list .dropdown-item:active::after, .settings-workspace-list .dropdown-item.active::after{
-  border-color:rgb(3, 173, 3);
-  box-shadow: 0px 0px 15px greenyellow;
+  border-color:#818cf8;
+  box-shadow: 0px 0px 12px #818cf8;
 }

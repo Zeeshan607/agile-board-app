@@ -37,6 +37,12 @@ import {persistStore} from 'redux-persist';
 import router from './routes.jsx';
 import { AuthProvider } from './hooks/useAuth.jsx';
 
+// Imported last (after react-toastify/react-responsive-modal/Froala CSS, all pulled in above via
+// routes -> App.jsx) so this theme layer wins the cascade for any class name they also target —
+// e.g. .react-responsive-modal-modal was previously losing to the library's own default (light)
+// styles in dark mode because its CSS happened to be injected after ours.
+import './theme.css';
+
 // global variables
 window.toast= toast;
 window.$=window.jQuery=$;

@@ -1,5 +1,5 @@
 import react, {useEffect, useState} from "react";
-import { Link ,useNavigate} from "react-router-dom";
+import { NavLink ,useNavigate} from "react-router-dom";
 import "./sidebar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectActiveWorkspace, selectWorkspaceList, setActiveWorkspace, wsMethods, } from "../features/workspaceSlice.js";
@@ -7,6 +7,7 @@ import { setUserLastActiveWorkspace } from "../features/UserAuthSlice.js";
 import CustomRequest from "../utils/customRequest";
 import { modalMethods } from "../features/modalSlice.js";
 import { useAuth } from "../hooks/useAuth.jsx";
+import { useTheme } from "../hooks/useTheme.jsx";
 import Loading from "../components/Loading.jsx";
 
 
@@ -21,6 +22,7 @@ export default function Sidebar() {
   const navigate=useNavigate();
 const {user}=useAuth();
 const authUser=user;
+const {theme, toggleTheme} = useTheme();
 
 useEffect(()=>{
 
@@ -78,30 +80,30 @@ return <i className="fa fa-spinner fa-spin"></i>
           <li className="sidebar-header">Pages</li>
 
           <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/"}>
+            <NavLink className="sidebar-link" to={"/"} end>
               <i className="fas fa-home" ></i>
               <span className="align-middle">Dashboard</span>
-            </Link>
+            </NavLink>
           </li>
 
-      
+
           <li className="sidebar-item">
-            <Link className="sidebar-link" id="board-menu" to={"/boards"}>
+            <NavLink className="sidebar-link" id="board-menu" to={"/boards"}>
               <i className="fas fa-columns"></i>
               <span className="align-middle">Boards</span>
-            </Link>
+            </NavLink>
           </li>
           <li className="sidebar-item">
-            <Link className="sidebar-link" id="workspaceMembers-menu" to={"/workspace_members"}>
+            <NavLink className="sidebar-link" id="workspaceMembers-menu" to={"/workspace_members"}>
               <i className="fa fa-users" ></i>
               <span className="align-middle">Members</span>
-            </Link>
+            </NavLink>
           </li>
           <li className="sidebar-item">
-            <Link className="sidebar-link" to={"/about_project"}>
+            <NavLink className="sidebar-link" to={"/about_project"}>
               <i className="far fa-map" ></i>
               <span className="align-middle">About This Project</span>
-            </Link>
+            </NavLink>
           </li>
          
      
@@ -109,7 +111,16 @@ return <i className="fa fa-spinner fa-spin"></i>
 
         </ul>
       
-        <div className="sidebar-bottom flex-shrink-0">
+        <div className="sidebar-bottom flex-shrink-0 d-flex align-items-center gap-2 px-3 py-2">
+           <button
+             type="button"
+             className="theme-toggle-btn"
+             onClick={toggleTheme}
+             title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+             aria-label="Toggle color theme"
+           >
+             <i className={theme === 'dark' ? 'fa fa-sun' : 'fa fa-moon'}></i>
+           </button>
            <div className="dropup position-relative">
            <a className="nav-icon dropdown-toggle" href="#" id="settingsdropup" data-bs-toggle="dropdown"   >
                     <div className="position-relative">

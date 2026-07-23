@@ -5,7 +5,6 @@ import FormRow from './FormRow.jsx';
 import FormTextarea from './FormTextarea.jsx';
 import SubmitBtn from './SubmitBtn.jsx';
 import {useDispatch, useSelector} from "react-redux";
-import { selectColumnsList} from '../features/ColumnSlice.js';
 import { selectActiveBoard } from '../features/BoardSlice.js';
 import WsMembersSelect from "./WsMembersSelect.jsx";
 import CustomRequest from '../utils/customRequest.jsx';

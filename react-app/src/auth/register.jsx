@@ -5,6 +5,8 @@ import  {SelectErrors, SelectMessages, resetResp} from '../features/ResponseSlic
 import CustomRequest from '../utils/customRequest.jsx';
 import { toast}  from 'react-toastify';
 import { handleErrors } from '../utils/helpers.js';
+import { setUserLoginStatus } from '../features/UserAuthSlice.js';
+import { jwtDecode } from 'jwt-decode';
 function Register(){
 
 const [form, setForm]=useState({name:'',email:'',password:''});
@@ -27,15 +29,15 @@ const onRegister= async (e)=>{
 		}
 		try{
 			const resp= await CustomRequest.post('/auth/register',data);
-			const user= await resp.data.user;
+			// Register now logs the user in immediately (same as login) so they land on the
+			// dashboard instead of bouncing back to /login with no session established.
+			const token = resp.data?.token;
+			const user = jwtDecode(token);
+			dispatch(setUserLoginStatus({ token, user }));
 			setIsSubmitting(false);
 			formReset();
 			toast.success("Success: " +resp.data?.msg);
-			setTimeout(function(){
-				navigate('/');
-			},2000)
-		
-			// console.log(user)
+			navigate('/');
 		}catch(err){
 			// console.log(err);
 			setIsSubmitting(false);
@@ -60,6 +62,7 @@ return(
 					<div className="d-table-cell align-middle">
 
 						<div className="text-center mt-4">
+							<div className="auth-brand-mark mx-auto mb-3"></div>
 							<h1 className="h2">Register</h1>
 							<p className="lead">
 								Create your acccount to manage all of your projects and tasks.
